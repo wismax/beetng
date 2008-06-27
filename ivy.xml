@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<ivy-module version="1.0">
+    <info organisation="mtgi" module="BehaviorTracking" status="milestone" revision="1.0">
+    	<description>
+    	The BehaviorTracking library adds aspect-oriented user behavior tracking
+    	and performance monitoring capabilities to a Java application.  It is designed
+    	for use with Spring-based applications backed with relational database
+    	persistence.
+    	</description>
+	</info>
+	
+	<configurations>
+		<conf name="base" description="core module without runtime dependencies"/>
+		<conf name="source" description="source jar"/>
+		<conf name="default" description="core module with runtime dependencies"/>
+		<conf name="compile" description="compile-time dependencies"/>
+		<conf name="test" description="dependencies used for junit testing"/>
+	</configurations>
+
+	<publications>
+		<artifact name="BehaviorTracking" type="jar" conf="base,default,test"/>
+		<artifact name="BehaviorTracking" type="source" ext="jar" conf="source"/>
+	</publications>
+	
+	<dependencies defaultconfmapping="default,compile,test->default">
+
+		<dependency org="springframework" name="spring" rev="2.0.5"/>
+		<dependency org="apache" name="commons-logging" rev="1.1"/>
+
+		<dependency org="sun" name="servlet-api" rev="2.4" conf="compile,test"/>
+
+		<dependency org="junit" name="junit" rev="4.4" conf="test"/>
+		<dependency org="mtgi" name="testfixtures" rev="1.1.1+" conf="test->tomcat,spring" changing="true"/>
+		<dependency org="unitils" name="unitils" rev="1.0" conf="test->junit,spring,easymock,dbunit,hsqldb"/>
+		<dependency org="easymock" name="easymockclassextension" rev="2.2.2" conf="test"/>
+		<dependency org="apache" name="commons-io" rev="1.2" conf="test"/>
+		
+	</dependencies>
+	
+</ivy-module>

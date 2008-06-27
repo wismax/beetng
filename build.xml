@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+
+<project name="BehaviorTracking" default="all">
+	<import file="scripts/build-master.xml"/>
+</project>
