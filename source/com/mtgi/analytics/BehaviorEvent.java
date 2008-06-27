@@ -235,6 +235,25 @@ public class BehaviorEvent implements Serializable {
 		return children == null ? Collections.<BehaviorEvent>emptyList() : children;
 	}
 	
+	@Override
+	public String toString() {
+		StringBuffer buf = new StringBuffer();
+		
+		buf.append("behavior-event:").append(" id=\"").append(id).append('"');
+		if (parent != null)
+			buf.append(" parent-id=\"").append(parent.getId()).append('"');
+		buf.append(" type=\"").append(type).append('"')
+		   .append(" name=\"").append(name).append('"')
+		   .append(" application=\"").append(application).append('"')
+		   .append(" start=\"").append(start).append('"')
+		   .append(" duration-ms=\"").append(duration).append('"')
+		   .append(" user-id=\"").append(userId).append('"')
+		   .append(" session-id=\"").append(sessionId).append('"')
+		   .append(" error=\"").append(error).append('"');
+		
+		return buf.toString();
+	}
+	
 	private void add(BehaviorEvent child) {
 		if (children == null)
 			children = new ArrayList<BehaviorEvent>();

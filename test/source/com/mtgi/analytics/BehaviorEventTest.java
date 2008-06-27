@@ -178,4 +178,36 @@ public class BehaviorEventTest {
 		assertSame("duplicate add has no effect", data, event.getData());
 	}
 	
+	@Test
+	public void testToString() {
+		BehaviorEvent event = new BehaviorEvent(null, "application", "hello.world", "test", "me", "1");
+		//a trivial example, with several null attributes and no parent.
+		assertEquals("behavior-event: id=\"null\" " +
+					 "type=\"application\" name=\"hello.world\" application=\"test\" " +
+					 "start=\"null\" duration-ms=\"null\" " +
+					 "user-id=\"me\" session-id=\"1\" " +
+					 "error=\"null\"", 
+					 event.toString());
+		event.setId(1);
+		event.start();
+
+		//a more complete example, with parent id, error message, and time statistics.
+		BehaviorEvent child = new BehaviorEvent(event, "child", "foo", "test", "you", "2");
+		child.addData().setText("ignored");
+		child.setId(2);
+		child.start();
+		child.setError("boom");
+		child.stop();
+		event.stop();
+		
+		String start = child.getStart().toString();
+		String duration = child.getDuration().toString();
+		
+		assertEquals("behavior-event: id=\"2\" parent-id=\"1\" " +
+				 "type=\"child\" name=\"foo\" application=\"test\" " +
+				 "start=\"" + start + "\" duration-ms=\"" + duration + "\" " +
+				 "user-id=\"you\" session-id=\"2\" " +
+				 "error=\"boom\"", 
+				 child.toString());
+	}
 }
