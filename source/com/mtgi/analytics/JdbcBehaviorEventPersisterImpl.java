@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Queue;
 
-import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.stream.XMLOutputFactory;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ConnectionCallback;
@@ -36,7 +36,7 @@ public class JdbcBehaviorEventPersisterImpl extends JdbcDaoSupport
 	private String insertSql = DEFAULT_INSERT_SQL;
 	private String idSql = DEFAULT_ID_SQL;
 	
-	private DocumentBuilderFactory domFactory;
+	private XMLOutputFactory xmlFactory;
 
 	/**
 	 * Set the JDBC batch size for executing inserts.  Only has effect if the JDBC driver
@@ -88,7 +88,7 @@ public class JdbcBehaviorEventPersisterImpl extends JdbcDaoSupport
 	@Override
 	protected void initDao() throws Exception {
 		super.initDao();
-		this.domFactory = DocumentBuilderFactory.newInstance();
+		this.xmlFactory = XMLOutputFactory.newInstance();
 	}
 
 	public int persist(final Queue<BehaviorEvent> events) {
@@ -103,7 +103,7 @@ public class JdbcBehaviorEventPersisterImpl extends JdbcDaoSupport
 					int tally = 0; //return total events persisted.
 					
 					boolean doBatch = supportsBatchUpdates(con);
-					EventDataElementSerializer dataSerializer = new EventDataElementSerializer(domFactory);
+					EventDataElementSerializer dataSerializer = new EventDataElementSerializer(xmlFactory);
 					
 					PreparedStatement insert = con.prepareStatement(insertSql);
 					try {
@@ -142,7 +142,7 @@ public class JdbcBehaviorEventPersisterImpl extends JdbcDaoSupport
 								nullSafeSet(insert, 10, next.getError(), Types.VARCHAR);
 	
 								//convert event data to XML
-								String data = dataSerializer.serialize(next.getData());
+								String data = dataSerializer.serialize(next.getData(), true);
 								nullSafeSet(insert, 11, data, Types.VARCHAR);
 
 								if (doBatch) {

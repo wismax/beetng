@@ -3,67 +3,53 @@ package com.mtgi.analytics;
 import static java.lang.Character.isLetter;
 import static java.lang.Character.isLetterOrDigit;
 
-import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-
-import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 
 public class EventDataElementSerializer {
 
-	private DocumentBuilder builder;
-	private XMLSerializer serializer;
+	private static final char[] DUMMY_TEXT = {};
+	
+	private XMLOutputFactory factory;
 	private StringWriter buffer;
 	
-	public EventDataElementSerializer(DocumentBuilderFactory domFactory) 
+	public EventDataElementSerializer(XMLOutputFactory factory)
 	{
-		try {
-			builder = domFactory.newDocumentBuilder();
-		} catch (ParserConfigurationException pce) {
-			throw new RuntimeException("Unable to access DOM API", pce);
-		}
-		serializer = new XMLSerializer();
-		buffer = new StringWriter();
-		serializer.setOutputCharStream(buffer);
-	}
-	
-	/**
-	 * Append a DOM representation of the given data element to <code>document</code>.
-	 * Does nothing if <code>data</code> is null.
-	 */
-	public void serializeToDOM(Document document, EventDataElement data) {
-		if (data != null)
-			serializeElement(document, document, data);
+		this.buffer = new StringWriter();
+		this.factory = factory;
 	}
 	
 	/**
 	 * Serialize the given event data as a standalone XML document
+	 * @param includeProlog if true, include an XML prolog; if not, just render a document fragment
 	 * @return the XML serialization, or null if <code>data</code> is null.
 	 */
-	public String serialize(EventDataElement data) {
+	public String serialize(EventDataElement data, boolean includeProlog) {
 		if (data == null)
 			return null;
 		
-		//convert the EventDataElement object to DOM
-		Document document = builder.newDocument();
-		serializeElement(document, document, data);
-		
 		try {
 			//serialize the DOM to our string buffer.
-			serializer.serialize(document);
+			XMLStreamWriter writer = factory.createXMLStreamWriter(buffer);
+			try {
+				if (includeProlog)
+					writer.writeStartDocument();
+				serializeElement(writer, data);
+				writer.writeEndDocument();
+				writer.flush();
+			} finally {
+				writer.close();
+			}
+			
 			//return buffer contents.
 			return buffer.toString();
 			
-		} catch (IOException ioe) {
+		} catch (XMLStreamException ioe) {
 			//this shouldn't happen, since the target output stream is a StringWriter, but
 			//the compiler demands that we handle it.
 			throw new RuntimeException("Error serializing XML data", ioe);
@@ -77,34 +63,52 @@ public class EventDataElementSerializer {
 	/**
 	 * Recursively serialize a single element, appending it to DOM element <code>parent</code>.
 	 */
-	protected void serializeElement(Document document, Node parent, EventDataElement element) {
+	protected void serializeElement(XMLStreamWriter writer, EventDataElement element) throws XMLStreamException {
 
 		//create a new node for the element and append it to the parent.
 		String name = getXMLElementName(element.getName());
-		Element elt = document.createElement(name);
-		parent.appendChild(elt);
 		
-		//add text to the element if applicable.
 		String text = element.getText();
-		if (text != null)
-			elt.appendChild(document.createTextNode(text));
+		Iterator<Entry<String,Object>> props = element.iterateProperties();
+		Iterator<EventDataElement> children = element.iterateChildren();
 		
-		//add child elements for properties.
-		for (Iterator<Entry<String,Object>> it = element.iterateProperties(); it.hasNext(); ) {
-			Entry<String,Object> prop = it.next();
-			Element propElt = document.createElement(getXMLElementName(prop.getKey()));
-			elt.appendChild(propElt);
+		if (text == null && !props.hasNext() && !children.hasNext()) {
+			writer.writeEmptyElement(name);
+			//TODO: remove when stax bug is fixed.
+			//this is a workaround for a bug in the 1.2 StAX implementation, where
+			//if the only element in your document is empty, the closing "/>" never gets written.
+			//any other API call fixes the problem, so here we do a no-op string append to force
+			//the element closed.
+			writer.writeCharacters(DUMMY_TEXT, 0, 0);
+		} else {
+			writer.writeStartElement(name);
 			
-			Object value = prop.getValue();
-			if (value != null)
-				propElt.appendChild(document.createTextNode(value.toString()));
+			//add text to the element if applicable.
+			if (text != null)
+				writer.writeCharacters(text);
+			
+			//add child elements for properties.
+			while (props.hasNext()) {
+				Entry<String,Object> prop = props.next();
+				
+				String propName = getXMLElementName(prop.getKey());
+				Object value = prop.getValue();
+				
+				if (value != null) {
+					writer.writeStartElement(propName);
+					writer.writeCharacters(value.toString());
+					writer.writeEndElement();
+				} else {
+					writer.writeEmptyElement(propName);
+				}
+			}
+			
+			//add child elements for children.
+			while (children.hasNext())
+				serializeElement(writer, children.next());
+			writer.writeEndElement();
 		}
 		
-		//add child elements for children.
-		for (Iterator<EventDataElement> it = element.iterateChildren(); it.hasNext(); ) {
-			EventDataElement child = it.next();
-			serializeElement(document, elt, child);
-		}
 	}
 	
 	/**

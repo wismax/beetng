@@ -4,6 +4,7 @@ import static org.dbunit.dataset.filter.DefaultColumnFilter.excludedColumnsTable
 import static org.junit.Assert.*;
 
 import java.io.InputStream;
+import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedList;
@@ -103,7 +104,7 @@ public class JdbcBehaviorEventPersisterTest extends JdbcEventTestCase {
 		assertTrue("sum of child events cannot exceed length of parent", total >= 0);
 	}
 
-	private int countChildren(long id) throws SQLException {
+	private int countChildren(Serializable id) throws SQLException {
 		ResultSet ret = stmt.executeQuery("select count(EVENT_ID) from BEHAVIOR_TRACKING_EVENT where PARENT_EVENT_ID = " + id);
 		assertTrue(ret.next());
 		int count = ret.getInt(1);
@@ -111,7 +112,7 @@ public class JdbcBehaviorEventPersisterTest extends JdbcEventTestCase {
 		return count;
 	}
 
-	private ResultSet getEventData(long id) throws SQLException {
+	private ResultSet getEventData(Serializable id) throws SQLException {
 		ResultSet ret = stmt.executeQuery("select * from BEHAVIOR_TRACKING_EVENT where EVENT_ID = " + id);
 		assertTrue("found event with id " + id, ret.next());
 		return ret;

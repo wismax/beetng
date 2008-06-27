@@ -32,7 +32,7 @@ public class BehaviorEvent implements Serializable {
 	private static final long serialVersionUID = -5341143588240860983L;
 	private static final Log log = LogFactory.getLog(BehaviorEvent.class);
 
-	private Long id;
+	private Serializable id;
 	private BehaviorEvent parent;
 	private String type;
 	private String name;
@@ -156,10 +156,10 @@ public class BehaviorEvent implements Serializable {
 	}
 	
 	/** a unique identifier (e.g. primary key) for this event */
-	public Long getId() {
+	public Serializable getId() {
 		return id;
 	}
-	public void setId(Long id) {
+	public void setId(Serializable id) {
 		this.id = id;
 	}
 	
