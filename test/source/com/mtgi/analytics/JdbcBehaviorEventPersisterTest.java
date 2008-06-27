@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 import org.dbunit.database.DatabaseConnection;
@@ -40,12 +41,13 @@ public class JdbcBehaviorEventPersisterTest extends JdbcEventTestCase {
 		// * events with errors and events without
 
 		//create a tree of 27 events that cover the properties above.
-		LinkedList<BehaviorEvent> events = new LinkedList<BehaviorEvent>();
+		ArrayList<BehaviorEvent> events = new ArrayList<BehaviorEvent>();
 		int[] counter = { 0 };
 		for (int i = 0; i < 3; ++i)
 			events.add(createEvent(null, 1, 3, 3, counter));
+		LinkedList<BehaviorEvent> queue = new LinkedList<BehaviorEvent>(events);
 
-		assertEquals("entire event tree persisted", 39, persister.persist(events));
+		assertEquals("entire event tree persisted", 39, persister.persist(queue));
 
 		//use the dbunit API to do a full check of data contents.  we can't use simple
 		//annotations because we have to exclude variable date columns from comparison.
@@ -80,12 +82,12 @@ public class JdbcBehaviorEventPersisterTest extends JdbcEventTestCase {
 			assertEquals(0, data.getLong("PARENT_EVENT_ID"));
 			assertTrue("no parent for event " + event.getId(), data.wasNull());
 		} else {
-			assertEquals(event.getParent().getId(), data.getString("PARENT_EVENT_ID"));
+			assertEquals(event.getParent().getId(), data.getLong("PARENT_EVENT_ID"));
 		}
 		assertEquals(event.getType(), data.getString("TYPE"));
 		assertEquals(event.getName(), data.getString("NAME"));
 		assertEquals(event.getApplication(), data.getString("APPLICATION"));
-		assertEquals(event.getStart().getTime(), data.getDate("START").getTime());
+		assertEquals(event.getStart().getTime(), data.getTimestamp("START").getTime());
 		assertEquals(event.getDuration(), (Long)data.getLong("DURATION_MS"));
 		assertEquals(event.getError(), data.getString("ERROR"));
 		assertEquals(event.getUserId(), data.getString("USER_ID"));
@@ -126,7 +128,7 @@ public class JdbcBehaviorEventPersisterTest extends JdbcEventTestCase {
 	 * @param maxChildren the number of children for each nested event.
 	 * @param counter maintains a count of the total number of events created.
 	 */
-	private BehaviorEvent createEvent(BehaviorEvent parent, int depth, int maxDepth, int maxChildren, int[] counter) 
+	protected static BehaviorEvent createEvent(BehaviorEvent parent, int depth, int maxDepth, int maxChildren, int[] counter) 
 		throws InterruptedException
 	{
 		//our range of test event data.  the sizes are coprime so that
