@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xmlns:aop="http://www.springframework.org/schema/aop"
+     xmlns:bt="http://www.mantis-tgi.com/schema/bt"
+     xsi:schemaLocation="
+     http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+     http://www.mantis-tgi.com/schema/bt mtgi-bt-1.0.xsd 
+     http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
+
+	<!-- check required annotations on test beans -->
+	<bean class="org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor"/>
+
+	<!-- 
+		add support for behavior tracking.  this tag should:
+		1.  automatically configure an instance of BehaviorTrackingManager in the spring context
+		2.  notice that instances of TaskExecutor, PersistenceManager, and SessionContext have been setup below, and use them
+	-->
+	<bt:advice id="btAdvice"/>
+	
+	<!-- 
+		this is where we configure which methods get instrumented.  We configure only methods
+		with names like "*Tracked" for instrumentation, so other methods will be ignored.
+	 -->
+	<aop:config>
+		<aop:pointcut id="trackedOperations" 
+		              expression="execution(* com.mtgi.analytics.aop.BehaviorAdviceTest*.*Tracked(..))"/>
+		<aop:advisor advice-ref="btAdvice" pointcut-ref="trackedOperations"/>
+	</aop:config>
+
+	<!-- these service beans should receive behavior tracking according to the pointcut configuration above -->
+	<bean id="serviceA" class="com.mtgi.analytics.aop.BehaviorAdviceTest$ServiceA">
+		<property name="serviceB" ref="serviceB"/>
+	</bean>
+	<bean id="serviceB" class="com.mtgi.analytics.aop.BehaviorAdviceTest$ServiceB"/>
+
+	<!-- the following beans provide configuration to the behavior tracking manager. -->
+
+	<!-- use in-memory datasource for testing -->
+	<bean id="dataSource" class="org.unitils.database.UnitilsDataSourceFactoryBean" />
+
+	<!-- create jdbc persistence manager used to store events -->	
+	<bean id="jdbcPersistenceManager" class="com.mtgi.analytics.JdbcBehaviorEventPersisterImpl">
+		<property name="dataSource" ref="dataSource"/>
+		<!-- accommodate HSQL seq syntax for tests -->
+		<property name="idSql">
+			<value>select next value for S_BEHAVIOR_TRACKING_EVENT from INFORMATION_SCHEMA.SYSTEM_SEQUENCES</value>
+		</property>
+	</bean>
+
+	<!-- task queue for async persistence operations -->	
+	<bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+		<property name="corePoolSize" value="1"/>
+		<property name="maxPoolSize" value="1"/>
+		<property name="queueCapacity" value="100"/>
+		<property name="threadFactory">
+			<bean class="org.springframework.scheduling.concurrent.CustomizableThreadFactory"/>
+		</property>
+	</bean>
+	
+	<!-- mock session context for testing -->
+	<bean id="sessionContext" class="com.mtgi.analytics.MockSessionContext"/>
+	
+</beans>
