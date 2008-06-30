@@ -106,7 +106,7 @@ public class BehaviorTrackingFilterTest extends JdbcEventTestCase {
 	/** verify that server error codes are logged in the event data */
 	@Test
 	public void testErrorStatus() throws Exception {
-		//first test sendError()
+		//first test sendError(int, String)
 		TestServlet.status = 403;
 		TestServlet.message = "Authorized personnel only";
 		try {
@@ -115,6 +115,16 @@ public class BehaviorTrackingFilterTest extends JdbcEventTestCase {
 		} catch (FailingHttpStatusCodeException expected) {
 			assertEquals("Server status code sent back", 403, expected.getStatusCode());
 			assertEquals("Authorized personnel only", expected.getStatusMessage());
+		    assertNotNull("Servlet was hit", servlet);
+		}
+		
+		//now sendError(int)
+		TestServlet.status = 401;
+		try {
+			webClient.getPage("http://localhost:8888/app/foo.ext?param1=secret");
+			fail("non-OK status should have been sent back by test servlet");
+		} catch (FailingHttpStatusCodeException expected) {
+			assertEquals("Server status code sent back", 401, expected.getStatusCode());
 		    assertNotNull("Servlet was hit", servlet);
 		}
 
@@ -266,9 +276,12 @@ public class BehaviorTrackingFilterTest extends JdbcEventTestCase {
 				
 				if (status != null) {
 					//test multiple API methods for setting response code
-					if (message == null)
-						response.setStatus(status);
-					else {
+					if (message == null) {
+						if (status >= 400)
+							response.sendError(status);
+						else
+							response.setStatus(status);
+					} else {
 						if (status >= 400)
 							response.sendError(status, message);
 						else
