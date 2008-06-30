@@ -79,19 +79,12 @@ public class BehaviorTrackingFilter implements Filter {
 		HttpServletRequest req = (HttpServletRequest)request;
 
 		//use the request path as an event name, excluding proto, host, and query string.
-		String eventName = req.getContextPath();
-		String path = req.getServletPath();
-		if (path != null)
-			eventName += path;
-		path = req.getPathInfo();
-		if (path != null)
-			eventName += path;
-		
+		String eventName = req.getRequestURI();
 		BehaviorEvent event = manager.createEvent(eventType, eventName);
 
 		//log relevant request data and parameters to the event.
 		EventDataElement data = event.addData();
-		data.put("uri", req.getRequestURI());
+		data.put("uri", eventName);
 		data.put("protocol", req.getProtocol());
 		data.put("method", req.getMethod());
 		data.put("remote-address", req.getRemoteAddr());
@@ -108,7 +101,7 @@ public class BehaviorTrackingFilter implements Filter {
 				param.addElement("value").setText(v);
 		}
 		
-		//wrap the response so that we can intercept response status if the user
+		//wrap the response so that we can intercept response status if the application
 		//sets it.
 		BehaviorTrackingResponse btr = new BehaviorTrackingResponse((HttpServletResponse)response);
 
@@ -120,24 +113,41 @@ public class BehaviorTrackingFilter implements Filter {
 			data.put("response-status", btr.status);
 			data.put("response-message", btr.message);
 			
+			//if an error code is being sent back, populate the 'error' field of the event with relevant info.
 			if (btr.status != null && btr.status >= 400)
 				event.setError(btr.status + ": " + btr.message);
 			
-		} catch (IOException ioe) {
-			event.setError(ioe);
-			throw ioe;
-		} catch (ServletException se) {
-			event.setError(se);
-			throw se;
-		} catch (RuntimeException re) {
-			event.setError(re);
-			throw re;
-		} catch (Error e) {
-			event.setError(e);
-			throw e;
+		} catch (Throwable error) {
+			//log exception messages to event data.
+			handleServerError(event, error);
 		} finally {
 			manager.stop(event);
 		}
+	}
+	
+	private static final void handleServerError(BehaviorEvent event, Throwable e) throws ServletException, IOException {
+
+		event.addData().put("response-status", 500);
+		
+		if (e instanceof ServletException) {
+			ServletException se = (ServletException)e;
+			Throwable cause = se.getRootCause();
+			if (cause != null)
+				event.setError(cause);
+			else
+				event.setError(se);
+			throw se;
+		} else {
+			event.setError(e);
+		}
+		
+		//propagate exception
+		if (e instanceof IOException)
+			throw (IOException)e;
+		if (e instanceof RuntimeException)
+			throw (RuntimeException)e;
+		//should not get this far in normal execution, but cover this case anyway..
+		throw new ServletException(e);
 	}
 	
 	private static class BehaviorTrackingResponse extends HttpServletResponseWrapper {

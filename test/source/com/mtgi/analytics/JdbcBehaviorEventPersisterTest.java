@@ -1,19 +1,13 @@
 package com.mtgi.analytics;
 
-import static org.dbunit.dataset.filter.DefaultColumnFilter.excludedColumnsTable;
 import static org.junit.Assert.*;
 
-import java.io.InputStream;
 import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-import org.dbunit.database.DatabaseConnection;
-import org.dbunit.database.IDatabaseConnection;
-import org.dbunit.dataset.ITable;
-import org.dbunit.dataset.xml.FlatXmlDataSet;
 import org.junit.Test;
 import org.unitils.spring.annotation.SpringBeanByType;
 
@@ -51,17 +45,7 @@ public class JdbcBehaviorEventPersisterTest extends JdbcEventTestCase {
 
 		//use the dbunit API to do a full check of data contents.  we can't use simple
 		//annotations because we have to exclude variable date columns from comparison.
-		IDatabaseConnection connection = new DatabaseConnection(conn);
-        ITable actualTable = connection.createDataSet().getTable("BEHAVIOR_TRACKING_EVENT");
-        actualTable = excludedColumnsTable(actualTable, new String[]{"START", "DURATION_MS"});
-
-		InputStream expectedData = JdbcBehaviorEventPersisterTest.class.getResourceAsStream("JdbcBehaviorEventPersisterTest.testNestedEvents-result.xml");
-		FlatXmlDataSet expectedDataSet = new FlatXmlDataSet(expectedData, true);
-		ITable expectedTable = expectedDataSet.getTable("BEHAVIOR_TRACKING_EVENT");
-		
-		expectedTable = excludedColumnsTable(expectedTable, new String[]{"START", "DURATION_MS"});
-
-		org.dbunit.Assertion.assertEquals(expectedTable, actualTable);
+		assertEventDataMatches("JdbcBehaviorEventPersisterTest.testNestedEvents-result.xml");
 		
 		//because the DBUnit dataset cannot contain static event times and durations,
 		//we do some extra verification of our own here.  we also do sanity checks, like

@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<!DOCTYPE dataset [
+	<!ELEMENT dataset (BEHAVIOR_TRACKING_EVENT*)>
+	<!ELEMENT BEHAVIOR_TRACKING_EVENT EMPTY>
+	<!ATTLIST BEHAVIOR_TRACKING_EVENT
+	    EVENT_ID CDATA #REQUIRED
+	    PARENT_EVENT_ID CDATA #IMPLIED
+	    APPLICATION CDATA #REQUIRED
+	    TYPE CDATA #REQUIRED
+	    NAME CDATA #REQUIRED
+	    START CDATA #REQUIRED
+	    DURATION_MS CDATA #REQUIRED
+	    USER_ID CDATA #IMPLIED
+	    SESSION_ID CDATA #IMPLIED
+	    ERROR CDATA #IMPLIED
+	    DATA CDATA #IMPLIED
+	>
+]>
+
+<dataset>
+	<BEHAVIOR_TRACKING_EVENT EVENT_ID="0" APPLICATION="testBT"
+		TYPE="http-request" NAME="/app/foo.ext"
+		START="2008-06-26 16:34:25.681" DURATION_MS="100"
+		DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data&gt;&lt;uri&gt;/app/foo.ext&lt;/uri&gt;&lt;protocol&gt;HTTP/1.1&lt;/protocol&gt;&lt;method&gt;GET&lt;/method&gt;&lt;remote-address&gt;127.0.0.1&lt;/remote-address&gt;&lt;remote-host&gt;127.0.0.1&lt;/remote-host&gt;&lt;response-status&gt;403&lt;/response-status&gt;&lt;response-message&gt;Authorized personnel only&lt;/response-message&gt;&lt;parameters&gt;&lt;parameter&gt;&lt;name&gt;param1&lt;/name&gt;&lt;value&gt;secret&lt;/value&gt;&lt;/parameter&gt;&lt;/parameters&gt;&lt;/event-data&gt;"
+		ERROR="403: Authorized personnel only"
+		USER_ID="testUser" SESSION_ID="ABCDEF123" />
+	<BEHAVIOR_TRACKING_EVENT EVENT_ID="2" APPLICATION="testBT"
+		TYPE="http-request" NAME="/app/redirect.ext"
+		START="2008-06-26 16:34:25.681" DURATION_MS="100"
+		DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data&gt;&lt;uri&gt;/app/redirect.ext&lt;/uri&gt;&lt;protocol&gt;HTTP/1.1&lt;/protocol&gt;&lt;method&gt;GET&lt;/method&gt;&lt;remote-address&gt;127.0.0.1&lt;/remote-address&gt;&lt;remote-host&gt;127.0.0.1&lt;/remote-host&gt;&lt;response-status&gt;301&lt;/response-status&gt;&lt;response-message/&gt;&lt;parameters/&gt;&lt;/event-data&gt;"
+		USER_ID="testUser" SESSION_ID="ABCDEF123" />
+	<BEHAVIOR_TRACKING_EVENT EVENT_ID="4" APPLICATION="testBT"
+		TYPE="http-request" NAME="/app/status.ext"
+		START="2008-06-26 16:34:25.681" DURATION_MS="100"
+		DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data&gt;&lt;uri&gt;/app/status.ext&lt;/uri&gt;&lt;protocol&gt;HTTP/1.1&lt;/protocol&gt;&lt;method&gt;GET&lt;/method&gt;&lt;remote-address&gt;127.0.0.1&lt;/remote-address&gt;&lt;remote-host&gt;127.0.0.1&lt;/remote-host&gt;&lt;response-status&gt;302&lt;/response-status&gt;&lt;response-message&gt;I don't remember what 302 means exactly&lt;/response-message&gt;&lt;parameters/&gt;&lt;/event-data&gt;"
+		USER_ID="testUser" SESSION_ID="ABCDEF123" />
+	<BEHAVIOR_TRACKING_EVENT EVENT_ID="6" APPLICATION="testBT"
+		TYPE="behavior-tracking" NAME="flush" 
+		START="2008-06-26 16:34:25.681" DURATION_MS="100" 
+		DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data&gt;&lt;count&gt;3&lt;/count&gt;&lt;/event-data&gt;" 
+		USER_ID="testUser" SESSION_ID="ABCDEF123"/>
+</dataset>

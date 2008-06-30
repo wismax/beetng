@@ -1,0 +1,75 @@
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
+    version="2.4">
+
+	<description>test web application used by BehaviorTrackingFilterTest; includes use of optional
+	filter configuration parameters.</description>
+
+	<!-- test spring context initialization.  this context includes the necessary configuration for behavior tracking. -->
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>classpath:applicationContext-test.xml</param-value>
+	</context-param>
+	
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+
+	<!-- a trivial servlet that helps us verify behavior tracking of http requests -->	
+	<servlet>
+		<servlet-name>test</servlet-name>
+		<servlet-class>com.mtgi.analytics.servlet.BehaviorTrackingFilterTest$TestServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<!-- map the test servlet, both by path and by extension to verify that both methods work. -->	
+	<servlet-mapping>
+		<servlet-name>test</servlet-name>
+		<url-pattern>/test/*</url-pattern>
+	</servlet-mapping>
+	
+	<servlet-mapping>
+		<servlet-name>test</servlet-name>
+		<url-pattern>*.ext</url-pattern>
+	</servlet-mapping>
+	
+	<filter>
+		<description>Populates the mock SessionContext implementation with UserId / SessionId for event logging.  This must happen BEFORE the event tracking filter.</description>
+		<filter-name>session-context</filter-name>
+		<filter-class>com.mtgi.analytics.servlet.BehaviorTrackingFilterTest$ContextFilter</filter-class>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>session-context</filter-name>
+		<servlet-name>test</servlet-name>
+		<dispatcher>REQUEST</dispatcher>
+		<dispatcher>INCLUDE</dispatcher>
+		<dispatcher>FORWARD</dispatcher>
+	</filter-mapping>
+	
+	<filter>
+		<description>Logs HTTP requests as Behavior Tracking events.</description>
+		<filter-name>tracking</filter-name>
+		<filter-class>com.mtgi.analytics.servlet.BehaviorTrackingFilter</filter-class>
+		<!-- The filter ordinarily uses the first BehaviorTrackingManager it finds in Spring configuration; this sets the manager to use explicitly -->
+		<init-param>
+			<param-name>com.mtgi.analytics.manager</param-name>
+			<param-value>behaviorTrackingManager</param-value>
+		</init-param>
+		<!-- The default parameter type is "http-request", but we override that with this parameter -->
+		<init-param>
+			<param-name>com.mtgi.analytics.servlet.event</param-name>
+			<param-value>tracked-request</param-value>
+		</init-param>
+	</filter>
+	
+	<filter-mapping>
+		<filter-name>tracking</filter-name>
+		<servlet-name>test</servlet-name>
+		<dispatcher>REQUEST</dispatcher>
+		<dispatcher>INCLUDE</dispatcher>
+		<dispatcher>FORWARD</dispatcher>
+	</filter-mapping>
+	
+</web-app>

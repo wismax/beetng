@@ -1,5 +1,6 @@
 package com.mtgi.analytics;
 
+import static org.dbunit.dataset.filter.DefaultColumnFilter.excludedColumnsTable;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
@@ -11,6 +12,12 @@ import java.sql.Statement;
 
 import javax.sql.DataSource;
 
+import org.dbunit.DatabaseUnitException;
+import org.dbunit.database.DatabaseConnection;
+import org.dbunit.database.IDatabaseConnection;
+import org.dbunit.dataset.DataSetException;
+import org.dbunit.dataset.ITable;
+import org.dbunit.dataset.xml.FlatXmlDataSet;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -46,7 +53,25 @@ public abstract class JdbcEventTestCase {
 			conn.close();
 		}
 	}
-	
+
+	/**
+	 * Verify that the contents of the test event database match the dataset in the given resource XML file.
+	 * The comparison excludes the START and DURATION_MS columns, since these will change with each test run.
+	 */
+	public void assertEventDataMatches(String dataSetResource) throws SQLException, DataSetException, IOException, DatabaseUnitException  {
+		IDatabaseConnection connection = new DatabaseConnection(conn);
+        ITable actualTable = connection.createDataSet().getTable("BEHAVIOR_TRACKING_EVENT");
+        actualTable = excludedColumnsTable(actualTable, new String[]{"START", "DURATION_MS"});
+
+		InputStream expectedData = getClass().getResourceAsStream(dataSetResource);
+		FlatXmlDataSet expectedDataSet = new FlatXmlDataSet(expectedData, true);
+		ITable expectedTable = expectedDataSet.getTable("BEHAVIOR_TRACKING_EVENT");
+		
+		expectedTable = excludedColumnsTable(expectedTable, new String[]{"START", "DURATION_MS"});
+
+		org.dbunit.Assertion.assertEquals(expectedTable, actualTable);
+		
+	}
 	
 	protected void runResourceScript(String resource) 
 		throws IOException, SQLException 
