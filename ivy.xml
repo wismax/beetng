@@ -27,7 +27,7 @@
 
 		<dependency org="springframework" name="spring" rev="2.0.5"/>
 		<dependency org="apache" name="commons-logging" rev="1.1"/>
-		<dependency org="apache" name="log4j" rev="1.2.13" conf="log4j->default"/>
+		<dependency org="apache" name="log4j" rev="1.2.13" conf="compile;test;log4j->default"/>
 		<dependency org="bea" name="stax-impl" rev="1.2.0"/>
 
 		<dependency org="sun" name="servlet-api" rev="2.4" conf="compile,test"/>
