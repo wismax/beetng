@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<xsd:schema xmlns="http://www.mantis-tgi.com/schema/bt"
+		xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+		xmlns:beans="http://www.springframework.org/schema/beans"
+		xmlns:tool="http://www.springframework.org/schema/tool"
+		targetNamespace="http://www.mantis-tgi.com/schema/bt"
+		elementFormDefault="qualified"
+		attributeFormDefault="unqualified">
+
+	<xsd:import namespace="http://www.springframework.org/schema/beans"/>
+	<xsd:import namespace="http://www.springframework.org/schema/tool"/>
+
+	<xsd:annotation>
+		<xsd:documentation><![CDATA[
+	Defines the elements used in the mantis-tgi behavior tracking management infrastructure.
+		]]></xsd:documentation>
+	</xsd:annotation>
+
+	<xsd:element name="advice">
+		<xsd:complexType>
+			<xsd:annotation>
+				<xsd:documentation source="java:com.mtgi.analytics.aop.BehaviorTrackingAdvice"><![CDATA[
+	Defines the tracking semantics of the AOP advice that is to be
+	executed.
+	
+				]]></xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation>
+						<tool:exports type="com.mtgi.analytics.aop.BehaviorTrackingAdvice"/>
+					</tool:annotation>
+				</xsd:appinfo>
+			</xsd:annotation>
+			<xsd:complexContent>
+				<xsd:extension base="beans:identifiedType">
+					<xsd:sequence>
+						<xsd:element name="attributes" type="attributesType" minOccurs="0" maxOccurs="1"/>
+					</xsd:sequence>
+					<xsd:attribute name="tracking-manager" type="xsd:string" default="trackingManager">
+						<xsd:annotation>
+							<xsd:documentation source="java:com.mtgi.analytics.BehaviorTrackingManager"><![CDATA[
+	The bean name of the BehaviorTrackingManager that is to be used
+	to drive trackings.
+	
+	This attribute is not required, and only needs to be specified
+	explicitly if the bean name of the desired BehaviorTrackingManager
+	is not 'trackingManager'.
+							]]></xsd:documentation>
+							<xsd:appinfo>
+								<tool:annotation kind="ref">
+									<tool:expected-type type="com.mtgi.analytics.BehaviorTrackingManager"/>
+								</tool:annotation>
+							</xsd:appinfo>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:extension>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	
+</xsd:schema>
