@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
+    "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+	<!-- check required annotations on test beans -->
+	<bean class="org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor"/>
+
+	<!-- use unitils hsqldb datasource for test persistence ops -->
+	<bean id="dataSource" class="org.unitils.database.UnitilsDataSourceFactoryBean" />
+
+	<!-- create jdbc persistence manager for testing. -->	
+	<bean id="jdbcPersistenceManager" class="com.mtgi.analytics.JdbcBehaviorEventPersisterImpl">
+		<property name="dataSource" ref="dataSource"/>
+		<!-- accommodate HSQL seq syntax for tests -->
+		<property name="idSql">
+			<value>select next value for S_BEHAVIOR_TRACKING_EVENT from INFORMATION_SCHEMA.SYSTEM_SEQUENCES</value>
+		</property>
+	</bean>
+
+	<!-- task queue for async persistence operations -->	
+	<bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+		<property name="corePoolSize" value="1"/>
+		<property name="maxPoolSize" value="1"/>
+		<property name="queueCapacity" value="100"/>
+		<property name="threadFactory">
+			<bean class="org.springframework.scheduling.concurrent.CustomizableThreadFactory"/>
+		</property>
+	</bean>
+	
+	<!-- mock session context for testing -->
+	<bean id="sessionContext" class="com.mtgi.analytics.MockSessionContext"/>
+	
+	<bean id="trackingManager" class="com.mtgi.analytics.BehaviorTrackingManagerImpl">
+		<property name="application" value="testBT"/>
+		<property name="executor" ref="taskExecutor"/>
+		<property name="persister" ref="jdbcPersistenceManager"/>
+		<property name="flushThreshold" value="5"/>
+		<property name="sessionContext" ref="sessionContext"/>
+	</bean>
+	
+</beans>

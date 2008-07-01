@@ -33,9 +33,6 @@
 			</xsd:annotation>
 			<xsd:complexContent>
 				<xsd:extension base="beans:identifiedType">
-					<xsd:sequence>
-						<xsd:element name="attributes" type="attributesType" minOccurs="0" maxOccurs="1"/>
-					</xsd:sequence>
 					<xsd:attribute name="tracking-manager" type="xsd:string" default="trackingManager">
 						<xsd:annotation>
 							<xsd:documentation source="java:com.mtgi.analytics.BehaviorTrackingManager"><![CDATA[

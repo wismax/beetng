@@ -20,15 +20,15 @@ import com.mtgi.analytics.EventDataElement;
 public class BehaviorTrackingAdvice implements MethodInterceptor {
 
 	private String eventType = "method";
-	private BehaviorTrackingManager manager;
+	private BehaviorTrackingManager trackingManager;
 	
 	public void setEventType(String eventType) {
 		this.eventType = eventType;
 	}
 
 	@Required
-	public void setManager(BehaviorTrackingManager manager) {
-		this.manager = manager;
+	public void setTrackingManager(BehaviorTrackingManager manager) {
+		this.trackingManager = manager;
 	}
 
 	public Object invoke(MethodInvocation invocation) throws Throwable {
@@ -36,7 +36,7 @@ public class BehaviorTrackingAdvice implements MethodInterceptor {
 		Method m = invocation.getMethod();
 		String eventName = m.getDeclaringClass().getName() + "." + m.getName();
 
-		BehaviorEvent event = manager.createEvent(eventType, eventName);
+		BehaviorEvent event = trackingManager.createEvent(eventType, eventName);
 
 		//log method parameters.  would be nice if we could figure
 		//out parameter names here.
@@ -55,7 +55,7 @@ public class BehaviorTrackingAdvice implements MethodInterceptor {
 			param.put("value", toString(val));
 		}
 		
-		manager.start(event);
+		trackingManager.start(event);
 		try {
 			Object ret = invocation.proceed();
 			data.put("result", toString(ret));
@@ -64,7 +64,7 @@ public class BehaviorTrackingAdvice implements MethodInterceptor {
 			event.setError(error);
 			throw error;
 		} finally {
-			manager.stop(event);
+			trackingManager.stop(event);
 		}
 	}
 	
