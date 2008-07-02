@@ -25,7 +25,7 @@
 	 -->
 	<aop:config>
 		<aop:pointcut id="trackedOperations" 
-		              expression="execution(* com.mtgi.analytics.aop.BehaviorAdviceTest*.*Tracked(..))"/>
+		              expression="execution(* com.mtgi.analytics.aop..*Tracked(..))"/>
 		<aop:advisor advice-ref="btAdvice" pointcut-ref="trackedOperations"/>
 	</aop:config>
 
