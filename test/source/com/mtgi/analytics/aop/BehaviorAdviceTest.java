@@ -32,6 +32,7 @@ public class BehaviorAdviceTest extends JdbcEventTestCase {
 		sessionContext.setContextSessionId("ABCDEF123");
 	}
 
+	/** test basic event tracking configuration, mixing instrumented and uninstrumented methods */
 	@Test
 	public void testTracking() throws Exception {
 		assertEquals("this call should log 2 events", "serviceA:0", service.getTracked("hello"));
@@ -41,12 +42,52 @@ public class BehaviorAdviceTest extends JdbcEventTestCase {
 		manager.flush();
 		assertEventDataMatches("BehaviorAdviceTest.testTracking-result.xml");
 	}
+
+	/** test support for unusual parameter and return types */
+	@Test
+	public void testComplexParameters() throws Exception {
+		//test logging of actual type of argument, when it differs from the method signature.
+		ServiceB arg = new SubServiceB();
+		assertSame("argument value is returned unmodified", arg, service.getWeirdParametersTracked(this, arg, "hello", "world"));
+		assertNull("null values allowed", service.getWeirdParametersTracked(null, null));
+		
+		arg = new ServiceB();
+		assertSame("argument value is returned unmodified", arg, service.getWeirdParametersTracked(this, arg, null, "value"));
+		
+		//flush and verify the log data.
+		manager.flush();
+		assertEventDataMatches("BehaviorAdviceTest.testComplexParameters-result.xml");
+	}
 	
+	/** test that event tracking responds graceful to application exceptions */
+	@Test
+	public void testExceptionHandling() throws Exception {
+		try {
+			service.throwExceptionTracked(1972);
+			fail("application exception should have been thrown");
+		} catch (RuntimeException expected) {
+			assertSame("original application exception is returned", ServiceA.ERROR, expected);
+		}
+		
+		manager.flush();
+		assertEventDataMatches("BehaviorAdviceTest.testExceptionHandling-result.xml");
+	}
+	
+	/** test support for methods without a return value and without parameters */
+	@Test
+	public void testVoidReturn() throws Exception {
+		service.getVoidReturnTracked();
+		manager.flush();
+		assertEventDataMatches("BehaviorAdviceTest.testVoidReturn-result.xml");
+	}
+
 	/**
 	 * Spring bean class that depends on another spring bean (ServiceB).
 	 * Some method calls in this class are tracked, some aren't.
 	 */
 	public static class ServiceA {
+		
+		public static final RuntimeException ERROR = new RuntimeException("i'm a bad application");
 		
 		private ServiceB serviceB;
 
@@ -70,7 +111,27 @@ public class BehaviorAdviceTest extends JdbcEventTestCase {
 		public String getUntracked() {
 			return "serviceA:" + serviceB.getTracked();
 		}
+
+		/**
+		 * Tests support for logging tracking events with custom parameter types and variable
+		 * argument lists.
+		 */
+		public ServiceB getWeirdParametersTracked(BehaviorAdviceTest arg0, ServiceB arg1, String... argN) {
+			return arg1;
+		}
 		
+		/**
+		 * Tests support for void return type.
+		 */
+		public void getVoidReturnTracked() {
+		}
+		
+		/**
+		 * Tests support for both primitive parameter types and error handling.
+		 */
+		public void throwExceptionTracked(long ignored) {
+			throw ERROR;
+		}
 	}
 	
 	public static class ServiceB {
@@ -82,5 +143,7 @@ public class BehaviorAdviceTest extends JdbcEventTestCase {
 		}
 		
 	}
+	
+	public static class SubServiceB extends ServiceB {}
 	
 }

@@ -1,5 +1,7 @@
 package com.mtgi.analytics.aop;
 
+import static java.util.Arrays.asList;
+
 import java.lang.reflect.Method;
 
 import org.aopalliance.intercept.MethodInterceptor;
@@ -46,19 +48,14 @@ public class BehaviorTrackingAdvice implements MethodInterceptor {
 		Object[] args = invocation.getArguments();
 		
 		for (int i = 0; i < sig.length; ++i) {
-			EventDataElement param = parameters.addElement("parameter");
 			Object val = args[i];
-			String type = val == null ? sig[i].getName()
-									  : val.getClass().getName();
-
-			param.put("type", type);
-			param.put("value", toString(val));
+			logValue(parameters, "parameter", sig[i], val);
 		}
 		
 		trackingManager.start(event);
 		try {
 			Object ret = invocation.proceed();
-			data.put("result", toString(ret));
+			logValue(data, "result", m.getReturnType(), ret);
 			return ret;
 		} catch (Throwable error) {
 			event.setError(error);
@@ -74,22 +71,32 @@ public class BehaviorTrackingAdvice implements MethodInterceptor {
 	 * represented as "[qualified.type.name]" to avoid invoking
 	 * costly (or buggy) toString() methods.
 	 */
-	private static final String toString(Object arg) {
+	private static final void logValue(EventDataElement parent, String elementName, Class expectedType, Object arg) {
+		EventDataElement element = parent.addElement(elementName);
 		if (arg == null)
-			return null;
+			return;
 		
 		Class type = arg.getClass();
-		if (type.isPrimitive())
-			return arg.toString();
-		
-		String typeName = type.isArray() ? type.getComponentType().getName() 
-										 : type.getName();
-		if (typeName.startsWith("java.lang"))
-			return arg.toString();
+		//log the concrete type of the argument if it differs from the expected type (i.e. is a subclass)
+		//the primitive type checks avoid logging redundant type info for autoboxed values
+		if (type != expectedType && !(expectedType.isPrimitive() || type.isPrimitive()))
+			element.addElement("type").setText(type.getName());
 		
 		//TODO: use annotations or some other configuration for custom
 		//parameter logging?
-		return "[" + type.getName() + "]";
+		String value = "{object}";
+		if (type.isArray()) {
+			if (shouldLog(type.getComponentType()))
+				value = asList((Object[])arg).toString();
+		} else {
+			if (shouldLog(type))
+				value = arg.toString();
+		}
+		element.addElement("value").setText(value);
+	}
+	
+	private static final boolean shouldLog(Class type) {
+		return type.isPrimitive() || type.getName().startsWith("java.lang");
 	}
 	
 }

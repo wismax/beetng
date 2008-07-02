@@ -22,17 +22,17 @@
 	<BEHAVIOR_TRACKING_EVENT EVENT_ID="0" APPLICATION="testBT"
 		TYPE="method" NAME="com.mtgi.analytics.aop.BehaviorAdviceTest$ServiceA.getTracked"
 		START="2008-06-26 16:34:25.681" DURATION_MS="100"
-		DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data&gt;&lt;result&gt;serviceA:0&lt;/result&gt;&lt;parameters&gt;&lt;parameter&gt;&lt;type&gt;java.lang.String&lt;/type&gt;&lt;value&gt;hello&lt;/value&gt;&lt;/parameter&gt;&lt;/parameters&gt;&lt;/event-data&gt;"
+		DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data&gt;&lt;parameters&gt;&lt;parameter&gt;&lt;value&gt;hello&lt;/value&gt;&lt;/parameter&gt;&lt;/parameters&gt;&lt;result&gt;&lt;value&gt;serviceA:0&lt;/value&gt;&lt;/result&gt;&lt;/event-data&gt;"
 		USER_ID="testUser" SESSION_ID="ABCDEF123" />
 	<BEHAVIOR_TRACKING_EVENT EVENT_ID="2" APPLICATION="testBT"
 		TYPE="method" NAME="com.mtgi.analytics.aop.BehaviorAdviceTest$ServiceB.getTracked"
 		START="2008-06-26 16:34:25.681" DURATION_MS="100"
-		DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data&gt;&lt;result&gt;1&lt;/result&gt;&lt;parameters/&gt;&lt;/event-data&gt;"
+		DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data&gt;&lt;parameters/&gt;&lt;result&gt;&lt;value&gt;1&lt;/value&gt;&lt;/result&gt;&lt;/event-data&gt;"
 		USER_ID="testUser" SESSION_ID="ABCDEF123" />
 	<BEHAVIOR_TRACKING_EVENT EVENT_ID="4" PARENT_EVENT_ID="0" APPLICATION="testBT"
 		TYPE="method" NAME="com.mtgi.analytics.aop.BehaviorAdviceTest$ServiceB.getTracked"
 		START="2008-06-26 16:34:25.681" DURATION_MS="100"
-		DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data&gt;&lt;result&gt;0&lt;/result&gt;&lt;parameters/&gt;&lt;/event-data&gt;"
+		DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data&gt;&lt;parameters/&gt;&lt;result&gt;&lt;value&gt;0&lt;/value&gt;&lt;/result&gt;&lt;/event-data&gt;"
 		USER_ID="testUser" SESSION_ID="ABCDEF123" />
 	<BEHAVIOR_TRACKING_EVENT EVENT_ID="6" APPLICATION="testBT"
 		TYPE="behavior-tracking" NAME="flush" 

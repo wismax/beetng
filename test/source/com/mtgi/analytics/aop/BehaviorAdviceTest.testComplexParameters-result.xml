@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<!DOCTYPE dataset [
+	<!ELEMENT dataset (BEHAVIOR_TRACKING_EVENT*)>
+	<!ELEMENT BEHAVIOR_TRACKING_EVENT EMPTY>
+	<!ATTLIST BEHAVIOR_TRACKING_EVENT
+	    EVENT_ID CDATA #REQUIRED
+	    PARENT_EVENT_ID CDATA #IMPLIED
+	    APPLICATION CDATA #REQUIRED
+	    TYPE CDATA #REQUIRED
+	    NAME CDATA #REQUIRED
+	    START CDATA #REQUIRED
+	    DURATION_MS CDATA #REQUIRED
+	    USER_ID CDATA #IMPLIED
+	    SESSION_ID CDATA #IMPLIED
+	    ERROR CDATA #IMPLIED
+	    DATA CDATA #IMPLIED
+	>
+]>
+
+<dataset>
+	<BEHAVIOR_TRACKING_EVENT EVENT_ID="0" APPLICATION="testBT"
+		TYPE="method" NAME="com.mtgi.analytics.aop.BehaviorAdviceTest$ServiceA.getWeirdParametersTracked"
+		START="2008-06-26 16:34:25.681" DURATION_MS="100"
+		DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data&gt;&lt;parameters&gt;&lt;parameter&gt;&lt;value&gt;{object}&lt;/value&gt;&lt;/parameter&gt;&lt;parameter&gt;&lt;type&gt;com.mtgi.analytics.aop.BehaviorAdviceTest$SubServiceB&lt;/type&gt;&lt;value&gt;{object}&lt;/value&gt;&lt;/parameter&gt;&lt;parameter&gt;&lt;value&gt;[hello, world]&lt;/value&gt;&lt;/parameter&gt;&lt;/parameters&gt;&lt;result&gt;&lt;type&gt;com.mtgi.analytics.aop.BehaviorAdviceTest$SubServiceB&lt;/type&gt;&lt;value&gt;{object}&lt;/value&gt;&lt;/result&gt;&lt;/event-data&gt;"
+		USER_ID="testUser" SESSION_ID="ABCDEF123" />
+	<BEHAVIOR_TRACKING_EVENT EVENT_ID="2" APPLICATION="testBT"
+		TYPE="method" NAME="com.mtgi.analytics.aop.BehaviorAdviceTest$ServiceA.getWeirdParametersTracked"
+		START="2008-06-26 16:34:25.681" DURATION_MS="100"
+		DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data&gt;&lt;parameters&gt;&lt;parameter/&gt;&lt;parameter/&gt;&lt;parameter&gt;&lt;value&gt;[]&lt;/value&gt;&lt;/parameter&gt;&lt;/parameters&gt;&lt;result/&gt;&lt;/event-data&gt;"
+		USER_ID="testUser" SESSION_ID="ABCDEF123" />
+	<BEHAVIOR_TRACKING_EVENT EVENT_ID="4" APPLICATION="testBT"
+		TYPE="method" NAME="com.mtgi.analytics.aop.BehaviorAdviceTest$ServiceA.getWeirdParametersTracked"
+		START="2008-06-26 16:34:25.681" DURATION_MS="100"
+		DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data&gt;&lt;parameters&gt;&lt;parameter&gt;&lt;value&gt;{object}&lt;/value&gt;&lt;/parameter&gt;&lt;parameter&gt;&lt;value&gt;{object}&lt;/value&gt;&lt;/parameter&gt;&lt;parameter&gt;&lt;value&gt;[null, value]&lt;/value&gt;&lt;/parameter&gt;&lt;/parameters&gt;&lt;result&gt;&lt;value&gt;{object}&lt;/value&gt;&lt;/result&gt;&lt;/event-data&gt;"
+		USER_ID="testUser" SESSION_ID="ABCDEF123" />
+	<BEHAVIOR_TRACKING_EVENT EVENT_ID="6" APPLICATION="testBT"
+		TYPE="behavior-tracking" NAME="flush" 
+		START="2008-06-26 16:34:25.681" DURATION_MS="100" 
+		DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data&gt;&lt;count&gt;3&lt;/count&gt;&lt;/event-data&gt;" 
+		USER_ID="testUser" SESSION_ID="ABCDEF123"/>
+</dataset>
