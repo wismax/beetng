@@ -16,6 +16,9 @@ import javax.xml.stream.XMLOutputFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ConnectionCallback;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
+import org.springframework.jdbc.datasource.ConnectionProxy;
+
+import com.mtgi.analytics.sql.BehaviorTrackingConnectionProxy;
 
 /**
  * Basic implementation of {@link BehaviorEventPersister}, which uses JDBC
@@ -100,83 +103,102 @@ public class JdbcBehaviorEventPersisterImpl extends JdbcDaoSupport
 	
 				public Object doInConnection(Connection con) throws SQLException, DataAccessException {
 	
-					int tally = 0; //return total events persisted.
-					
-					boolean doBatch = supportsBatchUpdates(con);
-					EventDataElementSerializer dataSerializer = new EventDataElementSerializer(xmlFactory);
-					
-					PreparedStatement insert = con.prepareStatement(insertSql);
-					try {
-						
-						PreparedStatement idQuery = con.prepareStatement(idSql);
-						try {
-							
-							//keep track of statements added to the batch so that we can time our
-							//flushes.
-							int batchCount = 0;
-							
-							//go until the queue is drained.
-							while (!events.isEmpty()) {
-								
-								//pop the next event off of the queue, and verify it has not been stored.
-								BehaviorEvent next = events.remove();
-								if (next.getId() != null) //circular references should be impossible by design, but it doesn't hurt to ask.
-									throw new IllegalStateException("Tracking Event " + next.getId() + " has already been persisted!");
-
-								//populate identifying information for the event into the insert statement.
-								Long id = nextId(idQuery);
-								insert.setLong(1, id);
-								
-								BehaviorEvent parent = next.getParent();
-								nullSafeSet(insert, 2, parent == null ? null : parent.getId(), Types.BIGINT);
-
-								insert.setString(3, next.getApplication());
-								insert.setString(4, next.getType());
-								insert.setString(5, next.getName());
-								insert.setTimestamp(6, new java.sql.Timestamp(next.getStart().getTime()));
-								insert.setLong(7, next.getDuration());
-
-								//set optional context information on the event.
-								nullSafeSet(insert, 8, next.getUserId(), Types.VARCHAR);
-								nullSafeSet(insert, 9, next.getSessionId(), Types.VARCHAR);
-								nullSafeSet(insert, 10, next.getError(), Types.VARCHAR);
-	
-								//convert event data to XML
-								String data = dataSerializer.serialize(next.getData(), true);
-								nullSafeSet(insert, 11, data, Types.VARCHAR);
-
-								if (doBatch) {
-									insert.addBatch();
-									if (++batchCount >= batchSize) {
-										insert.executeBatch();
-										batchCount = 0;
-									}
-								} else {
-									insert.executeUpdate();
-								}
-
-								//set the retrieved key on the instance for the benefit of child inserts.
-								next.setId(id);
-								
-								//push all child events onto the queue for persistence.
-								events.addAll(next.getChildren());
-								
-								++tally;
-							}
-
-							//flush any lingering batch inserts through to the server.
-							if (batchCount > 0)
-								insert.executeBatch();
-							
-						} finally {
-							closeStatement(idQuery);
+					//if this connection is behavior tracking, suspend tracking.
+					//we don't generate more events while persisting.
+					BehaviorTrackingConnectionProxy bt = null;
+					for (Connection c = con; 
+						 bt == null && c instanceof ConnectionProxy; 
+						 c = ((ConnectionProxy)c).getTargetConnection()) 
+					{
+						if (c instanceof BehaviorTrackingConnectionProxy) {
+							bt = (BehaviorTrackingConnectionProxy)c;
+							bt.suspendTracking();
 						}
-						
-					} finally {
-						closeStatement(insert);
 					}
 					
-					return tally;
+					try {
+						int tally = 0; //return total events persisted.
+						
+						boolean doBatch = supportsBatchUpdates(con);
+						EventDataElementSerializer dataSerializer = new EventDataElementSerializer(xmlFactory);
+	
+						PreparedStatement insert = con.prepareStatement(insertSql);
+						try {
+							
+							PreparedStatement idQuery = con.prepareStatement(idSql);
+							try {
+								
+								//keep track of statements added to the batch so that we can time our
+								//flushes.
+								int batchCount = 0;
+								
+								//go until the queue is drained.
+								while (!events.isEmpty()) {
+									
+									//pop the next event off of the queue, and verify it has not been stored.
+									BehaviorEvent next = events.remove();
+									if (next.getId() != null) //circular references should be impossible by design, but it doesn't hurt to ask.
+										throw new IllegalStateException("Tracking Event " + next.getId() + " has already been persisted!");
+	
+									//populate identifying information for the event into the insert statement.
+									Long id = nextId(idQuery);
+									insert.setLong(1, id);
+									
+									BehaviorEvent parent = next.getParent();
+									nullSafeSet(insert, 2, parent == null ? null : parent.getId(), Types.BIGINT);
+	
+									insert.setString(3, next.getApplication());
+									insert.setString(4, next.getType());
+									insert.setString(5, next.getName());
+									insert.setTimestamp(6, new java.sql.Timestamp(next.getStart().getTime()));
+									insert.setLong(7, next.getDuration());
+	
+									//set optional context information on the event.
+									nullSafeSet(insert, 8, next.getUserId(), Types.VARCHAR);
+									nullSafeSet(insert, 9, next.getSessionId(), Types.VARCHAR);
+									nullSafeSet(insert, 10, next.getError(), Types.VARCHAR);
+		
+									//convert event data to XML
+									String data = dataSerializer.serialize(next.getData(), true);
+									nullSafeSet(insert, 11, data, Types.VARCHAR);
+	
+									if (doBatch) {
+										insert.addBatch();
+										if (++batchCount >= batchSize) {
+											insert.executeBatch();
+											batchCount = 0;
+										}
+									} else {
+										insert.executeUpdate();
+									}
+	
+									//set the retrieved key on the instance for the benefit of child inserts.
+									next.setId(id);
+									
+									//push all child events onto the queue for persistence.
+									events.addAll(next.getChildren());
+									
+									++tally;
+								}
+	
+								//flush any lingering batch inserts through to the server.
+								if (batchCount > 0)
+									insert.executeBatch();
+								
+							} finally {
+								closeStatement(idQuery);
+							}
+							
+						} finally {
+							closeStatement(insert);
+						}
+						
+						return tally;
+						
+					} finally {
+						if (bt != null)
+							bt.resumeTracking();
+					}
 				}
 				
 			});

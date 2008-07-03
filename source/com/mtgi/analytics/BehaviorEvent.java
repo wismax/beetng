@@ -254,14 +254,14 @@ public class BehaviorEvent implements Serializable {
 		return buf.toString();
 	}
 	
-	private void add(BehaviorEvent child) {
+	protected void add(BehaviorEvent child) {
 		if (children == null)
 			children = new ArrayList<BehaviorEvent>();
 		children.add(child);
 		incrementTreeSize();
 	}
 	
-	private void incrementTreeSize() {
+	protected void incrementTreeSize() {
 		++treeSize;
 		if (parent != null)
 			parent.incrementTreeSize();

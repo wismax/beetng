@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<!DOCTYPE dataset [
+	<!ELEMENT dataset (BEHAVIOR_TRACKING_EVENT*)>
+	<!ELEMENT BEHAVIOR_TRACKING_EVENT EMPTY>
+	<!ATTLIST BEHAVIOR_TRACKING_EVENT
+	    EVENT_ID CDATA #REQUIRED
+	    PARENT_EVENT_ID CDATA #IMPLIED
+	    APPLICATION CDATA #REQUIRED
+	    TYPE CDATA #REQUIRED
+	    NAME CDATA #REQUIRED
+	    START CDATA #REQUIRED
+	    DURATION_MS CDATA #REQUIRED
+	    USER_ID CDATA #IMPLIED
+	    SESSION_ID CDATA #IMPLIED
+	    ERROR CDATA #IMPLIED
+	    DATA CDATA #IMPLIED
+	>
+]>
+
+<dataset>
+	<BEHAVIOR_TRACKING_EVENT EVENT_ID="0" APPLICATION="testBT"
+		TYPE="jdbc" NAME="execute"
+		START="2008-06-26 16:34:25.681" DURATION_MS="100"
+		DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data&gt;&lt;sql&gt;insert into TEST_TRACKING values (1, 'hello', null)&lt;/sql&gt;&lt;/event-data&gt;"
+		USER_ID="dbUser" SESSION_ID="ABCDEF123" />
+	<BEHAVIOR_TRACKING_EVENT EVENT_ID="2" APPLICATION="testBT"
+		TYPE="jdbc" NAME="execute"
+		START="2008-06-26 16:34:25.681" DURATION_MS="100"
+		DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data&gt;&lt;sql&gt;insert into TEST_TRACKING values (2, 'goodbye', null)&lt;/sql&gt;&lt;/event-data&gt;"
+		USER_ID="dbUser" SESSION_ID="ABCDEF123" />
+	<BEHAVIOR_TRACKING_EVENT EVENT_ID="4" APPLICATION="testBT"
+		TYPE="jdbc" NAME="executeUpdate"
+		START="2008-06-26 16:34:25.681" DURATION_MS="100"
+		DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data&gt;&lt;sql&gt;update TEST_TRACKING set DESCRIPTION = 'world'&lt;/sql&gt;&lt;/event-data&gt;"
+		USER_ID="dbUser" SESSION_ID="ABCDEF123" />
+	<BEHAVIOR_TRACKING_EVENT EVENT_ID="6" APPLICATION="testBT"
+		TYPE="jdbc" NAME="executeQuery"
+		START="2008-06-26 16:34:25.681" DURATION_MS="100"
+		DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data&gt;&lt;sql&gt;select ID from TEST_TRACKING order by ID&lt;/sql&gt;&lt;/event-data&gt;"
+		USER_ID="dbUser" SESSION_ID="ABCDEF123" />
+	<BEHAVIOR_TRACKING_EVENT EVENT_ID="8" APPLICATION="testBT"
+		TYPE="behavior-tracking" NAME="flush" 
+		START="2008-06-26 16:34:25.681" DURATION_MS="100" 
+		DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data&gt;&lt;count&gt;4&lt;/count&gt;&lt;/event-data&gt;" 
+		USER_ID="dbUser" SESSION_ID="ABCDEF123"/>
+</dataset>

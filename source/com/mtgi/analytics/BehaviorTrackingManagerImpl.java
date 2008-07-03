@@ -145,13 +145,12 @@ public class BehaviorTrackingManagerImpl implements BehaviorTrackingManager {
 		//we don't call our own start/stop/createEvents methods, because that could
 		//recursively lead to another flush() or other nasty problems if the flush 
 		//threshold is set too small
-		BehaviorEvent flushEvent = new BehaviorEvent(null, "behavior-tracking", "flush", application, 
-													 sessionContext.getContextUserId(), 
-													 sessionContext.getContextSessionId());
+		BehaviorEvent flushEvent = new FlushEvent();
 		EventDataElement data = flushEvent.addData();
 		flushEvent.start();
-		int count = -1;
 
+		int count = -1;
+		event.set(flushEvent);
 		try {
 			
 			LinkedList<BehaviorEvent> oldList = null, 
@@ -175,8 +174,10 @@ public class BehaviorTrackingManagerImpl implements BehaviorTrackingManager {
 			return count;
 			
 		} finally {
-			flushEvent.stop();
+			event.set(null);
+			
 			data.put("count", count);
+			flushEvent.stop();
 			
 			//persist the flush event immediately.
 			LinkedList<BehaviorEvent> temp = new LinkedList<BehaviorEvent>();
@@ -261,4 +262,25 @@ public class BehaviorTrackingManagerImpl implements BehaviorTrackingManager {
 		this.flushThreshold = flushThreshold;
 	}
 	
+	protected class FlushEvent extends BehaviorEvent {
+
+		private static final long serialVersionUID = 3182195013219330932L;
+
+		protected FlushEvent() {
+			super(null, "behavior-tracking", "flush", application, sessionContext.getContextUserId(), sessionContext.getContextSessionId());
+		}
+
+		/** 
+		 * flush events shouldn't have children, because persister implementations might end up being instrumented.
+		 * if the number of events spun off by the persister exceeds the flush threshold, we end
+		 * up in an infinite loop; flush, queue, flush, queue.  it might be nice to gain some 
+		 * visibility into flush events, but the complexity of such implementation is frought with peril.
+		 */
+		@Override
+		protected void add(BehaviorEvent child) {
+			//update bookkeeping but don't add children to persisted child list
+			incrementTreeSize();
+		}
+		
+	}
 }
