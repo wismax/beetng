@@ -10,8 +10,17 @@
      http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
 
 	<!-- check required annotations on test beans -->
-	<bean class="org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor"/>
+	<bean class="com.mtgi.analytics.aop.config.BehaviorTrackingBeanFactoryPostPocessor"/>
 
+	<bean class="org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor" />
+
+<!--	<bean id="behaviorTrackingManager" class="com.mtgi.analytics.BehaviorTrackingManagerImpl">-->
+<!--		<property name="application" value="testBT"/>-->
+<!--		<property name="executor" ref="taskExecutor"/>-->
+<!--		<property name="persister" ref="jdbcPersistenceManager"/>-->
+<!--		<property name="flushThreshold" value="5"/>-->
+<!--		<property name="sessionContext" ref="sessionContext"/>-->
+<!--	</bean>-->
 	<!-- 
 		add support for behavior tracking.  this tag should:
 		1.  automatically configure an instance of BehaviorTrackingManager in the spring context

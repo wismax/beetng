@@ -33,7 +33,7 @@
 			</xsd:annotation>
 			<xsd:complexContent>
 				<xsd:extension base="beans:identifiedType">
-					<xsd:attribute name="tracking-manager" type="xsd:string" default="trackingManager">
+					<xsd:attribute name="tracking-manager" type="xsd:string" >
 						<xsd:annotation>
 							<xsd:documentation source="java:com.mtgi.analytics.BehaviorTrackingManager"><![CDATA[
 	The bean name of the BehaviorTrackingManager that is to be used

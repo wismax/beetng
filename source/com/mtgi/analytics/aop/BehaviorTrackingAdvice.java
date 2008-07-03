@@ -94,6 +94,10 @@ public class BehaviorTrackingAdvice implements MethodInterceptor {
 		}
 		element.addElement("value").setText(value);
 	}
+
+	public BehaviorTrackingManager getTrackingManager() {
+		return trackingManager;
+	}
 	
 	private static final boolean shouldLog(Class type) {
 		return type.isPrimitive() || type.getName().startsWith("java.lang");
