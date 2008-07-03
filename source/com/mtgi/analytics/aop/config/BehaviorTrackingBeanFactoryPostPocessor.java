@@ -1,6 +1,7 @@
 package com.mtgi.analytics.aop.config;
 
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
@@ -21,10 +22,9 @@ public class BehaviorTrackingBeanFactoryPostPocessor implements BeanFactoryPostP
 		}
 
 		if (!checkConsistenceOfApplication(advice, manager)) {
-			throw new BeansException(
-					"The application value in Advice bean is inconsistent with the one in BehaviorTrackingManager bean!") {
-				private static final long serialVersionUID = 7291664081142277013L;
-			};
+			throw new BeanInitializationException(
+					"The application value in Advice bean is inconsistent with the one in BehaviorTrackingManager bean!"
+				);
 		}
 
 		advice.setTrackingManager(manager);
