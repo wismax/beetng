@@ -1,23 +1,20 @@
 package com.mtgi.analytics.aop.config;
 
-import java.util.List;
-
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
 
 import com.mtgi.analytics.aop.BehaviorTrackingAdvice;
 
 public class BtAdviceBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 
-	private static final String ATTRIBUTES = "attributes";
-
+	@Override
 	protected Class getBeanClass(Element element) {
 		return BehaviorTrackingAdvice.class;
 	}
 
+	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 		// Set the transaction manager property.
 		if (element.hasAttribute(BtNamespaceUtils.TRACKING_MANAGER_ATTRIBUTE))
@@ -28,11 +25,9 @@ public class BtAdviceBeanDefinitionParser extends AbstractSingleBeanDefinitionPa
 			builder.addPropertyValue(BtNamespaceUtils.TRACKING_MANAGER_APPLICATION_PROPERTY, element
 					.getAttribute(BtNamespaceUtils.TRACKING_MANAGER_APPLICATION_ATTRIBUTE));
 
-		List btAttributes = DomUtils.getChildElementsByTagName(element, ATTRIBUTES);
-		if (btAttributes.size() > 0) {
-			parserContext.getReaderContext().error("Element <attributes> is not allowed inside element <advice>",
-					element);
-		}
+		//add post-processor to check manager configuration.
+		BeanDefinitionBuilder processor = BeanDefinitionBuilder.rootBeanDefinition(BehaviorTrackingBeanFactoryPostPocessor.class);
+		parserContext.getRegistry().registerBeanDefinition("behaviorTrackingProcessor", processor.getBeanDefinition());
 
 		// else {
 		// // Assume annotations source.

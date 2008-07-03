@@ -36,15 +36,15 @@
 				
 				<xsd:extension base="beans:identifiedType">
 				<xsd:attribute name="application" type="xsd:string" use="required"/>	
-					<xsd:attribute name="tracking-manager" type="xsd:string" >
+					<xsd:attribute name="tracking-manager" type="xsd:string" use="optional">
 						<xsd:annotation>
 							<xsd:documentation source="java:com.mtgi.analytics.BehaviorTrackingManager"><![CDATA[
 	The bean name of the BehaviorTrackingManager that is to be used
 	to drive trackings.
 	
 	This attribute is not required, and only needs to be specified
-	explicitly if the bean name of the desired BehaviorTrackingManager
-	is not 'trackingManager'.
+	explicitly if there is more than one BehaviorTrackingManager defined
+	by the application.
 							]]></xsd:documentation>
 							<xsd:appinfo>
 								<tool:annotation kind="ref">
