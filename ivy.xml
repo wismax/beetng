@@ -29,6 +29,7 @@
 		<dependency org="apache" name="commons-logging" rev="1.1"/>
 		<dependency org="apache" name="log4j" rev="1.2.13" conf="compile;test;log4j->default"/>
 		<dependency org="bea" name="stax-impl" rev="1.2.0"/>
+		<dependency org="sun" name="FastInfoset" rev="1.2.2"/>
 		<dependency org="aspectj" name="aspectj" rev="1.5.3"/>
 		<dependency org="cglib" name="cglib" rev="2.1.3"/>
 

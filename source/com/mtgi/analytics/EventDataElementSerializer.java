@@ -4,7 +4,9 @@ import static java.lang.Character.isLetter;
 import static java.lang.Character.isLetterOrDigit;
 
 import java.io.StringWriter;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
 import javax.xml.stream.XMLOutputFactory;
@@ -18,8 +20,7 @@ public class EventDataElementSerializer {
 	private XMLOutputFactory factory;
 	private StringWriter buffer;
 	
-	public EventDataElementSerializer(XMLOutputFactory factory)
-	{
+	public EventDataElementSerializer(XMLOutputFactory factory) {
 		this.buffer = new StringWriter();
 		this.factory = factory;
 	}
@@ -126,6 +127,12 @@ public class EventDataElementSerializer {
 	 */
 	private static String getXMLElementName(String name) {
 
+		synchronized (nameCache) {
+			String cached = nameCache.get(name);
+			if (cached != null)
+				return cached;
+		}
+		
 		//accumulates return value.
 		StringBuffer buf = new StringBuffer();
 
@@ -181,10 +188,23 @@ public class EventDataElementSerializer {
 		
 		//input was just numbers or other gobbledigook.  return default value for element name.
 		if (length == 0)
-			return "data";
+			buf.append("data");
 		
 		//we have a usable name, return it.
-		return buf.toString();
+		String ret = buf.toString();
+		synchronized (nameCache) {
+			nameCache.put(name, ret);
+		}
+		return ret;
 	}
+
+	/** cache computed values to speed up processing */
+	private static HashMap<String,String> nameCache = new LinkedHashMap<String,String>() {
+		private static final long serialVersionUID = 8470335497980720176L;
+		@Override
+		protected boolean removeEldestEntry(Entry<String, String> eldest) {
+			return size() > 10000;
+		}
+	};
 	
 }

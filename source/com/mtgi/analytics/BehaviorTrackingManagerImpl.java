@@ -86,6 +86,9 @@ public class BehaviorTrackingManagerImpl implements BehaviorTrackingManager {
 		}
 	};
 	
+	public BehaviorTrackingManagerImpl() {
+	}
+	
 	public BehaviorEvent createEvent(String type, String name) {
 		//TODO: stack depth limits.  hand out a singleton dummy event if there are already
 		//too many pending events waiting for closure.

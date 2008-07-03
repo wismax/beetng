@@ -9,7 +9,7 @@
 			<param name="ConversionPattern" value="%d %p [%c] - %m%n"/>
 		</layout>
 	</appender>
-
+	
 	<category name="org.apache">
 		<priority value="WARN"/>
 	</category>
@@ -19,9 +19,9 @@
 	</category>
 
 	<category name="com.mtgi">
-		<priority value="DEBUG"/>
+		<priority value="INFO"/>
 	</category>
-	
+
 	<root>
 		<priority value="INFO"/>
 		<appender-ref ref="stdout"/>
