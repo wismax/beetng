@@ -9,7 +9,7 @@ import com.mtgi.analytics.BehaviorTrackingManager;
 import com.mtgi.analytics.BehaviorTrackingManagerImpl;
 import com.mtgi.analytics.aop.BehaviorTrackingAdvice;
 
-public class BehaviorTrackingBeanFactoryPostPocessor implements BeanFactoryPostProcessor {
+public class BehaviorTrackingBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
 
 	@SuppressWarnings("unchecked")
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {

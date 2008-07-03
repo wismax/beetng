@@ -26,7 +26,7 @@ public class BtAdviceBeanDefinitionParser extends AbstractSingleBeanDefinitionPa
 					.getAttribute(BtNamespaceUtils.TRACKING_MANAGER_APPLICATION_ATTRIBUTE));
 
 		//add post-processor to check manager configuration.
-		BeanDefinitionBuilder processor = BeanDefinitionBuilder.rootBeanDefinition(BehaviorTrackingBeanFactoryPostPocessor.class);
+		BeanDefinitionBuilder processor = BeanDefinitionBuilder.rootBeanDefinition(BehaviorTrackingBeanFactoryPostProcessor.class);
 		parserContext.getRegistry().registerBeanDefinition("behaviorTrackingProcessor", processor.getBeanDefinition());
 
 		// else {
