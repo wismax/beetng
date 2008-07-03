@@ -13,6 +13,11 @@ public class BtNamespaceUtils {
 
 	public static final String TRACKING_ATTRIBUTE_SOURCE = "trackingAttributeSource";
 
+	public static final String TRACKING_MANAGER_APPLICATION_ATTRIBUTE = "application";
+	
+	public static final String TRACKING_MANAGER_APPLICATION_PROPERTY =
+		Conventions.attributeNameToPropertyName(TRACKING_MANAGER_APPLICATION_ATTRIBUTE);
+
 //	private static final String ANNOTATION_TRACKING_ATTRIBUTE_SOURCE_CLASS_NAME =
 //			"org.springframework.transaction.annotation.AnnotationTransactionAttributeSource";
 //

@@ -31,8 +31,11 @@
 					</tool:annotation>
 				</xsd:appinfo>
 			</xsd:annotation>
+			
 			<xsd:complexContent>
+				
 				<xsd:extension base="beans:identifiedType">
+				<xsd:attribute name="application" type="xsd:string" use="required"/>	
 					<xsd:attribute name="tracking-manager" type="xsd:string" >
 						<xsd:annotation>
 							<xsd:documentation source="java:com.mtgi.analytics.BehaviorTrackingManager"><![CDATA[

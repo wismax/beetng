@@ -24,6 +24,17 @@ public class BehaviorTrackingAdvice implements MethodInterceptor {
 	private String eventType = "method";
 	private BehaviorTrackingManager trackingManager;
 	
+	private String application;
+	
+	public String getApplication() {
+		return application;
+	}
+
+	@Required
+	public void setApplication(String application) {
+		this.application = application;
+	}
+
 	public void setEventType(String eventType) {
 		this.eventType = eventType;
 	}
@@ -32,6 +43,11 @@ public class BehaviorTrackingAdvice implements MethodInterceptor {
 	public void setTrackingManager(BehaviorTrackingManager manager) {
 		this.trackingManager = manager;
 	}
+	
+	public BehaviorTrackingManager getTrackingManager() {
+		return trackingManager;
+	}
+	
 
 	public Object invoke(MethodInvocation invocation) throws Throwable {
 
@@ -95,9 +111,6 @@ public class BehaviorTrackingAdvice implements MethodInterceptor {
 		element.addElement("value").setText(value);
 	}
 
-	public BehaviorTrackingManager getTrackingManager() {
-		return trackingManager;
-	}
 	
 	private static final boolean shouldLog(Class type) {
 		return type.isPrimitive() || type.getName().startsWith("java.lang");

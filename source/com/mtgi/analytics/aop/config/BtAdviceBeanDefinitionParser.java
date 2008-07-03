@@ -23,6 +23,10 @@ public class BtAdviceBeanDefinitionParser extends AbstractSingleBeanDefinitionPa
 		if (element.hasAttribute(BtNamespaceUtils.TRACKING_MANAGER_ATTRIBUTE))
 			builder.addPropertyReference(BtNamespaceUtils.TRACKING_MANAGER_PROPERTY, element
 					.getAttribute(BtNamespaceUtils.TRACKING_MANAGER_ATTRIBUTE));
+		
+		if (element.hasAttribute(BtNamespaceUtils.TRACKING_MANAGER_APPLICATION_ATTRIBUTE))
+			builder.addPropertyValue(BtNamespaceUtils.TRACKING_MANAGER_APPLICATION_PROPERTY, element
+					.getAttribute(BtNamespaceUtils.TRACKING_MANAGER_APPLICATION_ATTRIBUTE));
 
 		List btAttributes = DomUtils.getChildElementsByTagName(element, ATTRIBUTES);
 		if (btAttributes.size() > 0) {

@@ -14,19 +14,12 @@
 
 	<bean class="org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor" />
 
-<!--	<bean id="behaviorTrackingManager" class="com.mtgi.analytics.BehaviorTrackingManagerImpl">-->
-<!--		<property name="application" value="testBT"/>-->
-<!--		<property name="executor" ref="taskExecutor"/>-->
-<!--		<property name="persister" ref="jdbcPersistenceManager"/>-->
-<!--		<property name="flushThreshold" value="5"/>-->
-<!--		<property name="sessionContext" ref="sessionContext"/>-->
-<!--	</bean>-->
 	<!-- 
 		add support for behavior tracking.  this tag should:
 		1.  automatically configure an instance of BehaviorTrackingManager in the spring context
 		2.  notice that instances of TaskExecutor, PersistenceManager, and SessionContext have been setup below, and use them
 	-->
-	<bt:advice id="btAdvice"/>
+	<bt:advice id="btAdvice" application="testBT"/>
 	
 	<!-- 
 		this is where we configure which methods get instrumented.  We configure only methods
