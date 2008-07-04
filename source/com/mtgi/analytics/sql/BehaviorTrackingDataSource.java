@@ -7,8 +7,6 @@ import java.lang.reflect.Proxy;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.LinkedHashMap;
-import java.util.Map.Entry;
 
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.jdbc.datasource.ConnectionProxy;
@@ -174,7 +172,7 @@ public class BehaviorTrackingDataSource extends DelegatingDataSource {
 	
 		private ConnectionHandler parent;
 		private String sql;
-		private LinkedHashMap<Object,Object> parameters = new LinkedHashMap<Object,Object>();
+		private EventDataElement parameters = new EventDataElement("parameters");
 		
 		public StatementHandler(ConnectionHandler parent, Object target, String sql) {
 			super(target);
@@ -207,14 +205,24 @@ public class BehaviorTrackingDataSource extends DelegatingDataSource {
 				} else if (op.startsWith("set")) {
 					//maybe parameters being set?  store up parameters in hash table until we start another execute event.
 					//we have to support multiple execute() calls on the same statement object to support prepared / callable API
+					String key = null;
+					Object value = null;
 					if (op.equals("setNull")) {
-						parameters.put(args[0], null);
+						key = args[0].toString();
 					} else if (args.length == 2) {
 						if (!(op.endsWith("Stream") || op.endsWith("lob"))) {
-							parameters.put(args[0], args[1]);
+							key = args[0].toString();
+							value = args[1];
 						}
 					} else if (args.length == 3 && ("setObject".equals(op) || "setDate".equals(op))) {
-						parameters.put(args[0], args[1]);
+						key = args[0].toString();
+						value = args[1];
+					}
+					
+					if (key != null) {
+						EventDataElement p = parameters.addElement("parameter");
+						p.put("key", key);
+						p.put("value", value);
 					}
 				}
 			}
@@ -234,15 +242,9 @@ public class BehaviorTrackingDataSource extends DelegatingDataSource {
 
 			if (!parameters.isEmpty()) {
 				//transfer parameters from buffer into event object.
-				EventDataElement params = data.addElement("parameters");
-				for (Entry<Object,Object> param : parameters.entrySet()) {
-					EventDataElement p = params.addElement("parameter");
-					p.put("key", param.getKey().toString());
-					p.put("value", param.getValue());
-				}
-	
+				data.addElement(parameters);
 				//clear out the parameter buffer for the next execute event.
-				parameters.clear();
+				parameters = new EventDataElement("parameters");
 			}
 			
 			trackingManager.start(event);

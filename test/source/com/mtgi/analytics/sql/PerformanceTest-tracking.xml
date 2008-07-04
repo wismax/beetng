@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xmlns:aop="http://www.springframework.org/schema/aop"
+     xmlns:bt="http://www.mantis-tgi.com/schema/bt"
+     xsi:schemaLocation="
+     http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+     http://www.mantis-tgi.com/schema/bt com/mtgi/analytics/aop/mtgi-bt-1.0.xsd 
+     http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
+
+	<!-- check required annotations on test beans -->
+	<bean class="org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor"/>
+
+	<!-- used to establish performance baseline -->
+	<bean id="dataSource" class="org.unitils.database.UnitilsDataSourceFactoryBean" />
+
+	<!-- used to measure affects of behavior tracking -->
+	<bean id="instrumentedDataSource" class="com.mtgi.analytics.sql.BehaviorTrackingDataSource">
+		<property name="trackingManager" ref="trackingManager"/>
+		<property name="targetDataSource" ref="dataSource"/>
+	</bean>
+
+	<bean id="trackingManager" class="com.mtgi.analytics.BehaviorTrackingManagerImpl">
+		<property name="application" value="testDb"/>
+		<property name="executor" ref="taskExecutor"/>
+		<property name="persister" ref="trackingPersister"/>
+		<property name="sessionContext" ref="sessionContext"/>
+	</bean>
+
+	<bean id="trackingPersister" class="com.mtgi.analytics.XmlBehaviorEventPersisterImpl">
+		<property name="file" value="test/tmp/perf-bin.log"/>
+		<property name="binary" value="true"/>
+	</bean>
+
+	<bean id="sessionContext" class="com.mtgi.analytics.MockSessionContext">
+		<property name="contextUserId" value="dbTest"/>
+		<property name="contextSessionId" value="01"/>
+	</bean>
+	
+	<!-- task queue for async persistence operations -->	
+	<bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+		<property name="corePoolSize" value="1"/>
+		<property name="maxPoolSize" value="1"/>
+		<property name="queueCapacity" value="100"/>
+		<property name="threadFactory">
+		<bean class="org.springframework.scheduling.concurrent.CustomizableThreadFactory">
+			<!-- one below normal priority, so that a full plate won't prevent request threads from doing their work -->
+			<property name="threadPriority" value="4"/>
+			<property name="threadNamePrefix" value="BehaviorEventPersister-"/>
+		</bean>
+		</property>
+	</bean>
+	
+</beans>

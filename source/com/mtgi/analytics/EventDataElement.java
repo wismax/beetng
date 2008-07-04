@@ -22,7 +22,7 @@ public class EventDataElement implements Serializable {
 	private LinkedHashMap<String,Object> properties;
 	private ArrayList<EventDataElement> children;
 	
-	protected EventDataElement(String name) {
+	public EventDataElement(String name) {
 		this.name = name;
 	}
 	
@@ -59,11 +59,19 @@ public class EventDataElement implements Serializable {
 	 * Add a child element with the given name to this element.
 	 */
 	public EventDataElement addElement(String name) {
+		EventDataElement ret = new EventDataElement(name);
+		addElement(ret);
+		return ret;
+	}
+	
+	public void addElement(EventDataElement child) {
 		if (children == null)
 			children = new ArrayList<EventDataElement>();
-		EventDataElement ret = new EventDataElement(name);
-		children.add(ret);
-		return ret;
+		children.add(child);
+	}
+	
+	public boolean isEmpty() {
+		return text == null && properties == null && children == null;
 	}
 	
 	public Iterator<Map.Entry<String,Object>> iterateProperties() {
