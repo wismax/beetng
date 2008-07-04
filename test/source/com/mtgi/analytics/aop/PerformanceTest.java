@@ -1,5 +1,7 @@
 package com.mtgi.analytics.aop;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -13,21 +15,30 @@ import com.mtgi.analytics.aop.BehaviorAdviceTest.ServiceA;
 public class PerformanceTest extends AbstractPerformanceTestCase {
 
 	private static final int METHOD_DELAY = 10;
+	private ClassPathXmlApplicationContext basisContext;
+	private ClassPathXmlApplicationContext testContext;
 	
 	public PerformanceTest() {
 		super(2); //each test job generates two BT events.
 	}
 	
+	@Before
+	public void initContext() {
+		basisContext = new ClassPathXmlApplicationContext("com/mtgi/analytics/aop/PerformanceTest-basis.xml");
+		testContext = new ClassPathXmlApplicationContext(new String[]{ 
+							"com/mtgi/analytics/aop/PerformanceTest-basis.xml",
+							"com/mtgi/analytics/aop/PerformanceTest-tracking.xml"
+					});
+	}
+	
+	@After
+	public void destroyContext() {
+		basisContext.destroy();
+		testContext.destroy();
+	}
+	
 	@Test
 	public void testPerformance() throws Throwable {
-		ClassPathXmlApplicationContext basisContext = 
-			new ClassPathXmlApplicationContext("com/mtgi/analytics/aop/PerformanceTest-basis.xml");
-		ClassPathXmlApplicationContext testContext = 
-			new ClassPathXmlApplicationContext(new String[]{ 
-					"com/mtgi/analytics/aop/PerformanceTest-basis.xml",
-					"com/mtgi/analytics/aop/PerformanceTest-tracking.xml"
-			});
-		
 		TestJob basisJob = new TestJob((ServiceA)basisContext.getBean("serviceA"));
 		TestJob testJob = new TestJob((ServiceA)testContext.getBean("serviceA"));
 		testPerformance(basisJob, testJob);

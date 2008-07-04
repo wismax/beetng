@@ -31,8 +31,12 @@ public class PerformanceTest extends AbstractPerformanceTestCase {
 	@TestDataSource
 	private DataSource dataSource;
 	
+	private ClassPathXmlApplicationContext context;
+	
 	@Before
 	public void initTestTable() throws SQLException{
+		context = new ClassPathXmlApplicationContext("com/mtgi/analytics/sql/PerformanceTest-tracking.xml");
+		
 		Connection conn = dataSource.getConnection();
 		Statement stmt = conn.createStatement();
 		stmt.execute("create table TEST_TRACKING (" +
@@ -51,13 +55,13 @@ public class PerformanceTest extends AbstractPerformanceTestCase {
 		stmt.execute("drop table TEST_TRACKING");
 		stmt.close();
 		conn.close();
+		
+		context.destroy();
+		context = null;
 	}
 	
 	@Test
 	public void testPerformance() throws Throwable {
-		ClassPathXmlApplicationContext context = 
-			new ClassPathXmlApplicationContext("com/mtgi/analytics/sql/PerformanceTest-tracking.xml");
-		
 		TestJob basisJob = new TestJob((DataSource)context.getBean("dataSource"));
 		TestJob testJob = new TestJob((DataSource)context.getBean("instrumentedDataSource"));
 
