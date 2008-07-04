@@ -41,9 +41,12 @@ public class BehaviorTrackingFilter implements Filter {
 	public static final String PARAM_MANAGER_NAME = "com.mtgi.analytics.manager";
 	/** filter parameter specifying the eventType value to use when logging behavior tracking events. */
 	public static final String PARAM_EVENT_TYPE = "com.mtgi.analytics.servlet.event";
-
+	/** filter parameter specifying a list of parameters to include in logging; defaults to all if unspecified */
+	public static final String PARAM_PARAMETERS_INCLUDE = "com.mtgi.analytics.parameters.include";
+	
 	private String eventType = "http-request";
 	private BehaviorTrackingManager manager;
+	private String[] parameters;
 	
 	public void destroy() {
 		manager = null;
@@ -72,6 +75,10 @@ public class BehaviorTrackingFilter implements Filter {
 		String type = config.getInitParameter(PARAM_EVENT_TYPE);
 		if (type != null)
 			eventType = type;
+		
+		String params = config.getInitParameter(PARAM_PARAMETERS_INCLUDE);
+		if (params != null)
+			parameters = params.split("[\\r\\n\\s,;]+");
 	}
 
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
@@ -91,14 +98,20 @@ public class BehaviorTrackingFilter implements Filter {
 		data.add("remote-host", req.getRemoteHost());
 		
 		EventDataElement parameters = data.addElement("parameters");
-		for (Enumeration params = request.getParameterNames(); params.hasMoreElements(); ) {
-			String name = (String)params.nextElement();
-			String[] values = request.getParameterValues(name);
-			
-			EventDataElement param = parameters.addElement("parameter");
-			param.add("name", name);
-			for (String v : values)
-				param.add("value", v);
+		if (this.parameters != null) {
+			//include only configured parameters
+			for (String name : this.parameters) {
+				String[] values = request.getParameterValues(name);
+				if (values != null)
+					addParameter(parameters, name, values);
+			}
+		} else {
+			//include all parameters
+			for (Enumeration params = request.getParameterNames(); params.hasMoreElements(); ) {
+				String name = (String)params.nextElement();
+				String[] values = request.getParameterValues(name);
+				addParameter(parameters, name, values);
+			}
 		}
 		
 		//wrap the response so that we can intercept response status if the application
@@ -123,6 +136,13 @@ public class BehaviorTrackingFilter implements Filter {
 		} finally {
 			manager.stop(event);
 		}
+	}
+	
+	private static final void addParameter(EventDataElement parameters, String name, String[] values) {
+		EventDataElement param = parameters.addElement("parameter");
+		param.add("name", name);
+		for (String v : values)
+			param.add("value", v);
 	}
 	
 	private static final void handleServerError(BehaviorEvent event, Throwable e) throws ServletException, IOException {

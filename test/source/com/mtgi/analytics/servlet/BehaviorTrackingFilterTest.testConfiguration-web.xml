@@ -62,6 +62,11 @@
 			<param-name>com.mtgi.analytics.servlet.event</param-name>
 			<param-value>tracked-request</param-value>
 		</init-param>
+		<!-- when this parameter is present, only listed parameters are logged -->
+		<init-param>
+			<param-name>com.mtgi.analytics.parameters.include</param-name>
+			<param-value>param1,param3</param-value>
+		</init-param>
 	</filter>
 	
 	<filter-mapping>
