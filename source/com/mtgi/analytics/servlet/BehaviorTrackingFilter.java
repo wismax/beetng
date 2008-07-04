@@ -98,7 +98,7 @@ public class BehaviorTrackingFilter implements Filter {
 			EventDataElement param = parameters.addElement("parameter");
 			param.add("name", name);
 			for (String v : values)
-				param.addElement("value").setText(v);
+				param.add("value", v);
 		}
 		
 		//wrap the response so that we can intercept response status if the application
