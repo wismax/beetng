@@ -69,11 +69,7 @@ public class EventDataElementSerializer {
 		//create a new node for the element and append it to the parent.
 		String name = getXMLElementName(element.getName());
 		
-		String text = element.getText();
-		Iterator<Entry<String,Object>> props = element.iterateProperties();
-		Iterator<EventDataElement> children = element.iterateChildren();
-		
-		if (text == null && !props.hasNext() && !children.hasNext()) {
+		if (element.isEmpty()) {
 			writer.writeEmptyElement(name);
 			//TODO: remove when stax bug is fixed.
 			//this is a workaround for a bug in the 1.2 StAX implementation, where
@@ -85,10 +81,12 @@ public class EventDataElementSerializer {
 			writer.writeStartElement(name);
 			
 			//add text to the element if applicable.
+			String text = element.getText();
 			if (text != null)
 				writer.writeCharacters(text);
 			
 			//add child elements for properties.
+			Iterator<Entry<String,Object>> props = element.iterateProperties();
 			while (props.hasNext()) {
 				Entry<String,Object> prop = props.next();
 				
@@ -105,11 +103,11 @@ public class EventDataElementSerializer {
 			}
 			
 			//add child elements for children.
+			Iterator<EventDataElement> children = element.iterateChildren();
 			while (children.hasNext())
 				serializeElement(writer, children.next());
 			writer.writeEndElement();
 		}
-		
 	}
 	
 	/**
