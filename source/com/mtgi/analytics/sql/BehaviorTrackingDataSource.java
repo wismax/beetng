@@ -205,24 +205,24 @@ public class BehaviorTrackingDataSource extends DelegatingDataSource {
 				} else if (op.startsWith("set")) {
 					//maybe parameters being set?  store up parameters in hash table until we start another execute event.
 					//we have to support multiple execute() calls on the same statement object to support prepared / callable API
-					String key = null;
+					Object key = null;
 					Object value = null;
 					if (op.equals("setNull")) {
-						key = args[0].toString();
+						key = args[0];
 					} else if (args.length == 2) {
 						if (!(op.endsWith("Stream") || op.endsWith("lob"))) {
-							key = args[0].toString();
+							key = args[0];
 							value = args[1];
 						}
 					} else if (args.length == 3 && ("setObject".equals(op) || "setDate".equals(op))) {
-						key = args[0].toString();
+						key = args[0];
 						value = args[1];
 					}
 					
 					if (key != null) {
 						EventDataElement p = parameters.addElement("parameter");
-						p.put("key", key);
-						p.put("value", value);
+						p.add("key", key);
+						p.add("value", value);
 					}
 				}
 			}
@@ -238,7 +238,7 @@ public class BehaviorTrackingDataSource extends DelegatingDataSource {
 
 			//SQL could either be provided as parameter, or when statement was created.
 			String actualSql = sql == null ? this.sql : sql;
-			data.put("sql", actualSql);
+			data.add("sql", actualSql);
 
 			if (!parameters.isEmpty()) {
 				//transfer parameters from buffer into event object.

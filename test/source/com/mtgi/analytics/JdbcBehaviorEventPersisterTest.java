@@ -142,7 +142,7 @@ public class JdbcBehaviorEventPersisterTest extends JdbcEventTestCase {
 			ret.setError("error[" + index + "]");
 		//two out of every three events have a data element.
 		if ( ((index + 2) % 3) != 0 )
-			ret.addData().put("key", "value<" + index + ">");
+			ret.addData().add("key", "value<" + index + ">");
 
 		//descend to create child events.
 		if (depth < maxDepth) {

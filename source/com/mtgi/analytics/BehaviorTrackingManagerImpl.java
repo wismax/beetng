@@ -179,7 +179,7 @@ public class BehaviorTrackingManagerImpl implements BehaviorTrackingManager {
 		} finally {
 			event.set(null);
 			
-			data.put("count", count);
+			data.add("count", count);
 			flushEvent.stop();
 			
 			//persist the flush event immediately.

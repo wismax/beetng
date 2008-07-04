@@ -84,11 +84,11 @@ public class BehaviorTrackingFilter implements Filter {
 
 		//log relevant request data and parameters to the event.
 		EventDataElement data = event.addData();
-		data.put("uri", eventName);
-		data.put("protocol", req.getProtocol());
-		data.put("method", req.getMethod());
-		data.put("remote-address", req.getRemoteAddr());
-		data.put("remote-host", req.getRemoteHost());
+		data.add("uri", eventName);
+		data.add("protocol", req.getProtocol());
+		data.add("method", req.getMethod());
+		data.add("remote-address", req.getRemoteAddr());
+		data.add("remote-host", req.getRemoteHost());
 		
 		EventDataElement parameters = data.addElement("parameters");
 		for (Enumeration params = request.getParameterNames(); params.hasMoreElements(); ) {
@@ -96,7 +96,7 @@ public class BehaviorTrackingFilter implements Filter {
 			String[] values = request.getParameterValues(name);
 			
 			EventDataElement param = parameters.addElement("parameter");
-			param.put("name", name);
+			param.add("name", name);
 			for (String v : values)
 				param.addElement("value").setText(v);
 		}
@@ -110,8 +110,8 @@ public class BehaviorTrackingFilter implements Filter {
 			chain.doFilter(request, btr);
 			
 			//log response codes.
-			data.put("response-status", btr.status);
-			data.put("response-message", btr.message);
+			data.add("response-status", btr.status);
+			data.add("response-message", btr.message);
 			
 			//if an error code is being sent back, populate the 'error' field of the event with relevant info.
 			if (btr.status != null && btr.status >= 400)
@@ -127,7 +127,7 @@ public class BehaviorTrackingFilter implements Filter {
 	
 	private static final void handleServerError(BehaviorEvent event, Throwable e) throws ServletException, IOException {
 
-		event.addData().put("response-status", 500);
+		event.addData().add("response-status", 500);
 		
 		if (e instanceof ServletException) {
 			ServletException se = (ServletException)e;

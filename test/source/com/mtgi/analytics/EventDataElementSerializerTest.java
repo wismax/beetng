@@ -36,11 +36,10 @@ public class EventDataElementSerializerTest {
 	public void testProperties() {
 		//test serialization of properties to elements.
 		EventDataElement root = new EventDataElement("event-data");
-		assertNull(root.put("foo", new Double(1.5)));
-		assertNull(root.put("---bar-7", "hello"));
-		assertNull(root.put("baz", null));
-		assertNull(root.put("qux", "hello"));
-		assertEquals("hello", root.put("qux", "world&escaped\nmaybe?"));
+		root.add("foo", new Double(1.5));
+		root.add("---bar-7", "hello");
+		root.add("baz", null);
+		root.add("qux", "world&escaped\nmaybe?");
 		assertEquals("<?xml version='1.0' encoding='utf-8'?><event-data><foo>1.5</foo><bar-7>hello</bar-7><baz/><qux>world&amp;escaped\nmaybe?</qux></event-data>", 
 					 serializer.serialize(root, true));
 	}
@@ -51,10 +50,10 @@ public class EventDataElementSerializerTest {
 		EventDataElement root = new EventDataElement("-0&9!@#$#$!!$");
 		root.addElement("--Leading&*(Trailing_7-#").setText("<hello&amp;world>");
 		EventDataElement child = root.addElement("9-foo@bar.baz");
-		child.put("hello", "world");
+		child.add("hello", "world");
 		child.setText("bar");
-		child.addElement("baz-quux").put("first", null);
-		child.addElement("baz-quux").put("second", null);
+		child.addElement("baz-quux").add("first", null);
+		child.addElement("baz-quux").add("second", null);
 		assertEquals("<?xml version='1.0' encoding='utf-8'?>" +
 					"<data>" +
 						"<Leading-Trailing-7>&lt;hello&amp;amp;world&gt;</Leading-Trailing-7>" +
