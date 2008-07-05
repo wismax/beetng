@@ -61,18 +61,25 @@ public class BehaviorTrackingDataSourceTest extends JdbcEventTestCase {
 	
 	@Test
 	public void testStaticSql() throws Exception {
-		//test simple static insert, update, deletes.
+		//test simple static insert / update.
 		assertFalse(stmt.execute("insert into TEST_TRACKING values (1, 'hello', null)"));
+
+		//test batching.  each batch should create one event.
+		stmt.addBatch("insert into TEST_TRACKING values (3, 'batch', '1')");
+		stmt.addBatch("insert into TEST_TRACKING values (4, 'batch', '2')");
+		stmt.executeBatch();
+
 		assertFalse(stmt.execute("insert into TEST_TRACKING values (2, 'goodbye', null)"));
-		assertEquals(2, stmt.executeUpdate("update TEST_TRACKING set DESCRIPTION = 'world'"));
+		assertEquals(4, stmt.executeUpdate("update TEST_TRACKING set DESCRIPTION = 'world'"));
 		
+		//test query.
 		ResultSet rs = stmt.executeQuery("select ID from TEST_TRACKING order by ID");
 		int index = 0;
-		long[] keys = { 1L, 2L };
+		long[] keys = { 1L, 2L, 3L, 4L };
 		while (rs.next())
 			assertEquals(keys[index++], rs.getLong(1));
 		rs.close();
-		assertEquals(2, index);
+		assertEquals(4, index);
 		
 		manager.flush();
 		assertEventDataMatches("BehaviorTrackingDataSourceTest.testStaticSql-result.xml");
@@ -88,22 +95,35 @@ public class BehaviorTrackingDataSourceTest extends JdbcEventTestCase {
 		stmt.setObject(3, null, Types.VARCHAR);
 		assertEquals(1, stmt.executeUpdate());
 
+		//test support for batching.  each batch should log 1 event.
+		stmt.setLong(1, 3);
+		stmt.setString(2, "batch");
+		stmt.setObject(3, "1", Types.VARCHAR);
+		stmt.addBatch();
+		
+		stmt.setLong(1, 4);
+		stmt.setString(2, "batch");
+		stmt.setObject(3, "2", Types.VARCHAR);
+		stmt.addBatch();
+		stmt.executeBatch();
+		
+		//back to a regular old update.
 		stmt.setLong(1, 2);
 		stmt.setObject(2, "goodbye", Types.VARCHAR);
 		stmt.setNull(3, Types.VARCHAR);
 		assertEquals(1, stmt.executeUpdate());
 		
 		stmt = conn.prepareStatement("update TEST_TRACKING set DESCRIPTION = 'world'");
-		assertEquals(2, stmt.executeUpdate());
+		assertEquals(4, stmt.executeUpdate());
 
 		stmt = conn.prepareStatement("select ID from TEST_TRACKING order by ID");
 		ResultSet rs = stmt.executeQuery();
 		int index = 0;
-		long[] keys = { 1L, 2L };
+		long[] keys = { 1L, 2L, 3L, 4L };
 		while (rs.next())
 			assertEquals(keys[index++], rs.getLong(1));
 		rs.close();
-		assertEquals(2, index);
+		assertEquals(4, index);
 		
 		manager.flush();
 		assertEventDataMatches("BehaviorTrackingDataSourceTest.testPreparedStatement-result.xml");

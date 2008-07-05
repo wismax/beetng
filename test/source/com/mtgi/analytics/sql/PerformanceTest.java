@@ -25,7 +25,7 @@ import com.mtgi.analytics.AbstractPerformanceTestCase;
 public class PerformanceTest extends AbstractPerformanceTestCase {
 
 	public PerformanceTest() {
-		super(3); //each test job generates three BT events.
+		super(5); //each test job generates five BT events.
 	}
 	
 	@TestDataSource
@@ -83,7 +83,7 @@ public class PerformanceTest extends AbstractPerformanceTestCase {
 				Connection conn = ds.getConnection();
 				try {
 					PreparedStatement ps = conn.prepareStatement("insert into TEST_TRACKING values (?, ?, ?)");
-					long s1 = SEQ++, s2 = SEQ++;
+					long s1 = SEQ++, s2 = SEQ++, s3 = SEQ++, s4 = SEQ++;
 					ps.setLong(1, s1);
 					ps.setString(2, "foo" + SEQ);
 					ps.setString(3, "adesc");
@@ -93,10 +93,25 @@ public class PerformanceTest extends AbstractPerformanceTestCase {
 					ps.setString(2, "bar" + SEQ);
 					ps.setString(3, "bdesc");
 					ps.executeUpdate();
+					
+					ps.setLong(1, s3);
+					ps.setString(2, "bar" + SEQ);
+					ps.setString(3, "bdesc");
+					ps.addBatch();
+					
+					ps.setLong(1, s4);
+					ps.setString(2, "bar" + SEQ);
+					ps.setString(3, "bdesc");
+					ps.addBatch();
+					ps.executeBatch();
 					ps.close();
 					
 					Statement s = conn.createStatement();
 					s.executeUpdate("delete from TEST_TRACKING where ID in (" + s1 + "," + s2 + ")");
+					
+					s.addBatch("delete from TEST_TRACKING where ID = " + s3);
+					s.addBatch("delete from TEST_TRACKING where ID = " + s4);
+					s.executeBatch();
 					s.close();
 
 				} finally {

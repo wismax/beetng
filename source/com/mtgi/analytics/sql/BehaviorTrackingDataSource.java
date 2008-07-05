@@ -172,6 +172,7 @@ public class BehaviorTrackingDataSource extends DelegatingDataSource {
 	
 		private ConnectionHandler parent;
 		private String sql;
+		private EventDataElement batch;
 		private EventDataElement parameters = new EventDataElement("parameters");
 		
 		public StatementHandler(ConnectionHandler parent, Object target, String sql) {
@@ -190,8 +191,7 @@ public class BehaviorTrackingDataSource extends DelegatingDataSource {
 				
 				String op = method.getName();
 				if (op.startsWith("execute")) {
-	
-					//query is being executed -- start the event timer.
+					//query or batch is being executed -- start the event timer.
 					BehaviorEvent event = start(op, findSqlArg(args));
 					try {
 						return invokeTarget(method, args);
@@ -200,6 +200,23 @@ public class BehaviorTrackingDataSource extends DelegatingDataSource {
 						throw t;
 					} finally {
 						trackingManager.stop(event);
+					}
+					
+				} else if (op.equals("addBatch")) {
+					//statement is being rolled up into a batch for execution,
+					//add parameter and sql info to event data.
+					if (batch == null)
+						batch = new EventDataElement("batch");
+
+					String sql = findSqlArg(args);
+					if (sql != null) {
+						//static SQL batch. add an element to contain SQL.
+						batch.add("sql", sql);
+					} else {
+						//prepared statement batch.  add any parameters to 
+						//event info and reset for next statement.
+						batch.addElement(parameters);
+						parameters = new EventDataElement("parameters");
 					}
 					
 				} else if (op.startsWith("set")) {
@@ -238,9 +255,15 @@ public class BehaviorTrackingDataSource extends DelegatingDataSource {
 
 			//SQL could either be provided as parameter, or when statement was created.
 			String actualSql = sql == null ? this.sql : sql;
-			data.add("sql", actualSql);
+			if (actualSql != null) 
+				data.add("sql", actualSql);
 
-			if (!parameters.isEmpty()) {
+			if (name.endsWith("Batch")) {
+				if (batch != null) {
+					data.addElement(batch);
+					batch = null;
+				}
+			} else if (!parameters.isEmpty()) {
 				//transfer parameters from buffer into event object.
 				data.addElement(parameters);
 				//clear out the parameter buffer for the next execute event.
