@@ -10,6 +10,7 @@ import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Queue;
+import java.util.zip.GZIPOutputStream;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -42,6 +43,7 @@ public class XmlBehaviorEventPersisterImpl
 	private static final SimpleDateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("yyyyMMddHHmmss");
 	
 	private boolean binary;
+	private boolean compress;
 	private File file;
 	private SimpleDateFormat dateFormat = DEFAULT_DATE_FORMAT;
 
@@ -58,15 +60,28 @@ public class XmlBehaviorEventPersisterImpl
 		return binary;
 	}
 
+	@ManagedAttribute(description="Can be used to turn on/off log file compression.  Changes take affect after the next log rotation.")
+	public boolean isCompress() {
+		return compress;
+	}
+	/** Set to true to log in ZLIB compressed format.  Changes take affect after the next log rotation.  Defaults to false. */
+	public void setCompress(boolean compress) {
+		this.compress = compress;
+	}
+	
 	/** override the default log name date format */
 	public void setDateFormat(String dateFormat) {
 		this.dateFormat = new SimpleDateFormat(dateFormat);
 	}
 
-	/** set the destination log file */
+	/** set the destination log file.  The file extension will be modified based on compression / binary settings. */
 	@Required
 	public void setFile(String path) {
 		this.file = new File(path);
+	}
+	
+	public String getFile() {
+		return file == null ? null : file.getAbsolutePath();
 	}
 	
 	public void afterPropertiesSet() throws Exception {
@@ -145,9 +160,16 @@ public class XmlBehaviorEventPersisterImpl
 			} else {
 				msg.append("No existing log data.");
 			}
+
+			//update output file name based on current settings.
+			file = getLogFile(file);
 			
-			//open a new writer
+			//open a new stream, optionally compressed.
 			stream = new BufferedOutputStream(new FileOutputStream(file));
+			if (compress)
+				stream = new GZIPOutputStream(stream);
+			
+			//open a new writer over the stream.
 			if (binary) {
 				StAXDocumentSerializer sds = new StAXDocumentSerializer();
 				sds.setOutputStream(stream);
@@ -163,6 +185,7 @@ public class XmlBehaviorEventPersisterImpl
 	
 	private void closeWriter() {
 		if (writer != null) {
+			//finish writing XML document.
 			try {
 				if (binary)
 					writer.writeEndDocument();
@@ -170,15 +193,48 @@ public class XmlBehaviorEventPersisterImpl
 			} catch (XMLStreamException xse) {
 				log.error("Error flushing log for rotation", xse);
 			} finally {
+				
+				//finish the compressed stream, if applicable.
 				try {
-					stream.close();
+					if (stream instanceof GZIPOutputStream)
+						((GZIPOutputStream)stream).finish();
 				} catch (IOException ioe) {
-					log.error("Error closing log stream", ioe);
+					log.error("Error finishing zip stream", ioe);
+				} finally {
+
+					//close the file
+					try {
+						stream.close();
+					} catch (IOException ioe) {
+						log.error("Error closing log stream", ioe);
+					} finally {
+						writer = null;
+						stream = null;
+					}
+					
 				}
-				writer = null;
-				stream = null;
 			}
 		}
+	}
+	
+	/** get the active log file, modifying the supplied base name to reflect compressed / binary options. */
+	public File getLogFile(File file) {
+
+		//generate an extension based on output options.
+		String ext = isBinary() ? ".bxml" : ".xml";
+		if (isCompress())
+			ext += ".gz";
+		
+		//strip off current extension if applicable.
+		String baseName = file.getName();
+		int dot = baseName.lastIndexOf('.');
+		if (dot > 0) {
+			String current = baseName.substring(dot);
+			if (current.equals(".xml") || current.equals(".bxml") || current.equals(".log"))
+				baseName = baseName.substring(0, dot);
+		}
+		
+		return new File(file.getParentFile(), baseName + ext);
 	}
 	
 	/** get the archive file to which current log data should be moved on rotation */
