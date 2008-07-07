@@ -109,10 +109,12 @@ public class XmlBehaviorEventPersisterImpl
 			
 			while (!events.isEmpty()) {
 				BehaviorEvent event = events.remove();
-				if (event.getId() != null)
-					throw new IllegalStateException("Event " + event.getId() + " already persisted");
+				if (event.getId() == null)
+					event.setId(randomUUID());
 				
-				event.setId(randomUUID());
+				BehaviorEvent parent = event.getParent();
+				if (parent != null && parent.getId() == null)
+					parent.setId(randomUUID());
 				
 				synchronized (this) {
 					serializer.serialize(writer, event);
@@ -120,8 +122,6 @@ public class XmlBehaviorEventPersisterImpl
 				}
 				
 				++count;
-				//push children on queue for logging.
-				events.addAll(event.getChildren());
 			}
 			
 			synchronized (this) {

@@ -38,7 +38,8 @@ public class BehaviorTrackingManagerImpl implements BehaviorTrackingManager {
 	 * but if activity temporarily exceeds anticipated levels, we want to avoid an excessive
 	 * backlog of completed events waiting in memory.  So, we add a configurable flush
 	 * threshold.  When more than the threshold number of events are finished, we automatically
-	 * flush.
+	 * flush.  We also allow child events to be persisted before their parents complete, to avoid
+	 * accumulating too many events in memory for long-running batch processes.
 	 * 
 	 * We also must worry about thread-safety.  Fortunately this one is
 	 * fairly easy for us.  By definition each BehaviorEvent is tied to exactly one thread,
@@ -120,15 +121,13 @@ public class BehaviorTrackingManagerImpl implements BehaviorTrackingManager {
 			event.set(evt.getParent());
 		}
 		
-		++pendingFlush;
-		if (evt.isRoot()) {
-			//top-level event is finished, put it on the write queue and check if the flush
-			//threshold has been crossed.
-			synchronized (bufferSync) {
-				writeBuffer.add(evt);
-			}
-			flushIfNeeded();
+		//put event on the write queue and check if the flush
+		//threshold has been crossed.
+		synchronized (bufferSync) {
+			++pendingFlush;
+			writeBuffer.add(evt);
 		}
+		flushIfNeeded();
 	}
 
 	/**
@@ -271,18 +270,6 @@ public class BehaviorTrackingManagerImpl implements BehaviorTrackingManager {
 
 		protected FlushEvent() {
 			super(null, "behavior-tracking", "flush", application, sessionContext.getContextUserId(), sessionContext.getContextSessionId());
-		}
-
-		/** 
-		 * flush events shouldn't have children, because persister implementations might end up being instrumented.
-		 * if the number of events spun off by the persister exceeds the flush threshold, we end
-		 * up in an infinite loop; flush, queue, flush, queue.  it might be nice to gain some 
-		 * visibility into flush events, but the complexity of such implementation is frought with peril.
-		 */
-		@Override
-		protected void add(BehaviorEvent child) {
-			//update bookkeeping but don't add children to persisted child list
-			incrementTreeSize();
 		}
 		
 	}

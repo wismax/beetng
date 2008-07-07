@@ -54,7 +54,7 @@ public class BehaviorTrackingManagerTest extends JdbcEventTestCase {
 		assertNull(event.getError());
 		assertNull(event.getStart());
 		assertNull(event.getDuration());
-		assertEquals(0, event.getChildren().size());
+		assertEquals(1, event.getTreeSize());
 		assertTrue(event.isRoot());
 		assertFalse(event.isStarted());
 		assertFalse(event.isEnded());
@@ -75,13 +75,12 @@ public class BehaviorTrackingManagerTest extends JdbcEventTestCase {
 		assertNull(child.getError());
 		assertNull(child.getStart());
 		assertNull(child.getDuration());
-		assertEquals(0, child.getChildren().size());
+		assertEquals(1, child.getTreeSize());
 		assertFalse(child.isRoot());
 		assertFalse(child.isStarted());
 		assertFalse(child.isEnded());
 		
-		assertEquals("pending event has child now", 1, event.getChildren().size());
-		assertSame("pending event has child now", child, event.getChildren().get(0));
+		assertEquals("pending event has child now", 2, event.getTreeSize());
 		
 		//go two deep
 		manager.start(child);
@@ -93,11 +92,10 @@ public class BehaviorTrackingManagerTest extends JdbcEventTestCase {
 		assertEquals("foodaddy", grandChild.getUserId());
 		assertEquals("anklebone", grandChild.getSessionId());
 		assertSame(child, grandChild.getParent());
-		assertEquals(0, grandChild.getChildren().size());
+		assertEquals(1, grandChild.getTreeSize());
 		assertFalse(grandChild.isRoot());
-		assertEquals(1, child.getChildren().size());
-		assertSame(grandChild, child.getChildren().get(0));
-		assertEquals("root event still only has one", 1, event.getChildren().size());
+		assertEquals(2, child.getTreeSize());
+		assertEquals("root event registers grandchild", 3, event.getTreeSize());
 		
 		manager.start(grandChild);
 		manager.stop(grandChild);
@@ -120,13 +118,12 @@ public class BehaviorTrackingManagerTest extends JdbcEventTestCase {
 		assertNull(child2.getError());
 		assertNull(child2.getStart());
 		assertNull(child2.getDuration());
-		assertEquals(0, child2.getChildren().size());
+		assertEquals(1, child2.getTreeSize());
 		assertFalse(child2.isRoot());
 		assertFalse(child2.isStarted());
 		assertFalse(child2.isEnded());
 		
-		assertEquals(2, event.getChildren().size());
-		assertSame(child2, event.getChildren().get(1));
+		assertEquals(4, event.getTreeSize());
 
 		manager.start(child2);
 		manager.stop(child2);
@@ -143,6 +140,7 @@ public class BehaviorTrackingManagerTest extends JdbcEventTestCase {
 		BehaviorEvent newRoot = manager.createEvent("bar", "baz");
 		assertNull("new event is root", newRoot.getParent());
 		assertTrue(newRoot.isRoot());
+		assertEquals("only one event in tree", 1, newRoot.getTreeSize());
 	}
 
 	@Test
@@ -170,7 +168,7 @@ public class BehaviorTrackingManagerTest extends JdbcEventTestCase {
 		assertTrue("event started", event.isStarted());
 		assertFalse("event running", event.isEnded());
 		assertFalse("second event is *not* started", dup.isStarted());
-		assertEquals("first event has no children", 0, event.getChildren().size());
+		assertEquals("first event has no children", 1, event.getTreeSize());
 		
 		try {
 			manager.start(event);
@@ -179,7 +177,7 @@ public class BehaviorTrackingManagerTest extends JdbcEventTestCase {
 		
 		assertTrue("event started", event.isStarted());
 		assertFalse("event running", event.isEnded());
-		assertEquals("first event has no children", 0, event.getChildren().size());
+		assertEquals("first event has no children", 1, event.getTreeSize());
 		
 		manager.stop(event);
 		assertTrue(event.isEnded());
@@ -200,7 +198,7 @@ public class BehaviorTrackingManagerTest extends JdbcEventTestCase {
 		
 		BehaviorEvent child = manager.createEvent("foo", "child");
 		assertSame(dup, child.getParent());
-		assertSame(child, dup.getChildren().get(0));
+		assertEquals(2, dup.getTreeSize());
 		
 		manager.start(child);
 		manager.stop(child);
@@ -224,7 +222,7 @@ public class BehaviorTrackingManagerTest extends JdbcEventTestCase {
 		assertTrue("event started", event.isStarted());
 		assertFalse("event running", event.isEnded());
 		assertFalse("second event is *not* started", dup.isStarted());
-		assertEquals("first event has no children", 0, event.getChildren().size());
+		assertEquals("first event has no children", 1, event.getTreeSize());
 		
 		manager.stop(event);
 		assertTrue(event.isEnded());
@@ -236,7 +234,7 @@ public class BehaviorTrackingManagerTest extends JdbcEventTestCase {
 		
 		BehaviorEvent child = manager.createEvent("foo", "child");
 		assertSame(dup, child.getParent());
-		assertSame(child, dup.getChildren().get(0));
+		assertEquals(2, dup.getTreeSize());
 		
 		manager.start(child);
 		
@@ -284,14 +282,18 @@ public class BehaviorTrackingManagerTest extends JdbcEventTestCase {
 		}
 		
 		flushTaskExecutions();
-		assertEquals("no events persisted yet", 0, countEventsOfType("app"));
-		assertEquals("no flush events persisted yet", 0, countEventsOfType("behavior-tracking"));
+		assertEquals("completed events have been persisted", 5, countEventsOfType("app"));
+		assertEquals("one flush event persisted", 1, countEventsOfType("behavior-tracking"));
 		
-		//flush should be performed as soon as the root event is ended.
 		manager.stop(root);
 		flushTaskExecutions();
-		assertEquals("autoflush was triggered", 6, countEventsOfType("app"));
+		assertEquals("extra flush not triggered", 5, countEventsOfType("app"));
 		assertEquals("flush event persisted", 1, countEventsOfType("behavior-tracking"));
+		
+		manager.flush();
+		flushTaskExecutions();
+		assertEquals("extra event flushed", 6, countEventsOfType("app"));
+		assertEquals("flush event persisted", 2, countEventsOfType("behavior-tracking"));
 		
 		String[] events = { "event[0]", "event[1]", "event[2]", "event[3]", "child[0]", "child[1]" };
 		ResultSet rs = stmt.executeQuery("select name from BEHAVIOR_TRACKING_EVENT where type='app' order by event_id");

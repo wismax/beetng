@@ -135,18 +135,17 @@ public class JdbcBehaviorEventPersisterImpl extends JdbcDaoSupport
 								//go until the queue is drained.
 								while (!events.isEmpty()) {
 									
-									//pop the next event off of the queue, and verify it has not been stored.
+									//pop the next event off of the queue.  event may already have an ID assigned if any
+									//of its child events has been persisted.
 									BehaviorEvent next = events.remove();
-									if (next.getId() != null) //circular references should be impossible by design, but it doesn't hurt to ask.
-										throw new IllegalStateException("Tracking Event " + next.getId() + " has already been persisted!");
-	
+									assignIds(next, idQuery);
+
 									//populate identifying information for the event into the insert statement.
-									Long id = nextId(idQuery);
-									insert.setLong(1, id);
+									insert.setLong(1, (Long)next.getId());
 									
 									BehaviorEvent parent = next.getParent();
 									nullSafeSet(insert, 2, parent == null ? null : parent.getId(), Types.BIGINT);
-	
+
 									insert.setString(3, next.getApplication());
 									insert.setString(4, next.getType());
 									insert.setString(5, next.getName());
@@ -172,12 +171,6 @@ public class JdbcBehaviorEventPersisterImpl extends JdbcDaoSupport
 										insert.executeUpdate();
 									}
 	
-									//set the retrieved key on the instance for the benefit of child inserts.
-									next.setId(id);
-									
-									//push all child events onto the queue for persistence.
-									events.addAll(next.getChildren());
-									
 									++tally;
 								}
 	
@@ -205,6 +198,18 @@ public class JdbcBehaviorEventPersisterImpl extends JdbcDaoSupport
 		}
 		
 		return count;
+	}
+	
+	private void assignIds(BehaviorEvent event, PreparedStatement idQuery) throws SQLException {
+		if (event.getId() != null)
+			return;
+		
+		BehaviorEvent parent = event.getParent();
+		if (parent != null && parent.getId() == null)
+			assignIds(parent, idQuery);
+		
+		if (event.getId() == null)
+			event.setId(nextId(idQuery));
 	}
 	
 	protected Long nextId(PreparedStatement idQuery) throws SQLException {

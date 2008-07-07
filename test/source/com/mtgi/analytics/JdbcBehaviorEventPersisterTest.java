@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.junit.Test;
 import org.unitils.spring.annotation.SpringBeanByType;
@@ -34,11 +35,11 @@ public class JdbcBehaviorEventPersisterTest extends JdbcEventTestCase {
 		// * events with children and events without
 		// * events with errors and events without
 
-		//create a tree of 27 events that cover the properties above.
+		//create a tree of 39 events that cover the properties above.
 		ArrayList<BehaviorEvent> events = new ArrayList<BehaviorEvent>();
 		int[] counter = { 0 };
 		for (int i = 0; i < 3; ++i)
-			events.add(createEvent(null, 1, 3, 3, counter));
+			createEvent(null, 1, 3, 3, counter, events);
 		LinkedList<BehaviorEvent> queue = new LinkedList<BehaviorEvent>(events);
 
 		assertEquals("entire event tree persisted", 39, persister.persist(queue));
@@ -79,15 +80,20 @@ public class JdbcBehaviorEventPersisterTest extends JdbcEventTestCase {
 		
 		data.close();
 
-		assertEquals("event " + event.getId() + " has correct child count", event.getChildren().size(), countChildren(event.getId()));
 		long total = event.getDuration();
-		for (BehaviorEvent child : event.getChildren()) {
-			verifyEvent(child);
-			assertTrue("child " + event.getId() + " starts after parent", child.getStart().getTime() >= event.getStart().getTime());
-			assertTrue("child " + event.getId() + " cannot have duration longer than parent", child.getDuration() <= event.getDuration());
-			total -= child.getDuration();
+			
+		ResultSet rs = stmt.executeQuery("select sum(duration_ms) from BEHAVIOR_TRACKING_EVENT where PARENT_EVENT_ID = " + event.getId());
+		assertTrue(rs.next());
+		long childTotal = rs.getLong(1);
+		int childCount = countChildren(event.getId());
+		
+		if (event.getTreeSize() == 1) {
+			assertEquals("no children in db", 0, childTotal);
+		} else {
+			assertTrue("some children in DB", childCount > 0);
+			assertTrue("child count is less than tree size", childCount < event.getTreeSize());
+			assertTrue("child duration is less than parent event duration", childTotal <= total);
 		}
-		assertTrue("sum of child events cannot exceed length of parent", total >= 0);
 	}
 
 	private int countChildren(Serializable id) throws SQLException {
@@ -112,10 +118,10 @@ public class JdbcBehaviorEventPersisterTest extends JdbcEventTestCase {
 	 * @param maxChildren the number of children for each nested event.
 	 * @param counter maintains a count of the total number of events created.
 	 */
-	protected static BehaviorEvent createEvent(BehaviorEvent parent, int depth, int maxDepth, int maxChildren, int[] counter) 
+	protected static BehaviorEvent createEvent(BehaviorEvent parent, int depth, int maxDepth, int maxChildren, int[] counter, List<BehaviorEvent> accum) 
 		throws InterruptedException
 	{
-		//our range of test event data.  the sizes are coprime so that
+		//our range of test event data.  the sizes are (mostly) coprime so that
 		//we should generate a bunch of different combinations.
 		final String[] types = { "request", "app" };
 		final String[] names = { "hello", "goodbye", "world" };
@@ -147,11 +153,12 @@ public class JdbcBehaviorEventPersisterTest extends JdbcEventTestCase {
 		//descend to create child events.
 		if (depth < maxDepth) {
 			for (int c = 0; c < maxChildren; ++c) {
-				createEvent(ret, depth + 1, maxDepth, maxChildren, counter);
+				createEvent(ret, depth + 1, maxDepth, maxChildren, counter, accum);
 			}
 		}
 		
 		ret.stop();
+		accum.add(ret);
 		return ret;
 	}
 	

@@ -1,10 +1,7 @@
 package com.mtgi.analytics;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -46,8 +43,6 @@ public class BehaviorEvent implements Serializable {
 	
 	private int treeSize = 1;
 	
-	private ArrayList<BehaviorEvent> children;
-	
 	protected BehaviorEvent(BehaviorEvent parent, String type, String name, String application, String userId, String sessionId) {
 		this.parent = parent;
 		this.type = type;
@@ -60,7 +55,7 @@ public class BehaviorEvent implements Serializable {
 				throw new IllegalStateException("Parent event has not started");
 			if (parent.isEnded())
 				throw new IllegalStateException("Parent event has already ended");
-			parent.add(this);
+			parent.incrementTreeSize();
 		}
 	}
 
@@ -228,13 +223,6 @@ public class BehaviorEvent implements Serializable {
 		return data;
 	}
 
-	/**
-	 * Get all of this event's child events, or an empty list if this event has no children.
-	 */
-	public List<BehaviorEvent> getChildren() {
-		return children == null ? Collections.<BehaviorEvent>emptyList() : children;
-	}
-	
 	@Override
 	public String toString() {
 		StringBuffer buf = new StringBuffer();
@@ -252,13 +240,6 @@ public class BehaviorEvent implements Serializable {
 		   .append(" error=\"").append(error).append('"');
 		
 		return buf.toString();
-	}
-	
-	protected void add(BehaviorEvent child) {
-		if (children == null)
-			children = new ArrayList<BehaviorEvent>();
-		children.add(child);
-		incrementTreeSize();
 	}
 	
 	protected void incrementTreeSize() {

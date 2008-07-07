@@ -106,7 +106,6 @@ public class BehaviorEventTest {
 	public void testNesting() {
 		BehaviorEvent root = new BehaviorEvent(null, "request", "/foo", "test", "me", "1");
 		assertTrue("event with no parent is root", root.isRoot());
-		assertEquals("event has no children", 0, root.getChildren().size());
 		assertEquals("one node in tree", 1, root.getTreeSize());
 		
 		try {
@@ -115,22 +114,18 @@ public class BehaviorEventTest {
 		} catch (IllegalStateException expected) {
 		}
 		
-		assertEquals("root event still does not have any children", 0, root.getChildren().size());
 		assertEquals("still one node in tree", 1, root.getTreeSize());
 		root.start();
 		
 		BehaviorEvent c10 = new BehaviorEvent(root, "request", "/bad", "test", "me", "1");
-		assertEquals("event now has child", 1, root.getChildren().size());
 		assertSame("child points to parent", root, c10.getParent());
 		assertEquals("now two nodes in tree", 2, root.getTreeSize());
-		assertSame("parent points to child", c10, root.getChildren().get(0));
+		
 		assertFalse("child node is not a root", c10.isRoot());
 		assertEquals(1, c10.getTreeSize());
 		
 		BehaviorEvent c11 = new BehaviorEvent(root, "request", "/bad", "test", "me", "1");
-		assertEquals("event now has two children", 2, root.getChildren().size());
 		assertSame("child points to parent", root, c11.getParent());
-		assertSame("parent points to child", c11, root.getChildren().get(1));
 		assertFalse("child node is not a root", c11.isRoot());
 		assertEquals("three nodes in tree", 3, root.getTreeSize());
 		assertEquals(1, c11.getTreeSize());
@@ -145,7 +140,6 @@ public class BehaviorEventTest {
 		} catch (IllegalStateException ise) {
 		}
 		
-		assertEquals("still noly two children on root", 2, root.getChildren().size());
 		assertTrue("root event stopped", root.isEnded());
 		assertEquals("still three nodes in tree", 3, root.getTreeSize());
 	}

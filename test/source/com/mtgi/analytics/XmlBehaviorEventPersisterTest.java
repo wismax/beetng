@@ -61,7 +61,7 @@ public class XmlBehaviorEventPersisterTest {
 		ArrayList<BehaviorEvent> events = new ArrayList<BehaviorEvent>();
 		int[] counter = { 0 };
 		for (int i = 0; i < 3; ++i)
-			events.add(JdbcBehaviorEventPersisterTest.createEvent(null, 1, 3, 3, counter));
+			JdbcBehaviorEventPersisterTest.createEvent(null, 1, 3, 3, counter, events);
 		LinkedList<BehaviorEvent> queue = new LinkedList<BehaviorEvent>(events);
 
 		assertEquals("entire event tree persisted", 39, persister.persist(queue));
@@ -70,10 +70,6 @@ public class XmlBehaviorEventPersisterTest {
 		//now perform verification of log data against the expected results.
 		List<String> actualLines = (List<String>)FileUtils.readLines(file);
 		assertEquals("every event was written", 39, actualLines.size());
-
-		//flatten the event data tree into an ordered list, as we expect to find it in the log.
-		for (int i = 0; i < events.size(); ++i)
-			events.addAll(events.get(i).getChildren());
 
 		//read up the expected results for comparison.
 		InputStream expectedData = XmlBehaviorEventPersisterTest.class.getResourceAsStream("XmlBehaviorEventPersisterTest.testNestedEvents-result.xml");
@@ -119,7 +115,7 @@ public class XmlBehaviorEventPersisterTest {
 		ArrayList<BehaviorEvent> events = new ArrayList<BehaviorEvent>();
 		int[] counter = { 0 };
 		for (int i = 0; i < 3; ++i)
-			events.add(JdbcBehaviorEventPersisterTest.createEvent(null, 1, 3, 3, counter));
+			JdbcBehaviorEventPersisterTest.createEvent(null, 1, 3, 3, counter, events);
 		LinkedList<BehaviorEvent> queue = new LinkedList<BehaviorEvent>(events);
 
 		assertEquals("entire event tree persisted", 39, persister.persist(queue));
@@ -151,10 +147,6 @@ public class XmlBehaviorEventPersisterTest {
 					 expectedOpen, actualLines.get(0).substring(0, expectedOpen.length()));
 		assertEquals("well-formed close", "</event-log>", actualLines.get(actualLines.size() - 1));
 		
-		//flatten the event data tree into an ordered list, as we expect to find it in the log.
-		for (int i = 0; i < events.size(); ++i)
-			events.addAll(events.get(i).getChildren());
-
 		//read up the expected results for comparison.
 		InputStream expectedData = XmlBehaviorEventPersisterTest.class.getResourceAsStream("XmlBehaviorEventPersisterTest.testBinaryXml-result.xml");
 		assertNotNull("expected results resource found in test environment", expectedData);
@@ -203,7 +195,7 @@ public class XmlBehaviorEventPersisterTest {
 		ArrayList<BehaviorEvent> events = new ArrayList<BehaviorEvent>();
 		int[] counter = { 0 };
 		for (int i = 0; i < 3; ++i)
-			events.add(JdbcBehaviorEventPersisterTest.createEvent(null, 1, 3, 3, counter));
+			JdbcBehaviorEventPersisterTest.createEvent(null, 1, 3, 3, counter, events);
 		LinkedList<BehaviorEvent> queue = new LinkedList<BehaviorEvent>(events);
 
 		assertEquals("entire event tree persisted", 39, persister.persist(queue));
@@ -235,10 +227,6 @@ public class XmlBehaviorEventPersisterTest {
 					 expectedOpen, actualLines.get(0).substring(0, expectedOpen.length()));
 		assertEquals("well-formed close", "</event-log>", actualLines.get(actualLines.size() - 1));
 		
-		//flatten the event data tree into an ordered list, as we expect to find it in the log.
-		for (int i = 0; i < events.size(); ++i)
-			events.addAll(events.get(i).getChildren());
-
 		//read up the expected results for comparison.
 		InputStream expectedData = XmlBehaviorEventPersisterTest.class.getResourceAsStream("XmlBehaviorEventPersisterTest.testBinaryXml-result.xml");
 		assertNotNull("expected results resource found in test environment", expectedData);
