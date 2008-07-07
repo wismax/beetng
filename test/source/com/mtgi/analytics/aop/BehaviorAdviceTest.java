@@ -48,11 +48,11 @@ public class BehaviorAdviceTest extends JdbcEventTestCase {
 	public void testComplexParameters() throws Exception {
 		//test logging of actual type of argument, when it differs from the method signature.
 		ServiceB arg = new SubServiceB();
-		assertSame("argument value is returned unmodified", arg, service.getWeirdParametersTracked(this, arg, "hello", "world"));
-		assertNull("null values allowed", service.getWeirdParametersTracked(null, null));
+		assertSame("argument value is returned unmodified", arg, service.getWeirdParametersTracked(this, arg, Param.Value_1, "hello", "world"));
+		assertNull("null values allowed", service.getWeirdParametersTracked(null, null, null));
 		
 		arg = new ServiceB();
-		assertSame("argument value is returned unmodified", arg, service.getWeirdParametersTracked(this, arg, null, "value"));
+		assertSame("argument value is returned unmodified", arg, service.getWeirdParametersTracked(this, arg, Param.Value_2, null, "value"));
 		
 		//flush and verify the log data.
 		manager.flush();
@@ -116,7 +116,7 @@ public class BehaviorAdviceTest extends JdbcEventTestCase {
 		 * Tests support for logging tracking events with custom parameter types and variable
 		 * argument lists.
 		 */
-		public ServiceB getWeirdParametersTracked(BehaviorAdviceTest arg0, ServiceB arg1, String... argN) {
+		public ServiceB getWeirdParametersTracked(BehaviorAdviceTest arg0, ServiceB arg1, Param enumParam, String... argN) {
 			return arg1;
 		}
 		
@@ -132,6 +132,10 @@ public class BehaviorAdviceTest extends JdbcEventTestCase {
 		public void throwExceptionTracked(long ignored) {
 			throw ERROR;
 		}
+	}
+	
+	public static enum Param {
+		Value_1, Value_2;
 	}
 	
 	public static class ServiceB {

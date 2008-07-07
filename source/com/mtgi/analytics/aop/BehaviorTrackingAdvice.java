@@ -111,9 +111,8 @@ public class BehaviorTrackingAdvice implements MethodInterceptor {
 		element.addElement("value").setText(value);
 	}
 
-	
 	private static final boolean shouldLog(Class type) {
-		return type.isPrimitive() || type.getName().startsWith("java.lang");
+		return type.isPrimitive() || type.isEnum() || type.getName().startsWith("java.lang");
 	}
 	
 }
