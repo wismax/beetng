@@ -140,6 +140,19 @@ public class BehaviorTrackingManagerImpl implements BehaviorTrackingManager {
 	@ManagedOperation(description="Immediately flush all completed events to the behavior tracking database.  Returns the number of events written to the database (not counting the flush event that is also logged)")
 	public int flush() {
 		
+		LinkedList<BehaviorEvent> oldList = null, 
+								newList = new LinkedList<BehaviorEvent>();
+		//rotate the buffer.
+		synchronized(bufferSync) {
+			oldList = writeBuffer;
+			writeBuffer = newList;
+			flushRequested = false;
+		}
+		
+		//prevent no-ops from spewing a bunch of noise into the logs.
+		if (oldList.isEmpty())
+			return 0;
+
 		//we log flush events, so that we can correlate flush events to system
 		//resource spikes, and also see evidence of behavior tracking
 		//churn in the database if tuning parameters aren't set correctly.
@@ -154,15 +167,6 @@ public class BehaviorTrackingManagerImpl implements BehaviorTrackingManager {
 		int count = -1;
 		event.set(flushEvent);
 		try {
-			
-			LinkedList<BehaviorEvent> oldList = null, 
-									  newList = new LinkedList<BehaviorEvent>();
-			//rotate the buffer.
-			synchronized(bufferSync) {
-				oldList = writeBuffer;
-				writeBuffer = newList;
-				flushRequested = false;
-			}
 			
 			count = persister.persist(oldList);
 			pendingFlush -= count;
