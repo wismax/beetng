@@ -1,5 +1,25 @@
 <?xml version="1.0"?>
 
-<project name="BehaviorTracking" default="all">
+<project name="BehaviorTracking" default="all-dist"
+		 xmlns:ivy="antlib:org.apache.ivy.ant">
+
 	<import file="scripts/build-master.xml"/>
+	
+	<target name="all-dist" depends="all,package-utils"/>
+	
+	<target name="package-utils" description="package command line utilities">
+	    <property name="utils.dist" value="${target.dir}/utils"/>
+	    <mkdir dir="${utils.dist}"/>
+	
+	    <ivy:resolve file="utils/ivy.xml"/>
+	    <ivy:retrieve useOrigin="true"
+	                  pattern="${utils.dist}/lib/[artifact]-[revision].[ext]"
+					  conf="default"/>
+	
+	    <copy todir="${utils.dist}">
+	            <fileset dir="${build.root}/utils/dist/jars"
+	                     includes="**/*.jar" excludes="**/*test*"/>
+	    </copy>
+	</target>
+	
 </project>

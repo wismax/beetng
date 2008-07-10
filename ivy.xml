@@ -15,7 +15,6 @@
 		<conf name="default" description="core module with runtime dependencies"/>
 		<conf name="compile" description="compile-time dependencies"/>
 		<conf name="test" description="dependencies used for junit testing"/>
-		<conf name="log4j" extends="default" description="includes support for the log4j even persister"/>
 	</configurations>
 
 	<publications>
@@ -27,7 +26,6 @@
 
 		<dependency org="springframework" name="spring" rev="2.0.5"/>
 		<dependency org="apache" name="commons-logging" rev="1.1"/>
-		<dependency org="apache" name="log4j" rev="1.2.13" conf="compile;test;log4j->default"/>
 		<dependency org="bea" name="stax-impl" rev="1.2.0"/>
 		<dependency org="sun" name="FastInfoset" rev="1.2.2"/>
 		<dependency org="aspectj" name="aspectj" rev="1.5.3"/>
