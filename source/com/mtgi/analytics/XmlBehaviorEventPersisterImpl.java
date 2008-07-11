@@ -47,7 +47,6 @@ public class XmlBehaviorEventPersisterImpl
 	private File file;
 	private SimpleDateFormat dateFormat = DEFAULT_DATE_FORMAT;
 
-	private BehaviorEventSerializer serializer;
 	private XMLStreamWriter writer;
 	private OutputStream stream;
 	
@@ -90,7 +89,6 @@ public class XmlBehaviorEventPersisterImpl
 			throw new IOException("Unable to create directories for log file " + file.getAbsolutePath());
 		
 		//open for business.
-		serializer = new BehaviorEventSerializer();
 		rotateLog();
 	}
 
@@ -106,6 +104,7 @@ public class XmlBehaviorEventPersisterImpl
 	public int persist(Queue<BehaviorEvent> events) {
 		int count = 0;
 		try {
+			BehaviorEventSerializer serializer = new BehaviorEventSerializer();
 			
 			while (!events.isEmpty()) {
 				BehaviorEvent event = events.remove();

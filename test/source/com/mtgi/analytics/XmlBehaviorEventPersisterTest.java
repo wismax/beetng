@@ -1,6 +1,5 @@
 package com.mtgi.analytics;
 
-import static com.mtgi.analytics.BehaviorEventSerializer.XS_DATE_FORMAT;
 import static org.apache.commons.io.IOUtils.readLines;
 import static org.junit.Assert.*;
 
@@ -12,6 +11,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.io.FileUtils;
@@ -23,6 +23,8 @@ import com.sun.xml.fastinfoset.tools.FI_SAX_XML;
 
 public class XmlBehaviorEventPersisterTest {
 
+	private static final Pattern DATE_PATTERN = Pattern.compile("<start>\\d\\d\\d\\d-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\d\\.\\d\\d\\d\\+|-\\d\\d:\\d\\d</start>");
+	
 	private XmlBehaviorEventPersisterImpl persister;
 	private File file;
 	
@@ -98,7 +100,7 @@ public class XmlBehaviorEventPersisterTest {
 			else
 				assertTrue("log contains parent reference", actual.contains("parent-id=\"" + parent.getId() + "\""));
 			
-			assertTrue("log records time correctly", actual.contains("<start>" + XS_DATE_FORMAT.format(evt.getStart()) + "</start>"));
+			assertTrue("log records time correctly", DATE_PATTERN.matcher(actual).find());
 			assertTrue("log records duration correctly", actual.contains("<duration-ms>" + evt.getDuration() + "</duration-ms>"));
 		}
 	}
@@ -176,7 +178,7 @@ public class XmlBehaviorEventPersisterTest {
 				else
 					assertTrue("log contains parent reference", actual.contains("parent-id=\"" + parent.getId() + "\""));
 				
-				assertTrue("log records time correctly", actual.contains("<start>" + XS_DATE_FORMAT.format(evt.getStart()) + "</start>"));
+				assertTrue("log records time correctly", DATE_PATTERN.matcher(actual).find());
 				assertTrue("log records duration correctly", actual.contains("<duration-ms>" + evt.getDuration() + "</duration-ms>"));
 			}
 		}
@@ -256,7 +258,7 @@ public class XmlBehaviorEventPersisterTest {
 				else
 					assertTrue("log contains parent reference", actual.contains("parent-id=\"" + parent.getId() + "\""));
 				
-				assertTrue("log records time correctly", actual.contains("<start>" + XS_DATE_FORMAT.format(evt.getStart()) + "</start>"));
+				assertTrue("log records time correctly", DATE_PATTERN.matcher(actual).find());
 				assertTrue("log records duration correctly", actual.contains("<duration-ms>" + evt.getDuration() + "</duration-ms>"));
 			}
 		}

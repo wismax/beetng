@@ -20,6 +20,11 @@
 	            <fileset dir="${build.root}/utils/dist/jars"
 	                     includes="**/*.jar" excludes="**/*test*"/>
 	    </copy>
+		
+		<zip file="${target.dir}/bt-utils.zip" >
+			<zipfileset prefix="BehaviorTracking" dir="${utils.dist}" includes="**/*"/>
+		</zip>
+	
 	</target>
 	
 </project>
