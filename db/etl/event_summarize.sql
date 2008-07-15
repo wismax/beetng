@@ -6,7 +6,7 @@ INSERT INTO BEHAVIOR_TRACKING_SUMMARY
  		(SELECT MIN(event_start) FROM BEHAVIOR_TRACKING_EVENT tmp WHERE tmp.event_name = event.event_name) period_start, 
  		(SELECT MAX(event_start) FROM BEHAVIOR_TRACKING_EVENT tmp WHERE tmp.event_name = event.event_name) period_end,
  		(SELECT COUNT(*) FROM BEHAVIOR_TRACKING_EVENT tmp WHERE tmp.event_name = event.event_name) event_count,
- 		(SELECT SUM(duration_ms) FROM BEHAVIOR_TRACKING_EVENT tmp WHERE tmp.event_name = event.event_name) average_ms,
+ 		(SELECT AVG(duration_ms) FROM BEHAVIOR_TRACKING_EVENT tmp WHERE tmp.event_name = event.event_name) average_ms,
   		(SELECT MIN(duration_ms) FROM BEHAVIOR_TRACKING_EVENT tmp WHERE tmp.event_name = event.event_name) min_ms,
  		(SELECT MAX(duration_ms) FROM BEHAVIOR_TRACKING_EVENT tmp WHERE tmp.event_name = event.event_name) max_ms,
 		(SELECT MEDIAN(duration_ms) FROM BEHAVIOR_TRACKING_EVENT tmp WHERE tmp.event_name = event.event_name) median_ms,
