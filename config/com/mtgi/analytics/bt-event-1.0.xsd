@@ -66,7 +66,7 @@
 				<xsd:element name="user-id" type="xsd:string" minOccurs="0">
 					<xsd:annotation>
 						<xsd:documentation>If the event was performed by an authenticated user, a unique
-						identifier for that user (such as long name).  Missing if the event was not performed
+						identifier for that user (such as login name).  Missing if the event was not performed
 						in an authenticated context.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:element>"
