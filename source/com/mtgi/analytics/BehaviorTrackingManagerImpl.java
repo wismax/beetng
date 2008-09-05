@@ -80,6 +80,9 @@ public class BehaviorTrackingManagerImpl implements BehaviorTrackingManager {
 	//whether a flush has been requested since the last flush was run.
 	private volatile boolean flushRequested = false;
 	
+	//whether logging has been temporarily suspended.
+	private volatile boolean suspended = false;
+	
 	//task executor job to flush events to the database.
 	private Runnable flushJob = new Runnable() {
 		public void run() {
@@ -120,14 +123,34 @@ public class BehaviorTrackingManagerImpl implements BehaviorTrackingManager {
 			//pop the event stack
 			event.set(evt.getParent());
 		}
-		
-		//put event on the write queue and check if the flush
-		//threshold has been crossed.
-		synchronized (bufferSync) {
-			++pendingFlush;
-			writeBuffer.add(evt);
+
+		//if logging has been suspended, we just discard the finished event.
+		if (!suspended) {
+			//put event on the write queue and check if the flush
+			//threshold has been crossed.
+			synchronized (bufferSync) {
+				++pendingFlush;
+				writeBuffer.add(evt);
+			}
+			flushIfNeeded();
 		}
-		flushIfNeeded();
+	}
+
+	@ManagedAttribute(description="Returns true if event logging has been temporarily disabled with the suspend() operation.")
+	public boolean isSuspended() {
+		return suspended;
+	}
+	
+	@ManagedOperation(description="Temporarily suspend logging of behavior events.")
+	public String suspend() {
+		suspended = true;
+		return "Event logging temporarily suspended.  Use resume() to resume logging.";
+	}
+	
+	@ManagedOperation(description="Resume logging of behavior events after a previous call to suspend().")
+	public String resume() {
+		suspended = false;
+		return "Event logging resumed.";
 	}
 
 	/**

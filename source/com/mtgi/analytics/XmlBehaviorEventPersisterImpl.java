@@ -51,6 +51,7 @@ public class XmlBehaviorEventPersisterImpl
 	private OutputStream stream;
 	
 	/** Set to true to log in FastInfoset binary XML format.  Defaults to false. */
+	@ManagedAttribute(description="Can be used to switch between binary and text XML.  Changes take affect after the next log rotation.")
 	public void setBinary(boolean binary) {
 		this.binary = binary;
 	}
@@ -64,6 +65,7 @@ public class XmlBehaviorEventPersisterImpl
 		return compress;
 	}
 	/** Set to true to log in ZLIB compressed format.  Changes take affect after the next log rotation.  Defaults to false. */
+	@ManagedAttribute(description="Can be used to turn on/off log file compression.  Changes take affect after the next log rotation.")
 	public void setCompress(boolean compress) {
 		this.compress = compress;
 	}

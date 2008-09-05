@@ -306,6 +306,70 @@ public class BehaviorTrackingManagerTest extends JdbcEventTestCase {
 	}
 	
 	@Test
+	public void testSuspendAndResume() throws InterruptedException, SQLException {
+		
+		assertFalse("manager is not in suspended state", manager.isSuspended());
+		
+		//configured flush threshold is five.  build up a backlog of events exceeding it.
+		for (int i = 0; i < 3; ++i) {
+			BehaviorEvent evt = manager.createEvent("app", "event[" + i + "]");
+			manager.start(evt);
+			manager.stop(evt);
+		}
+		
+		assertEquals("no events persisted yet", 0, countEventsOfType("app"));
+		
+		BehaviorEvent root = manager.createEvent("app", "event[3]");
+		manager.start(root);
+		
+		assertNotNull("status message returned on suspend", manager.suspend());
+		assertTrue("manager is now suspended", manager.isSuspended());
+		
+		//start and stop nested events, pushing past the flush threshold.
+		for (int i = 0; i < 2; ++i) {
+			BehaviorEvent evt = manager.createEvent("app", "child[" + i + "]");
+			manager.start(evt);
+			manager.stop(evt);
+		}
+		
+		flushTaskExecutions();
+		assertEquals("no events persisted yet", 0, countEventsOfType("app"));
+		
+		assertNotNull("status message returned on resume", manager.resume());
+		assertFalse("event logging resumed", manager.isSuspended());
+		
+		for (int i = 0; i < 2; ++i) {
+			BehaviorEvent evt = manager.createEvent("app", "child[" + (i + 2) + "]");
+			manager.start(evt);
+			manager.stop(evt);
+		}
+		
+		flushTaskExecutions();
+		assertEquals("completed events have been persisted", 5, countEventsOfType("app"));
+		assertEquals("one flush event persisted", 1, countEventsOfType("behavior-tracking"));
+		
+		manager.stop(root);
+		flushTaskExecutions();
+		assertEquals("extra flush not triggered", 5, countEventsOfType("app"));
+		assertEquals("still only one flush event", 1, countEventsOfType("behavior-tracking"));
+		
+		manager.flush();
+		flushTaskExecutions();
+		assertEquals("extra event flushed", 6, countEventsOfType("app"));
+		assertEquals("new flush event persisted", 2, countEventsOfType("behavior-tracking"));
+		
+		//verify that only events fired outside of suspended period were logged
+		String[] events = { "event[0]", "event[1]", "event[2]", "event[3]", "child[2]", "child[3]" };
+		ResultSet rs = stmt.executeQuery("select name from BEHAVIOR_TRACKING_EVENT where type='app' order by event_id");
+		for (int i = 0; i < events.length; ++i) {
+			assertTrue("got event[" + i + "]", rs.next());
+			assertEquals("event[" + i + "] has correct name", events[i], rs.getString(1));
+		}
+		assertFalse(rs.next());
+		rs.close();
+	}
+	
+	@Test
 	public void testThreadSafety() throws InterruptedException, SQLException {
 		
 		EventGenerator[] threads = new EventGenerator[20];
