@@ -81,6 +81,20 @@ public class BehaviorAdviceTest extends JdbcEventTestCase {
 		assertEventDataMatches("BehaviorAdviceTest.testVoidReturn-result.xml");
 	}
 
+	/** test support for primitive types and varargs arrays */
+	@Test
+	public void testPrimitiveTypes() throws Exception {
+		assertEquals(6, service.getPrimitiveTracked(1, 2, 3, -4, 1, 3));
+		//now test a really long array to test length limiting.
+		int[] data = new int[102];
+		for (int i = 0; i < data.length; ++i)
+			data[i] = i;
+		
+		assertEquals(5151, service.getPrimitiveTracked(data));
+		manager.flush();
+		assertEventDataMatches("BehaviorAdviceTest.testPrimitiveTypes-result.xml");
+	}
+	
 	/**
 	 * Spring bean class that depends on another spring bean (ServiceB).
 	 * Some method calls in this class are tracked, some aren't.
@@ -102,6 +116,14 @@ public class BehaviorAdviceTest extends JdbcEventTestCase {
 		 */
 		public String getTracked(String param) {
 			return "serviceA:" + serviceB.getTracked();
+		}
+
+		/** test varargs and primitive type support in logging */
+		public int getPrimitiveTracked(int... params) {
+			int sum = 0;
+			for (int i : params)
+				sum += i;
+			return sum;
 		}
 		
 		/**

@@ -1,7 +1,6 @@
 package com.mtgi.analytics.aop;
 
-import static java.util.Arrays.asList;
-
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 
 import org.aopalliance.intercept.MethodInterceptor;
@@ -103,7 +102,7 @@ public class BehaviorTrackingAdvice implements MethodInterceptor {
 		String value = "{object}";
 		if (type.isArray()) {
 			if (shouldLog(type.getComponentType()))
-				value = asList((Object[])arg).toString();
+				value = toStringArray(arg);
 		} else {
 			if (shouldLog(type))
 				value = arg.toString();
@@ -111,8 +110,23 @@ public class BehaviorTrackingAdvice implements MethodInterceptor {
 		element.addElement("value").setText(value);
 	}
 
+	protected static final String toStringArray(Object array) {
+		StringBuffer ret = new StringBuffer("[");
+		int len = Array.getLength(array);
+		int maxLen = Math.min(len, 100);
+		for (int i = 0; i < maxLen; ++i) {
+			if (i > 0)
+				ret.append(", ");
+			ret.append(String.valueOf(Array.get(array, i)));
+		}
+		if (maxLen < len)
+			ret.append(", ... (").append(len - maxLen).append(" more)");
+		ret.append("]");
+		return ret.toString();
+	}
+	
 	private static final boolean shouldLog(Class type) {
-		return type.isPrimitive() || type.isEnum() || type.getName().startsWith("java.lang");
+		return (type.isPrimitive()) || type.isEnum() || type.getName().startsWith("java.lang");
 	}
 	
 }
