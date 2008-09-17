@@ -10,6 +10,9 @@ import java.util.concurrent.Semaphore;
 import org.junit.After;
 import org.junit.Test;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.unitils.spring.annotation.SpringBeanByType;
 
 public class BehaviorTrackingManagerTest extends JdbcEventTestCase {
@@ -20,10 +23,13 @@ public class BehaviorTrackingManagerTest extends JdbcEventTestCase {
 	private MockSessionContext sessionContext;
 	@SpringBeanByType
 	private BehaviorTrackingManagerImpl manager;
+	@SpringBeanByType
+	private BehaviorEventPersister persister;
 	
 	@After
 	public void waitForQueue() throws InterruptedException {
 		
+		RequestContextHolder.resetRequestAttributes();
 		sessionContext.reset();
 		manager.flush();
 		
@@ -141,6 +147,49 @@ public class BehaviorTrackingManagerTest extends JdbcEventTestCase {
 		assertNull("new event is root", newRoot.getParent());
 		assertTrue(newRoot.isRoot());
 		assertEquals("only one event in tree", 1, newRoot.getTreeSize());
+	}
+
+	/** test use of default SpringSessionContext when none is specified in configuration */
+	@Test
+	public void testDefaultSessionContext() throws Exception {
+		BehaviorTrackingManagerImpl impl = new BehaviorTrackingManagerImpl();
+		impl.setApplication(manager.getApplication());
+		impl.setExecutor(executor);
+		impl.setPersister(persister);
+		impl.setFlushThreshold(5);
+		impl.afterPropertiesSet();
+		
+		MockHttpServletRequest request = new MockHttpServletRequest();
+		request.setRemoteUser("testUser");
+		ServletRequestAttributes atts = new ServletRequestAttributes(request);
+		RequestContextHolder.setRequestAttributes(atts);
+		
+		BehaviorEvent event = impl.createEvent("foo", "testEvent");
+		assertNotNull("event created", event);
+		
+		assertEquals("testBT", event.getApplication());
+		assertEquals("foo", event.getType());
+		assertEquals("testEvent", event.getName());
+		assertEquals("testUser", event.getUserId());
+		assertEquals(request.getSession().getId(), event.getSessionId());
+		assertNull(event.getParent());
+		assertNull(event.getData());
+		assertNull(event.getError());
+		assertNull(event.getStart());
+		assertNull(event.getDuration());
+		assertEquals(1, event.getTreeSize());
+		assertTrue(event.isRoot());
+		assertFalse(event.isStarted());
+		assertFalse(event.isEnded());
+		
+		//start the event.
+		impl.start(event);
+		impl.stop(event);
+		
+		assertEquals("all events now pending flush", 1, impl.getEventsPendingFlush());
+		impl.flush();
+		
+		assertEquals("event queue flushed", 0, impl.getEventsPendingFlush());
 	}
 
 	@Test

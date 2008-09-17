@@ -4,11 +4,14 @@ import java.util.LinkedList;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.jmx.export.annotation.ManagedAttribute;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
+
+import com.mtgi.analytics.servlet.SpringSessionContext;
 
 /**
  * <p>Standard implementation of {@link BehaviorTrackingManager}.  BehaviorEvent
@@ -23,7 +26,7 @@ import org.springframework.jmx.export.annotation.ManagedResource;
  */
 @ManagedResource(objectName="com.mtgi:group=analytics,name=BehaviorTracking", 
 		 		 description="Monitor and control user behavior tracking")
-public class BehaviorTrackingManagerImpl implements BehaviorTrackingManager {
+public class BehaviorTrackingManagerImpl implements BehaviorTrackingManager, InitializingBean {
 
 	/*
 	 * Implementation is complicated by many issues, the first of which is performance.
@@ -255,7 +258,6 @@ public class BehaviorTrackingManagerImpl implements BehaviorTrackingManager {
 	 * Set a session context for the application, used to determine the
 	 * current user and session ID for a calling thread.
 	 */
-	@Required
 	public void setSessionContext(SessionContext sessionContext) {
 		this.sessionContext = sessionContext;
 	}
@@ -291,6 +293,13 @@ public class BehaviorTrackingManagerImpl implements BehaviorTrackingManager {
 		this.flushThreshold = flushThreshold;
 	}
 	
+	public void afterPropertiesSet() throws Exception {
+		if (sessionContext == null) {
+			log.info("No sessionContext specified, using default implementation " + SpringSessionContext.class.getName());
+			sessionContext = new SpringSessionContext();
+		}
+	}
+
 	protected class FlushEvent extends BehaviorEvent {
 
 		private static final long serialVersionUID = 3182195013219330932L;
