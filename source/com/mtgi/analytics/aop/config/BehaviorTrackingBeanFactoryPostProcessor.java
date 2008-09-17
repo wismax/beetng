@@ -43,7 +43,7 @@ public class BehaviorTrackingBeanFactoryPostProcessor implements BeanFactoryPost
 				BehaviorTrackingManager.class);
 		if (manager == null) {
 			manager = (BehaviorTrackingManager) beanFactory.createBean(BehaviorTrackingManagerImpl.class,
-					ConfigurableListableBeanFactory.AUTOWIRE_AUTODETECT, true);
+					ConfigurableListableBeanFactory.AUTOWIRE_AUTODETECT, false);
 			BehaviorTrackingManagerImpl managerImpl = (BehaviorTrackingManagerImpl) manager;
 			managerImpl.setApplication(application);
 			beanFactory.registerSingleton("defaultTrackingManager", manager);
