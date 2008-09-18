@@ -5,10 +5,12 @@ import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -19,6 +21,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.mtgi.io.RelocatableFile;
 import com.sun.xml.fastinfoset.tools.FI_SAX_XML;
 
 public class XmlBehaviorEventPersisterTest {
@@ -31,7 +34,7 @@ public class XmlBehaviorEventPersisterTest {
 	@Before
 	public void setUp() throws Exception {
 		file = File.createTempFile("perf", ".bxml");
-		file.deleteOnExit();
+		file.delete();
 		//initialize the persister to point to the test logger.
 		persister = new XmlBehaviorEventPersisterImpl();
 		persister.setFile(file.getAbsolutePath());
@@ -262,6 +265,62 @@ public class XmlBehaviorEventPersisterTest {
 				assertTrue("log records duration correctly", actual.contains("<duration-ms>" + evt.getDuration() + "</duration-ms>"));
 			}
 		}
+	}
+	
+	@Test
+	public void testListLogFiles() throws Exception {
+		//switch to binary format.
+		persister.setBinary(true);
+		file = new File(persister.rotateLog());
+		
+		//rotate again so that we have multiple matching files, with different extensions.
+		String path = persister.rotateLog();
+		File file2 = new File(path);
+
+		//test list wrapper.
+		StringBuffer fileData = persister.listLogFiles();
+		assertNotNull("file list returned", fileData);
+
+		String data = fileData.toString();
+		int offset = data.indexOf(file.getName());
+		assertTrue("row for first file found", offset > 0);
+		String rowData = "<tr><td>" + file.getName() + "</td><td>" + file.length() + "</td><td>" + new Date(file.lastModified()) + "</td></tr>";
+		assertEquals(rowData, data.subSequence(offset - 8, offset - 8 + rowData.length()));
+
+		offset = data.indexOf(file2.getName());
+		rowData = "<tr><td>" + file2.getName() + "</td><td>" + file2.length() + "</td><td>" + new Date(file2.lastModified()) + "</td></tr>";
+		assertEquals(rowData, data.subSequence(offset - 8, offset - 8 + rowData.length()));
+		
+		//test download
+		RelocatableFile data0 = persister.downloadLogFile(file.getName());
+		assertNotNull("file data found", data0);
+		assertEquals(file, data0.getLocalFile());
+		
+		RelocatableFile data1 = persister.downloadLogFile(file2.getName());
+		assertNotNull("file data found", data1);
+		assertEquals(file2, data1.getLocalFile());
+		
+		//delete a file and verify that it disappears from the list.
+		file2.delete();
+		fileData = persister.listLogFiles();
+		assertNotNull("file list returned", fileData);
+		data = fileData.toString();
+		assertTrue("first file still in list", data.indexOf(file.getName()) > 0);
+		assertTrue("second file is gone", data.indexOf(file2.getName()) < 0);
+		
+		try {
+			persister.downloadLogFile(file2.getName());
+			fail("attempt to download missing file should fail");
+		} catch (FileNotFoundException expected) {}
+		
+		data0 = persister.downloadLogFile(file.getName());
+		assertNotNull("existing file data found", data0);
+		assertEquals(file, data0.getLocalFile());
+		
+		try {
+			persister.downloadLogFile("junk.junk");
+			fail("attempt to access illegal file should fail");
+		} catch (IllegalArgumentException expected) {}
 	}
 	
 	/**

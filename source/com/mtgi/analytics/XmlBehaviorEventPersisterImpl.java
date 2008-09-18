@@ -4,12 +4,18 @@ import static java.util.UUID.randomUUID;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileFilter;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Queue;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.GZIPOutputStream;
 
 import javax.xml.stream.XMLOutputFactory;
@@ -23,8 +29,10 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.jmx.export.annotation.ManagedAttribute;
 import org.springframework.jmx.export.annotation.ManagedOperation;
+import org.springframework.jmx.export.annotation.ManagedOperationParameter;
 import org.springframework.jmx.export.annotation.ManagedResource;
 
+import com.mtgi.io.RelocatableFile;
 import com.sun.xml.fastinfoset.stax.StAXDocumentSerializer;
 
 /**
@@ -41,6 +49,7 @@ public class XmlBehaviorEventPersisterImpl
 	private static final Log log = LogFactory.getLog(XmlBehaviorEventPersisterImpl.class);
 
 	private static final SimpleDateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("yyyyMMddHHmmss");
+	private static final Pattern FILE_NAME_PATTERN = Pattern.compile("^(.+)\\.b?xml(?:\\.gz)?");
 	
 	private boolean binary;
 	private boolean compress;
@@ -75,6 +84,43 @@ public class XmlBehaviorEventPersisterImpl
 		this.dateFormat = new SimpleDateFormat(dateFormat);
 	}
 
+	/**
+	 * JMX operation to list archived xml data files available for download.
+	 */
+	@ManagedOperation(description="List all archived performance data log files available for download")
+	public StringBuffer listLogFiles() {
+
+		final Pattern pattern = getArchiveNamePattern();
+
+		//scan parent directory for matches.
+		File[] files = file.getParentFile().listFiles(new FileFilter() {
+			public boolean accept(File child) {
+				String childName = child.getName();
+				return pattern.matcher(childName).matches();
+			}
+		});
+		Arrays.sort(files, FileOrder.INST);
+
+		StringBuffer ret = new StringBuffer("<html><body><table><tr><th>File</th><th>Size</th><th>Modified</th></tr>");
+		for (File f : files)
+			ret.append("<tr><td>").append(f.getName()).append("</td><td>")
+			   .append(f.length()).append("</td><td>")
+			   .append(new Date(f.lastModified()).toString()).append("</td></tr>");
+		ret.append("</table></body></html>");
+		return ret;
+	}
+	
+	@ManagedOperation(description="directly access a performance log file by name; use listLogFiles to determine valid file names")
+	@ManagedOperationParameter(name="name", description="The relative name of the file to download; see listLogFiles")
+	public RelocatableFile downloadLogFile(String name) throws IOException {
+		if (!getArchiveNamePattern().matcher(name).matches())
+			throw new IllegalArgumentException(name + " does not appear to be a performance data file");
+		File data = new File(file.getParentFile(), name);
+		if (!data.isFile())
+			throw new FileNotFoundException(file.getAbsolutePath());
+		return new RelocatableFile(data);
+	}
+	
 	/** set the destination log file.  The file extension will be modified based on compression / binary settings. */
 	@Required
 	public void setFile(String path) {
@@ -228,12 +274,9 @@ public class XmlBehaviorEventPersisterImpl
 		
 		//strip off current extension if applicable.
 		String baseName = file.getName();
-		int dot = baseName.lastIndexOf('.');
-		if (dot > 0) {
-			String current = baseName.substring(dot);
-			if (current.equals(".xml") || current.equals(".bxml") || current.equals(".log"))
-				baseName = baseName.substring(0, dot);
-		}
+		Matcher matcher = FILE_NAME_PATTERN.matcher(baseName);
+		if (matcher.matches())
+			baseName = matcher.group(1);
 		
 		return new File(file.getParentFile(), baseName + ext);
 	}
@@ -249,4 +292,27 @@ public class XmlBehaviorEventPersisterImpl
 		return ret;
 	}
 	
+	private Pattern getArchiveNamePattern() {
+		//build a regex that matches files with the configured basename, plus a non-binary or binary xml extension,
+		//plus a date suffix.
+		String filePattern = file.getName();
+		Matcher m = FILE_NAME_PATTERN.matcher(filePattern);
+		if (m.matches())
+			filePattern = m.group(1);
+		filePattern += "\\.b?xml\\..+";
+		return Pattern.compile(filePattern);
+	}
+	
+	protected static class FileOrder implements Comparator<File> {
+
+		public static final FileOrder INST = new FileOrder();
+		
+		public int compare(File f0, File f1) {
+			long delta = f0.lastModified() - f1.lastModified();
+			return delta == 0 ? f0.compareTo(f1)
+							  : delta > 0 ? -1
+							  : 0;
+		}
+		
+	}
 }
