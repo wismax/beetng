@@ -16,8 +16,8 @@ import java.io.Serializable;
  */
 public class RelocatableFile implements Serializable {
 
-	private static final long serialVersionUID = -8888877891952135171L;
-	private File localPath;
+	private static final long serialVersionUID = 6034331005472005195L;
+	private transient File localPath;
 	
 	public RelocatableFile(File localPath) {
 		this.localPath = localPath;
