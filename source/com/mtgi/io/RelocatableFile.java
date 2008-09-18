@@ -37,7 +37,7 @@ public class RelocatableFile implements Serializable {
 	private void writeObject(ObjectOutputStream out) 
 		throws IOException 
 	{
-		out.writeObject(localPath.getName());
+		out.writeUTF(localPath.getName());
 		out.writeLong(localPath.length());
 		
 		byte[] xfer = new byte[4096];
@@ -53,7 +53,7 @@ public class RelocatableFile implements Serializable {
 	private void readObject(ObjectInputStream in) 
 		throws IOException, ClassNotFoundException 
 	{
-		String remote = (String)in.readObject();
+		String remote = in.readUTF();
 		String ext = ".data";
 		int dot = remote.lastIndexOf('.');
 		if (dot > 0) {
