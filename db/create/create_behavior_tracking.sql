@@ -1,4 +1,8 @@
-create sequence S_BEHAVIOR_TRACKING_EVENT;
+-- staging table to receive XML event data.
+create table BEHAVIOR_EVENT_XML of XMLType;
+
+-- event data table for basic analysis.
+create sequence SEQ_BEHAVIOR_TRACKING_EVENT;
 create table BEHAVIOR_TRACKING_EVENT (
 	EVENT_ID_PK		NUMBER(16)		PRIMARY KEY,
 	EVENT_ID		VARCHAR2(100)	NOT NULL,
@@ -18,6 +22,7 @@ create index EVENT_NAME_IDX on BEHAVIOR_TRACKING_EVENT (
    EVENT_NAME ASC
 );
 
+-- event summary table for trending over long periods of time
 create sequence S_BEHAVIOR_TRACKING_SUMMARY;
 create table BEHAVIOR_TRACKING_SUMMARY (
 	ID					NUMBER(16)		PRIMARY KEY,

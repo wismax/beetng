@@ -11,8 +11,8 @@ INSERT INTO BEHAVIOR_TRACKING_EVENT (event_id_pk, event_id, parent_event_id, eve
 		 extractValue(value(x), '/event/duration-ms') event_duration,
 		 extract(value(x), '/event/event-data').getClobVal() data,
          extractValue(value(x), '/event/error') error
-         FROM CASPR_EVENT_XML  t,
+         FROM BEHAVIOR_EVENT_XML  t,
 TABLE(XMLSequence(extract(t.SYS_NC_ROWINFO$,'/event-log/event'))) x);
 COMMIT;
-DELETE FROM CASPR_EVENT_XML;
+DELETE FROM BEHAVIOR_EVENT_XML;
 COMMIT;
