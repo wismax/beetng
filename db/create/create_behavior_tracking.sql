@@ -23,7 +23,7 @@ create index EVENT_NAME_IDX on BEHAVIOR_TRACKING_EVENT (
 );
 
 -- event summary table for trending over long periods of time
-create sequence S_BEHAVIOR_TRACKING_SUMMARY;
+create sequence SEQ_BEHAVIOR_TRACKING_SUMMARY;
 create table BEHAVIOR_TRACKING_SUMMARY (
 	ID					NUMBER(16)		PRIMARY KEY,
 	SUMMARY_DATE		VARCHAR2(100)	NOT NULL,
