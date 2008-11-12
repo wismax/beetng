@@ -7,4 +7,4 @@ LOAD DATA
 INTO TABLE BEHAVIOR_EVENT_XML
 XMLType(event_xml)
    FIELDS TERMINATED BY "!!" 
-      (event_xml char(7000000))
+      (event_xml char(150000000))
