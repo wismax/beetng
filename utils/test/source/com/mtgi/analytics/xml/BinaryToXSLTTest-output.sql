@@ -15,7 +15,7 @@ INSERT INTO BEHAVIOR_TRACKING_EVENT (
 	'him1',
 	'test',
 	0,
-	'value<2>',
+	'<event-data><key>value&lt;2&gt;</key></event-data>',
 	'error[2]'
 );
 
@@ -35,7 +35,7 @@ INSERT INTO BEHAVIOR_TRACKING_EVENT (
 	'her2',
 	'test',
 	16,
-	'value<3>',
+	'<event-data><key>value&lt;3&gt;</key></event-data>',
 	null
 );
 
@@ -95,7 +95,7 @@ INSERT INTO BEHAVIOR_TRACKING_EVENT (
 	'you1',
 	'test',
 	16,
-	'value<6>',
+	'<event-data><key>value&lt;6&gt;</key></event-data>',
 	'error[6]'
 );
 
@@ -135,7 +135,7 @@ INSERT INTO BEHAVIOR_TRACKING_EVENT (
 	'her1',
 	'test',
 	16,
-	'value<8>',
+	'<event-data><key>value&lt;8&gt;</key></event-data>',
 	'error[8]'
 );
 COMMIT;
@@ -156,7 +156,7 @@ INSERT INTO BEHAVIOR_TRACKING_EVENT (
 	'me2',
 	'test',
 	47,
-	'value<5>',
+	'<event-data><key>value&lt;5&gt;</key></event-data>',
 	null
 );
 
@@ -196,7 +196,7 @@ INSERT INTO BEHAVIOR_TRACKING_EVENT (
 	'you2',
 	'test',
 	16,
-	'value<11>',
+	'<event-data><key>value&lt;11&gt;</key></event-data>',
 	null
 );
 
@@ -216,7 +216,7 @@ INSERT INTO BEHAVIOR_TRACKING_EVENT (
 	'him1',
 	'test',
 	15,
-	'value<12>',
+	'<event-data><key>value&lt;12&gt;</key></event-data>',
 	'error[12]'
 );
 
@@ -236,7 +236,7 @@ INSERT INTO BEHAVIOR_TRACKING_EVENT (
 	null,
 	'test',
 	46,
-	'value<9>',
+	'<event-data><key>value&lt;9&gt;</key></event-data>',
 	null
 );
 
@@ -256,7 +256,7 @@ INSERT INTO BEHAVIOR_TRACKING_EVENT (
 	'me1',
 	'test',
 	171,
-	'value<0>',
+	'<event-data><key>value&lt;0&gt;</key></event-data>',
 	'error[0]'
 );
 
@@ -276,7 +276,7 @@ INSERT INTO BEHAVIOR_TRACKING_EVENT (
 	'me2',
 	'test',
 	15,
-	'value<15>',
+	'<event-data><key>value&lt;15&gt;</key></event-data>',
 	null
 );
 COMMIT;
@@ -317,7 +317,7 @@ INSERT INTO BEHAVIOR_TRACKING_EVENT (
 	'him2',
 	'test',
 	16,
-	'value<17>',
+	'<event-data><key>value&lt;17&gt;</key></event-data>',
 	null
 );
 
@@ -337,7 +337,7 @@ INSERT INTO BEHAVIOR_TRACKING_EVENT (
 	null,
 	'test',
 	63,
-	'value<14>',
+	'<event-data><key>value&lt;14&gt;</key></event-data>',
 	'error[14]'
 );
 
@@ -377,7 +377,7 @@ INSERT INTO BEHAVIOR_TRACKING_EVENT (
 	'me1',
 	'test',
 	0,
-	'value<20>',
+	'<event-data><key>value&lt;20&gt;</key></event-data>',
 	'error[20]'
 );
 
@@ -397,7 +397,7 @@ INSERT INTO BEHAVIOR_TRACKING_EVENT (
 	'you2',
 	'test',
 	0,
-	'value<21>',
+	'<event-data><key>value&lt;21&gt;</key></event-data>',
 	null
 );
 
@@ -417,7 +417,7 @@ INSERT INTO BEHAVIOR_TRACKING_EVENT (
 	'her1',
 	'test',
 	46,
-	'value<18>',
+	'<event-data><key>value&lt;18&gt;</key></event-data>',
 	'error[18]'
 );
 COMMIT;
@@ -438,7 +438,7 @@ INSERT INTO BEHAVIOR_TRACKING_EVENT (
 	'her2',
 	'test',
 	16,
-	'value<23>',
+	'<event-data><key>value&lt;23&gt;</key></event-data>',
 	null
 );
 
@@ -458,7 +458,7 @@ INSERT INTO BEHAVIOR_TRACKING_EVENT (
 	null,
 	'test',
 	15,
-	'value<24>',
+	'<event-data><key>value&lt;24&gt;</key></event-data>',
 	'error[24]'
 );
 
@@ -558,7 +558,7 @@ INSERT INTO BEHAVIOR_TRACKING_EVENT (
 	null,
 	'test',
 	0,
-	'value<29>',
+	'<event-data><key>value&lt;29&gt;</key></event-data>',
 	null
 );
 COMMIT;
@@ -579,7 +579,7 @@ INSERT INTO BEHAVIOR_TRACKING_EVENT (
 	'me1',
 	'test',
 	15,
-	'value<30>',
+	'<event-data><key>value&lt;30&gt;</key></event-data>',
 	'error[30]'
 );
 
@@ -599,7 +599,7 @@ INSERT INTO BEHAVIOR_TRACKING_EVENT (
 	'him2',
 	'test',
 	46,
-	'value<27>',
+	'<event-data><key>value&lt;27&gt;</key></event-data>',
 	null
 );
 
@@ -619,7 +619,7 @@ INSERT INTO BEHAVIOR_TRACKING_EVENT (
 	'him1',
 	'test',
 	32,
-	'value<32>',
+	'<event-data><key>value&lt;32&gt;</key></event-data>',
 	'error[32]'
 );
 
@@ -639,7 +639,7 @@ INSERT INTO BEHAVIOR_TRACKING_EVENT (
 	'her2',
 	'test',
 	15,
-	'value<33>',
+	'<event-data><key>value&lt;33&gt;</key></event-data>',
 	null
 );
 
@@ -699,7 +699,7 @@ INSERT INTO BEHAVIOR_TRACKING_EVENT (
 	'you1',
 	'test',
 	15,
-	'value<36>',
+	'<event-data><key>value&lt;36&gt;</key></event-data>',
 	'error[36]'
 );
 COMMIT;
@@ -740,7 +740,7 @@ INSERT INTO BEHAVIOR_TRACKING_EVENT (
 	'her1',
 	'test',
 	0,
-	'value<38>',
+	'<event-data><key>value&lt;38&gt;</key></event-data>',
 	'error[38]'
 );
 
@@ -760,7 +760,7 @@ INSERT INTO BEHAVIOR_TRACKING_EVENT (
 	'me2',
 	'test',
 	31,
-	'value<35>',
+	'<event-data><key>value&lt;35&gt;</key></event-data>',
 	null
 );
 
@@ -780,6 +780,6 @@ INSERT INTO BEHAVIOR_TRACKING_EVENT (
 	'you1',
 	'test',
 	156,
-	'value<26>',
+	'<event-data><key>value&lt;26&gt;</key></event-data>',
 	'error[26]'
 );

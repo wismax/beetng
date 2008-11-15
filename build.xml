@@ -17,9 +17,13 @@
 					  conf="default"/>
 	
 	    <copy todir="${utils.dist}">
-	            <fileset dir="${build.root}/utils/dist/jars"
-	                     includes="**/*.jar" excludes="**/*test*"/>
+            <fileset dir="${build.root}/utils/dist/jars"
+                     includes="**/*.jar" excludes="**/*test*"/>
 	    </copy>
+		
+		<copy todir="${utils.dist}">
+			<fileset dir="db" includes="etl/**"/>
+		</copy>
 		
 		<zip file="${target.dir}/bt-utils.zip" >
 			<zipfileset prefix="BehaviorTracking" dir="${utils.dist}" includes="**/*"/>
