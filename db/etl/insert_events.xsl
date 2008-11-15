@@ -11,9 +11,9 @@
 	<!-- output a SQL insert statement for each event.  every 100th statement is followed by a 'COMMIT'. -->
 	<xsl:template match="event">
 INSERT INTO BEHAVIOR_TRACKING_EVENT (
-	event_id_pk, event_id, parent_id, event_type,
+	event_id_pk, event_id, parent_event_id, event_type,
 	event_name, event_start, user_id, session_id,
-	application, event_duration, event_data, 
+	application, duration_ms, event_data, 
 	error
 ) VALUES (
 	SEQ_BEHAVIOR_TRACKING_EVENT.NEXTVAL, 
