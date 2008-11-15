@@ -7,31 +7,31 @@
 	    EVENT_ID CDATA #REQUIRED
 	    PARENT_EVENT_ID CDATA #IMPLIED
 	    APPLICATION CDATA #REQUIRED
-	    TYPE CDATA #REQUIRED
-	    NAME CDATA #REQUIRED
-	    START CDATA #REQUIRED
+	    EVENT_TYPE CDATA #REQUIRED
+	    EVENT_NAME CDATA #REQUIRED
+	    EVENT_START CDATA #REQUIRED
 	    DURATION_MS CDATA #REQUIRED
 	    USER_ID CDATA #IMPLIED
 	    SESSION_ID CDATA #IMPLIED
 	    ERROR CDATA #IMPLIED
-	    DATA CDATA #IMPLIED
+	    EVENT_DATA CDATA #IMPLIED
 	>
 ]>
 
 <dataset>
 	<BEHAVIOR_TRACKING_EVENT EVENT_ID="0" APPLICATION="testBT"
-		TYPE="method" NAME="com.mtgi.analytics.aop.BehaviorAdviceTest$ServiceA.getPrimitiveTracked"
-		START="2008-06-26 16:34:25.681" DURATION_MS="100"
-		DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data&gt;&lt;parameters&gt;&lt;parameter&gt;&lt;value&gt;[1, 2, 3, -4, 1, 3]&lt;/value&gt;&lt;/parameter&gt;&lt;/parameters&gt;&lt;result&gt;&lt;value&gt;6&lt;/value&gt;&lt;/result&gt;&lt;/event-data&gt;"
+		EVENT_TYPE="method" EVENT_NAME="com.mtgi.analytics.aop.BehaviorAdviceTest$ServiceA.getPrimitiveTracked"
+		EVENT_START="2008-06-26 16:34:25.681" DURATION_MS="100"
+		EVENT_DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data&gt;&lt;parameters&gt;&lt;parameter&gt;&lt;value&gt;[1, 2, 3, -4, 1, 3]&lt;/value&gt;&lt;/parameter&gt;&lt;/parameters&gt;&lt;result&gt;&lt;value&gt;6&lt;/value&gt;&lt;/result&gt;&lt;/event-data&gt;"
 		USER_ID="testUser" SESSION_ID="ABCDEF123" />
 	<BEHAVIOR_TRACKING_EVENT EVENT_ID="2" APPLICATION="testBT"
-		TYPE="method" NAME="com.mtgi.analytics.aop.BehaviorAdviceTest$ServiceA.getPrimitiveTracked"
-		START="2008-06-26 16:34:25.681" DURATION_MS="100"
-		DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data&gt;&lt;parameters&gt;&lt;parameter&gt;&lt;value&gt;[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, ... (2 more)]&lt;/value&gt;&lt;/parameter&gt;&lt;/parameters&gt;&lt;result&gt;&lt;value&gt;5151&lt;/value&gt;&lt;/result&gt;&lt;/event-data&gt;"
+		EVENT_TYPE="method" EVENT_NAME="com.mtgi.analytics.aop.BehaviorAdviceTest$ServiceA.getPrimitiveTracked"
+		EVENT_START="2008-06-26 16:34:25.681" DURATION_MS="100"
+		EVENT_DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data&gt;&lt;parameters&gt;&lt;parameter&gt;&lt;value&gt;[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, ... (2 more)]&lt;/value&gt;&lt;/parameter&gt;&lt;/parameters&gt;&lt;result&gt;&lt;value&gt;5151&lt;/value&gt;&lt;/result&gt;&lt;/event-data&gt;"
 		USER_ID="testUser" SESSION_ID="ABCDEF123" />
 	<BEHAVIOR_TRACKING_EVENT EVENT_ID="4" APPLICATION="testBT"
-		TYPE="behavior-tracking" NAME="flush" 
-		START="2008-06-26 16:34:25.681" DURATION_MS="100" 
-		DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data&gt;&lt;count&gt;2&lt;/count&gt;&lt;/event-data&gt;" 
+		EVENT_TYPE="behavior-tracking" EVENT_NAME="flush" 
+		EVENT_START="2008-06-26 16:34:25.681" DURATION_MS="100" 
+		EVENT_DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data&gt;&lt;count&gt;2&lt;/count&gt;&lt;/event-data&gt;" 
 		USER_ID="testUser" SESSION_ID="ABCDEF123"/>
 </dataset>

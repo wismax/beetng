@@ -61,13 +61,13 @@ public abstract class JdbcEventTestCase {
 	public void assertEventDataMatches(String dataSetResource) throws SQLException, DataSetException, IOException, DatabaseUnitException  {
 		IDatabaseConnection connection = new DatabaseConnection(conn);
         ITable actualTable = connection.createDataSet().getTable("BEHAVIOR_TRACKING_EVENT");
-        actualTable = excludedColumnsTable(actualTable, new String[]{"START", "DURATION_MS"});
+        actualTable = excludedColumnsTable(actualTable, new String[]{"EVENT_START", "DURATION_MS"});
 
 		InputStream expectedData = getClass().getResourceAsStream(dataSetResource);
 		FlatXmlDataSet expectedDataSet = new FlatXmlDataSet(expectedData, true);
 		ITable expectedTable = expectedDataSet.getTable("BEHAVIOR_TRACKING_EVENT");
 		
-		expectedTable = excludedColumnsTable(expectedTable, new String[]{"START", "DURATION_MS"});
+		expectedTable = excludedColumnsTable(expectedTable, new String[]{"EVENT_START", "DURATION_MS"});
 
 		org.dbunit.Assertion.assertEquals(expectedTable, actualTable);
 		
@@ -84,8 +84,10 @@ public abstract class JdbcEventTestCase {
 		String sql = IOUtils.toString(is);
 		is.close();
 
-		//normalize oracle specific type to generic SQL92
+		//convert oracle types to hsql types
 		sql = sql.replaceAll("VARCHAR2", "VARCHAR");
+		sql = sql.replaceAll("NUMBER", "NUMERIC");
+		sql = sql.replaceAll("CLOB", "LONGVARCHAR");
 		stmt.execute(sql);
 	}
 }

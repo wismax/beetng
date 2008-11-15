@@ -29,11 +29,11 @@ import com.mtgi.analytics.sql.BehaviorTrackingConnectionProxy;
 public class JdbcBehaviorEventPersisterImpl extends JdbcDaoSupport
 	implements BehaviorEventPersister {
 
-	private static final String DEFAULT_ID_SQL = "select S_BEHAVIOR_TRACKING_EVENT.nextval from dual";
+	private static final String DEFAULT_ID_SQL = "select SEQ_BEHAVIOR_TRACKING_EVENT.nextval from dual";
 	private static final String DEFAULT_INSERT_SQL = 
 		"insert into BEHAVIOR_TRACKING_EVENT " +
-			"(EVENT_ID, PARENT_EVENT_ID, APPLICATION, TYPE, NAME, START, DURATION_MS, USER_ID, SESSION_ID, ERROR, DATA) values " +
-			"(       ?,               ?,           ?,    ?,    ?,     ?,           ?,       ?,          ?,     ?,    ?)";
+			"(EVENT_ID, PARENT_EVENT_ID, APPLICATION, EVENT_TYPE, EVENT_NAME, EVENT_START, DURATION_MS, USER_ID, SESSION_ID, ERROR, EVENT_DATA) values " +
+			"(       ?,               ?,           ?,          ?,           ?,          ?,           ?,       ?,          ?,     ?,          ?)";
 	
 	private int batchSize = 25;
 	private String insertSql = DEFAULT_INSERT_SQL;

@@ -22,7 +22,7 @@
 		<property name="dataSource" ref="dataSource"/>
 		<!-- accommodate HSQL seq syntax for tests -->
 		<property name="idSql">
-			<value>select next value for S_BEHAVIOR_TRACKING_EVENT from INFORMATION_SCHEMA.SYSTEM_SEQUENCES</value>
+			<value>select next value for SEQ_BEHAVIOR_TRACKING_EVENT from INFORMATION_SCHEMA.SYSTEM_SEQUENCES</value>
 		</property>
 	</bean>
 

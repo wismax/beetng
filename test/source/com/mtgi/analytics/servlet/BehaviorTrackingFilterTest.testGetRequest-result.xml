@@ -7,26 +7,26 @@
 	    EVENT_ID CDATA #REQUIRED
 	    PARENT_EVENT_ID CDATA #IMPLIED
 	    APPLICATION CDATA #REQUIRED
-	    TYPE CDATA #REQUIRED
-	    NAME CDATA #REQUIRED
-	    START CDATA #REQUIRED
+	    EVENT_TYPE CDATA #REQUIRED
+	    EVENT_NAME CDATA #REQUIRED
+	    EVENT_START CDATA #REQUIRED
 	    DURATION_MS CDATA #REQUIRED
 	    USER_ID CDATA #IMPLIED
 	    SESSION_ID CDATA #IMPLIED
 	    ERROR CDATA #IMPLIED
-	    DATA CDATA #IMPLIED
+	    EVENT_DATA CDATA #IMPLIED
 	>
 ]>
 
 <dataset>
 	<BEHAVIOR_TRACKING_EVENT EVENT_ID="0" APPLICATION="testBT"
-		TYPE="http-request" NAME="/app/test/path"
-		START="2008-06-26 16:34:25.681" DURATION_MS="100"
-		DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data&gt;&lt;uri&gt;/app/test/path&lt;/uri&gt;&lt;protocol&gt;HTTP/1.1&lt;/protocol&gt;&lt;method&gt;GET&lt;/method&gt;&lt;remote-address&gt;127.0.0.1&lt;/remote-address&gt;&lt;remote-host&gt;127.0.0.1&lt;/remote-host&gt;&lt;response-status/&gt;&lt;response-message/&gt;&lt;parameters&gt;&lt;parameter&gt;&lt;name&gt;param3&lt;/name&gt;&lt;value&gt;72&amp;lt;&lt;/value&gt;&lt;/parameter&gt;&lt;parameter&gt;&lt;name&gt;param2&lt;/name&gt;&lt;value&gt;&lt;/value&gt;&lt;/parameter&gt;&lt;parameter&gt;&lt;name&gt;param1&lt;/name&gt;&lt;value&gt;hello&lt;/value&gt;&lt;value&gt;world&lt;/value&gt;&lt;/parameter&gt;&lt;/parameters&gt;&lt;/event-data&gt;"
+		EVENT_TYPE="http-request" EVENT_NAME="/app/test/path"
+		EVENT_START="2008-06-26 16:34:25.681" DURATION_MS="100"
+		EVENT_DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data&gt;&lt;uri&gt;/app/test/path&lt;/uri&gt;&lt;protocol&gt;HTTP/1.1&lt;/protocol&gt;&lt;method&gt;GET&lt;/method&gt;&lt;remote-address&gt;127.0.0.1&lt;/remote-address&gt;&lt;remote-host&gt;127.0.0.1&lt;/remote-host&gt;&lt;response-status/&gt;&lt;response-message/&gt;&lt;parameters&gt;&lt;parameter&gt;&lt;name&gt;param3&lt;/name&gt;&lt;value&gt;72&amp;lt;&lt;/value&gt;&lt;/parameter&gt;&lt;parameter&gt;&lt;name&gt;param2&lt;/name&gt;&lt;value&gt;&lt;/value&gt;&lt;/parameter&gt;&lt;parameter&gt;&lt;name&gt;param1&lt;/name&gt;&lt;value&gt;hello&lt;/value&gt;&lt;value&gt;world&lt;/value&gt;&lt;/parameter&gt;&lt;/parameters&gt;&lt;/event-data&gt;"
 		USER_ID="testUser" SESSION_ID="ABCDEF123" />
 	<BEHAVIOR_TRACKING_EVENT EVENT_ID="2" APPLICATION="testBT"
-		TYPE="behavior-tracking" NAME="flush" 
-		START="2008-06-26 16:34:25.681" DURATION_MS="100" 
-		DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data&gt;&lt;count&gt;1&lt;/count&gt;&lt;/event-data&gt;" 
+		EVENT_TYPE="behavior-tracking" EVENT_NAME="flush" 
+		EVENT_START="2008-06-26 16:34:25.681" DURATION_MS="100" 
+		EVENT_DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data&gt;&lt;count&gt;1&lt;/count&gt;&lt;/event-data&gt;" 
 		USER_ID="testUser" SESSION_ID="ABCDEF123"/>
 </dataset>

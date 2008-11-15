@@ -47,8 +47,8 @@ public class BehaviorTrackingDataSourceTest extends JdbcEventTestCase {
 		Statement cleanup = ((ConnectionProxy)conn).getTargetConnection().createStatement();
 		cleanup.execute(
 			"delete from BEHAVIOR_TRACKING_EVENT; " +
-			"drop sequence S_BEHAVIOR_TRACKING_EVENT; " +
-			"create sequence S_BEHAVIOR_TRACKING_EVENT; "
+			"drop sequence SEQ_BEHAVIOR_TRACKING_EVENT; " +
+			"create sequence SEQ_BEHAVIOR_TRACKING_EVENT; "
 		);
 		cleanup.close();
 	}

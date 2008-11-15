@@ -69,10 +69,10 @@ public class JdbcBehaviorEventPersisterTest extends JdbcEventTestCase {
 		} else {
 			assertEquals(event.getParent().getId(), data.getLong("PARENT_EVENT_ID"));
 		}
-		assertEquals(event.getType(), data.getString("TYPE"));
-		assertEquals(event.getName(), data.getString("NAME"));
+		assertEquals(event.getType(), data.getString("EVENT_TYPE"));
+		assertEquals(event.getName(), data.getString("EVENT_NAME"));
 		assertEquals(event.getApplication(), data.getString("APPLICATION"));
-		assertEquals(event.getStart().getTime(), data.getTimestamp("START").getTime());
+		assertEquals(event.getStart().getTime(), data.getTimestamp("EVENT_START").getTime());
 		assertEquals(event.getDuration(), (Long)data.getLong("DURATION_MS"));
 		assertEquals(event.getError(), data.getString("ERROR"));
 		assertEquals(event.getUserId(), data.getString("USER_ID"));

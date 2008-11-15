@@ -7,26 +7,26 @@
 	    EVENT_ID CDATA #REQUIRED
 	    PARENT_EVENT_ID CDATA #IMPLIED
 	    APPLICATION CDATA #REQUIRED
-	    TYPE CDATA #REQUIRED
-	    NAME CDATA #REQUIRED
-	    START CDATA #REQUIRED
+	    EVENT_TYPE CDATA #REQUIRED
+	    EVENT_NAME CDATA #REQUIRED
+	    EVENT_START CDATA #REQUIRED
 	    DURATION_MS CDATA #REQUIRED
 	    USER_ID CDATA #IMPLIED
 	    SESSION_ID CDATA #IMPLIED
 	    ERROR CDATA #IMPLIED
-	    DATA CDATA #IMPLIED
+	    EVENT_DATA CDATA #IMPLIED
 	>
 ]>
 
 <dataset>
 	<BEHAVIOR_TRACKING_EVENT EVENT_ID="0" APPLICATION="testBT"
-		TYPE="jdbc" NAME="execute"
-		START="2008-06-26 16:34:25.681" DURATION_MS="100"
-		DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data&gt;&lt;sql&gt;select BARF from VOID where DEATH RULES order by CHAOS&lt;/sql&gt;&lt;/event-data&gt;"
+		EVENT_TYPE="jdbc" EVENT_NAME="execute"
+		EVENT_START="2008-06-26 16:34:25.681" DURATION_MS="100"
+		EVENT_DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data&gt;&lt;sql&gt;select BARF from VOID where DEATH RULES order by CHAOS&lt;/sql&gt;&lt;/event-data&gt;"
 		USER_ID="dbUser" SESSION_ID="ABCDEF123" ERROR="java.sql.SQLException: Table not found in statement [select BARF from VOID]"/>
 	<BEHAVIOR_TRACKING_EVENT EVENT_ID="2" APPLICATION="testBT"
-		TYPE="behavior-tracking" NAME="flush" 
-		START="2008-06-26 16:34:25.681" DURATION_MS="100" 
-		DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data&gt;&lt;count&gt;1&lt;/count&gt;&lt;/event-data&gt;" 
+		EVENT_TYPE="behavior-tracking" EVENT_NAME="flush" 
+		EVENT_START="2008-06-26 16:34:25.681" DURATION_MS="100" 
+		EVENT_DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data&gt;&lt;count&gt;1&lt;/count&gt;&lt;/event-data&gt;" 
 		USER_ID="dbUser" SESSION_ID="ABCDEF123"/>
 </dataset>

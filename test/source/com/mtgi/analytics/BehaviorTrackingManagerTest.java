@@ -345,7 +345,7 @@ public class BehaviorTrackingManagerTest extends JdbcEventTestCase {
 		assertEquals("flush event persisted", 2, countEventsOfType("behavior-tracking"));
 		
 		String[] events = { "event[0]", "event[1]", "event[2]", "event[3]", "child[0]", "child[1]" };
-		ResultSet rs = stmt.executeQuery("select name from BEHAVIOR_TRACKING_EVENT where type='app' order by event_id");
+		ResultSet rs = stmt.executeQuery("select event_name from BEHAVIOR_TRACKING_EVENT where event_type='app' order by event_id");
 		for (int i = 0; i < events.length; ++i) {
 			assertTrue("got event[" + i + "]", rs.next());
 			assertEquals("event[" + i + "] has correct name", events[i], rs.getString(1));
@@ -409,7 +409,7 @@ public class BehaviorTrackingManagerTest extends JdbcEventTestCase {
 		
 		//verify that only events fired outside of suspended period were logged
 		String[] events = { "event[0]", "event[1]", "event[2]", "event[3]", "child[2]", "child[3]" };
-		ResultSet rs = stmt.executeQuery("select name from BEHAVIOR_TRACKING_EVENT where type='app' order by event_id");
+		ResultSet rs = stmt.executeQuery("select event_name from BEHAVIOR_TRACKING_EVENT where event_type='app' order by event_id");
 		for (int i = 0; i < events.length; ++i) {
 			assertTrue("got event[" + i + "]", rs.next());
 			assertEquals("event[" + i + "] has correct name", events[i], rs.getString(1));
@@ -446,7 +446,7 @@ public class BehaviorTrackingManagerTest extends JdbcEventTestCase {
 		assertEquals("no uncommitted events remain", 0, manager.getEventsPendingFlush());
 		
 		//do an initial count to see how we look.
-		ResultSet rs = stmt.executeQuery("select count(event_id) from BEHAVIOR_TRACKING_EVENT where type != 'behavior-tracking'");
+		ResultSet rs = stmt.executeQuery("select count(event_id) from BEHAVIOR_TRACKING_EVENT where event_type != 'behavior-tracking'");
 		assertTrue(rs.next());
 		int ret = rs.getInt(1);
 		rs.close();
@@ -458,7 +458,7 @@ public class BehaviorTrackingManagerTest extends JdbcEventTestCase {
 	}
 	
 	private int countEventsOfType(String type) throws SQLException {
-		ResultSet rs = stmt.executeQuery("select count(event_id) from BEHAVIOR_TRACKING_EVENT where type = '" + type + "'");
+		ResultSet rs = stmt.executeQuery("select count(event_id) from BEHAVIOR_TRACKING_EVENT where event_type = '" + type + "'");
 		assertTrue(rs.next());
 		int ret = rs.getInt(1);
 		rs.close();
@@ -507,8 +507,8 @@ public class BehaviorTrackingManagerTest extends JdbcEventTestCase {
 
 			ResultSet l0 = stmt.executeQuery(
 					"select * from BEHAVIOR_TRACKING_EVENT " +
-					"where type='level-0' " +
-					"and name like '" + getName() + "%' " +
+					"where event_type='level-0' " +
+					"and event_name like '" + getName() + "%' " +
 					"order by event_id"
 			);
 			for (int a = 0; a < 3; ++a) {
@@ -517,8 +517,8 @@ public class BehaviorTrackingManagerTest extends JdbcEventTestCase {
 				
 				ResultSet l1 = stmt.executeQuery(
 						"select * from BEHAVIOR_TRACKING_EVENT " +
-						"where type='level-1' " +
-						"and name like '" + getName() + "%' " +
+						"where event_type='level-1' " +
+						"and event_name like '" + getName() + "%' " +
 						"and parent_event_id=" + l0_id +
 						"order by event_id"
 				);
@@ -529,8 +529,8 @@ public class BehaviorTrackingManagerTest extends JdbcEventTestCase {
 					
 					ResultSet l2 = stmt.executeQuery(
 							"select * from BEHAVIOR_TRACKING_EVENT " +
-							"where type='level-2' " +
-							"and name like '" + getName() + "%' " +
+							"where event_type='level-2' " +
+							"and event_name like '" + getName() + "%' " +
 							"and parent_event_id=" + l1_id +
 							"order by event_id"
 					);

@@ -7,26 +7,26 @@
 	    EVENT_ID CDATA #REQUIRED
 	    PARENT_EVENT_ID CDATA #IMPLIED
 	    APPLICATION CDATA #REQUIRED
-	    TYPE CDATA #REQUIRED
-	    NAME CDATA #REQUIRED
-	    START CDATA #REQUIRED
+	    EVENT_TYPE CDATA #REQUIRED
+	    EVENT_NAME CDATA #REQUIRED
+	    EVENT_START CDATA #REQUIRED
 	    DURATION_MS CDATA #REQUIRED
 	    USER_ID CDATA #IMPLIED
 	    SESSION_ID CDATA #IMPLIED
 	    ERROR CDATA #IMPLIED
-	    DATA CDATA #IMPLIED
+	    EVENT_DATA CDATA #IMPLIED
 	>
 ]>
 
 <dataset>
 	<BEHAVIOR_TRACKING_EVENT EVENT_ID="0" APPLICATION="testBT"
-		TYPE="method" NAME="com.mtgi.analytics.aop.BehaviorAdviceTest$ServiceA.getVoidReturnTracked"
-		START="2008-06-26 16:34:25.681" DURATION_MS="100"
-		DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data&gt;&lt;parameters/&gt;&lt;result/&gt;&lt;/event-data&gt;"
+		EVENT_TYPE="method" EVENT_NAME="com.mtgi.analytics.aop.BehaviorAdviceTest$ServiceA.getVoidReturnTracked"
+		EVENT_START="2008-06-26 16:34:25.681" DURATION_MS="100"
+		EVENT_DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data&gt;&lt;parameters/&gt;&lt;result/&gt;&lt;/event-data&gt;"
 		USER_ID="testUser" SESSION_ID="ABCDEF123" />
 	<BEHAVIOR_TRACKING_EVENT EVENT_ID="2" APPLICATION="testBT"
-		TYPE="behavior-tracking" NAME="flush" 
-		START="2008-06-26 16:34:25.681" DURATION_MS="100" 
-		DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data&gt;&lt;count&gt;1&lt;/count&gt;&lt;/event-data&gt;" 
+		EVENT_TYPE="behavior-tracking" EVENT_NAME="flush" 
+		EVENT_START="2008-06-26 16:34:25.681" DURATION_MS="100" 
+		EVENT_DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data&gt;&lt;count&gt;1&lt;/count&gt;&lt;/event-data&gt;" 
 		USER_ID="testUser" SESSION_ID="ABCDEF123"/>
 </dataset>
