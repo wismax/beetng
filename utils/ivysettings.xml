@@ -9,7 +9,7 @@
 	<triggers>
 		<publish-manifest>
 			<manifest-attribute attribute="Main-Class" 
-								value="com.mtgi.analytics.xml.BinaryToXml"/>
+								value="com.mtgi.analytics.xml.Main"/>
 			<manifest-classpath pattern="lib/[artifact]-[revision].[ext]"/>
 		</publish-manifest>
 	</triggers>

@@ -12,16 +12,18 @@ import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 
 import com.sun.xml.fastinfoset.sax.SAXDocumentParser;
-import com.sun.xml.fastinfoset.tools.TransformInputOutput;
 
 /**
  * A alternative to the FastInfoset FI_TO_XML utility, which continues processing if
  * the source document is malformed.  This allows us to handle incomplete XML documents,
  * e.g. performance logs left from a crashed server.
  */
-public class BinaryToXml extends TransformInputOutput {
+public class BinaryToXml extends BinaryXmlProcessor {
 
-    public BinaryToXml() {
+	private static final String HELP_TEXT = "Usage: -tool xml [input] [output]";
+
+	public BinaryToXml() {
+		super(HELP_TEXT);
     }
     
     public void parse(InputStream finf, OutputStream xml) throws Exception {
@@ -127,9 +129,4 @@ public class BinaryToXml extends TransformInputOutput {
     		writer.close();
     	}
     }
-    
-    public static void main(String[] args) throws Exception {        
-    	BinaryToXml p = new BinaryToXml();
-        p.parse(args);
-    }    
 }

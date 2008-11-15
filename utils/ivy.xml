@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <ivy-module version="1.0">
-    <info organisation="mtgi" module="BehaviorTracking-utils" status="milestone" revision="1.0">
+    <info organisation="mtgi" module="BehaviorTracking-utils" status="milestone" revision="1.1">
     	<description>
     	Utilities for working with behavior tracking log files.
     	</description>
@@ -23,6 +23,7 @@
 
 		<dependency org="bea" name="stax-impl" rev="1.2.0"/>
 		<dependency org="sun" name="FastInfoset" rev="1.2.2"/>
+		<dependency org="saxon" name="saxon" rev="8.8"/>
 		<dependency org="junit" name="junit" rev="4.4" conf="test"/>
 		
 	</dependencies>
