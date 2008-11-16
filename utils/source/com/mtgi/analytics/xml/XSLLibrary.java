@@ -71,6 +71,32 @@ public class XSLLibrary {
     	return "'" + str.replace("'", "''") + "'";
     }
     
+    public static String quoteCsv(Object value) throws IOException {
+    	String str = serialize(value);
+    	if (str == null)
+    		return "";
+    	StringBuffer escaped = new StringBuffer(2 + str.length());
+    	escaped.append('"');
+    	for (int i = 0; i < str.length(); ++i) {
+    		char c = str.charAt(i);
+    		switch (c) {
+    		case '\n':
+    			//convert \r\n or \n to single \r.
+    			if (i == 0 || str.charAt(i - 1) != '\r')
+    				escaped.append('\r');
+    			break;
+    		case '\\':
+    		case '"':
+    			escaped.append('\\');
+    		default:
+    			escaped.append(c);
+				break;
+    		}
+    	}
+    	escaped.append('"');
+    	return escaped.toString();
+    }
+    
     private static class Serializer {
     	
     	private XMLSerializer serializer;

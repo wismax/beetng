@@ -44,6 +44,32 @@ public class XSLLibraryTest {
 	}
 	
 	@Test
+	public void testEscapeCsv() throws IOException, ParserConfigurationException {
+		
+		Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+		Element elt = doc.createElement("foo");
+		elt.setAttribute("bar", "\"b\\ar\"");
+		Element child = doc.createElement("baz");
+		child.appendChild(doc.createTextNode("inner\rlines\r\nnormalized\ncompletely"));
+		elt.appendChild(child);
+		
+		assertEquals("xml is serialized, with internal quotes escaped",
+					 "\"<foo bar=\\\"&quot;b\\\\ar&quot;\\\"><baz>inner&#xd;lines&#xd;\rnormalized\rcompletely</baz></foo>\"",
+					 XSLLibrary.quoteCsv(new NodeWrapper(elt, null, 1) {}));
+		
+	}
+	
+	@Test
+	public void testNullCsv() throws IOException {
+		assertEquals("Null CSV is converted to blank", "", XSLLibrary.quoteCsv(null));
+	}
+	
+	@Test
+	public void testEmptyCsv() throws IOException {
+		assertEquals("Empty CSV is quoted", "\"\"", XSLLibrary.quoteCsv(""));
+	}
+	
+	@Test
 	public void testSerializeNull() throws IOException {
 		assertNull("null object serializes to null", XSLLibrary.serialize(null));
 	}
