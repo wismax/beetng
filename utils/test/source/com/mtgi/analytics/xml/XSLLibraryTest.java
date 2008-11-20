@@ -53,8 +53,8 @@ public class XSLLibraryTest {
 		child.appendChild(doc.createTextNode("inner\rlines\r\nnormalized\ncompletely"));
 		elt.appendChild(child);
 		
-		assertEquals("xml is serialized, with internal quotes escaped",
-					 "\"<foo bar=\\\"&quot;b\\\\ar&quot;\\\"><baz>inner&#xd;lines&#xd;\rnormalized\rcompletely</baz></foo>\"",
+		assertEquals("xml is serialized, with internal quotes stuttered",
+					 "\"<foo bar=\"\"&quot;b\\ar&quot;\"\"><baz>inner&#xd;lines&#xd;\rnormalized\rcompletely</baz></foo>\"",
 					 XSLLibrary.quoteCsv(new NodeWrapper(elt, null, 1) {}));
 		
 	}

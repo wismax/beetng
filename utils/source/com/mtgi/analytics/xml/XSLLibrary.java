@@ -85,9 +85,8 @@ public class XSLLibrary {
     			if (i == 0 || str.charAt(i - 1) != '\r')
     				escaped.append('\r');
     			break;
-    		case '\\':
     		case '"':
-    			escaped.append('\\');
+    			escaped.append('"'); //stutter quotes
     		default:
     			escaped.append(c);
 				break;
