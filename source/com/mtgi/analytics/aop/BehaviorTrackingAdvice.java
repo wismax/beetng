@@ -64,7 +64,7 @@ public class BehaviorTrackingAdvice implements MethodInterceptor {
 		
 		for (int i = 0; i < sig.length; ++i) {
 			Object val = args[i];
-			logValue(parameters, "parameter", sig[i], val);
+			logValue(parameters, "param", sig[i], val);
 		}
 		
 		trackingManager.start(event);
@@ -95,7 +95,7 @@ public class BehaviorTrackingAdvice implements MethodInterceptor {
 		//log the concrete type of the argument if it differs from the expected type (i.e. is a subclass)
 		//the primitive type checks avoid logging redundant type info for autoboxed values
 		if (type != expectedType && !(expectedType.isPrimitive() || type.isPrimitive()))
-			element.addElement("type").setText(type.getName());
+			element.add("type", type.getName());
 		
 		//TODO: use annotations or some other configuration for custom
 		//parameter logging?
@@ -107,7 +107,7 @@ public class BehaviorTrackingAdvice implements MethodInterceptor {
 			if (shouldLog(type))
 				value = arg.toString();
 		}
-		element.addElement("value").setText(value);
+		element.setText(value);
 	}
 
 	protected static final String toStringArray(Object array) {

@@ -211,7 +211,7 @@ public class BehaviorTrackingDataSource extends DelegatingDataSource {
 					String sql = findSqlArg(args);
 					if (sql != null) {
 						//static SQL batch. add an element to contain SQL.
-						batch.add("sql", sql);
+						batch.addElement("sql").setText(sql);
 					} else {
 						//prepared statement batch.  add any parameters to 
 						//event info and reset for next statement.
@@ -237,9 +237,9 @@ public class BehaviorTrackingDataSource extends DelegatingDataSource {
 					}
 					
 					if (key != null) {
-						EventDataElement p = parameters.addElement("parameter");
-						p.add("key", key);
-						p.add("value", value);
+						EventDataElement v = parameters.addElement("param");
+						if (value != null)
+							v.setText(value.toString());
 					}
 				}
 			}
@@ -256,7 +256,7 @@ public class BehaviorTrackingDataSource extends DelegatingDataSource {
 			//SQL could either be provided as parameter, or when statement was created.
 			String actualSql = sql == null ? this.sql : sql;
 			if (actualSql != null) 
-				data.add("sql", actualSql);
+				data.addElement("sql").setText(actualSql);
 
 			if (name.endsWith("Batch")) {
 				if (batch != null) {
@@ -269,7 +269,7 @@ public class BehaviorTrackingDataSource extends DelegatingDataSource {
 				//clear out the parameter buffer for the next execute event.
 				parameters = new EventDataElement("parameters");
 			}
-			
+
 			trackingManager.start(event);
 			return event;
 		}

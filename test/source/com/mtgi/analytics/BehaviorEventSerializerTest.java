@@ -5,7 +5,6 @@ import static org.junit.Assert.*;
 import java.io.StringWriter;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 import java.util.TimeZone;
 
 import javax.xml.stream.XMLOutputFactory;
@@ -68,7 +67,7 @@ public class BehaviorEventSerializerTest {
 					"<start>2006-07-01T13:59:07.000+00:00</start><duration-ms>17</duration-ms>" +
 					"<user-id>user</user-id><session-id>session</session-id>" +
 					"<error>java.lang.RuntimeException: boom</error>" +
-					"<event-data><hello>world</hello></event-data></event>", 
+					"<event-data hello=\"world\"></event-data></event>", 
 					buffer.toString());
 		
 	}

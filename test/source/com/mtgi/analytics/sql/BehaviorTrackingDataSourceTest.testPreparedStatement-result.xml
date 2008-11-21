@@ -22,17 +22,17 @@
 	<BEHAVIOR_TRACKING_EVENT EVENT_ID="0" APPLICATION="testBT"
 		EVENT_TYPE="jdbc" EVENT_NAME="executeUpdate"
 		EVENT_START="2008-06-26 16:34:25.681" DURATION_MS="100"
-		EVENT_DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data&gt;&lt;sql&gt;insert into TEST_TRACKING values (?, ?, ?)&lt;/sql&gt;&lt;parameters&gt;&lt;parameter&gt;&lt;key&gt;1&lt;/key&gt;&lt;value&gt;1&lt;/value&gt;&lt;/parameter&gt;&lt;parameter&gt;&lt;key&gt;2&lt;/key&gt;&lt;value&gt;hello&lt;/value&gt;&lt;/parameter&gt;&lt;parameter&gt;&lt;key&gt;3&lt;/key&gt;&lt;value/&gt;&lt;/parameter&gt;&lt;/parameters&gt;&lt;/event-data&gt;"
+		EVENT_DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data&gt;&lt;sql&gt;insert into TEST_TRACKING values (?, ?, ?)&lt;/sql&gt;&lt;parameters&gt;&lt;param&gt;1&lt;/param&gt;&lt;param&gt;hello&lt;/param&gt;&lt;param/&gt;&lt;/parameters&gt;&lt;/event-data&gt;"
 		USER_ID="dbUser" SESSION_ID="ABCDEF123" />
 	<BEHAVIOR_TRACKING_EVENT EVENT_ID="2" APPLICATION="testBT"
 		EVENT_TYPE="jdbc" EVENT_NAME="executeBatch"
 		EVENT_START="2008-06-26 16:34:25.681" DURATION_MS="100"
-		EVENT_DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data&gt;&lt;sql&gt;insert into TEST_TRACKING values (?, ?, ?)&lt;/sql&gt;&lt;batch&gt;&lt;parameters&gt;&lt;parameter&gt;&lt;key&gt;1&lt;/key&gt;&lt;value&gt;3&lt;/value&gt;&lt;/parameter&gt;&lt;parameter&gt;&lt;key&gt;2&lt;/key&gt;&lt;value&gt;batch&lt;/value&gt;&lt;/parameter&gt;&lt;parameter&gt;&lt;key&gt;3&lt;/key&gt;&lt;value&gt;1&lt;/value&gt;&lt;/parameter&gt;&lt;/parameters&gt;&lt;parameters&gt;&lt;parameter&gt;&lt;key&gt;1&lt;/key&gt;&lt;value&gt;4&lt;/value&gt;&lt;/parameter&gt;&lt;parameter&gt;&lt;key&gt;2&lt;/key&gt;&lt;value&gt;batch&lt;/value&gt;&lt;/parameter&gt;&lt;parameter&gt;&lt;key&gt;3&lt;/key&gt;&lt;value&gt;2&lt;/value&gt;&lt;/parameter&gt;&lt;/parameters&gt;&lt;/batch&gt;&lt;/event-data&gt;"
+		EVENT_DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data&gt;&lt;sql&gt;insert into TEST_TRACKING values (?, ?, ?)&lt;/sql&gt;&lt;batch&gt;&lt;parameters&gt;&lt;param&gt;3&lt;/param&gt;&lt;param&gt;batch&lt;/param&gt;&lt;param&gt;1&lt;/param&gt;&lt;/parameters&gt;&lt;parameters&gt;&lt;param&gt;4&lt;/param&gt;&lt;param&gt;batch&lt;/param&gt;&lt;param&gt;2&lt;/param&gt;&lt;/parameters&gt;&lt;/batch&gt;&lt;/event-data&gt;"
 		USER_ID="dbUser" SESSION_ID="ABCDEF123" ></BEHAVIOR_TRACKING_EVENT>
 	<BEHAVIOR_TRACKING_EVENT EVENT_ID="4" APPLICATION="testBT"
 		EVENT_TYPE="jdbc" EVENT_NAME="executeUpdate"
 		EVENT_START="2008-06-26 16:34:25.681" DURATION_MS="100"
-		EVENT_DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data&gt;&lt;sql&gt;insert into TEST_TRACKING values (?, ?, ?)&lt;/sql&gt;&lt;parameters&gt;&lt;parameter&gt;&lt;key&gt;1&lt;/key&gt;&lt;value&gt;2&lt;/value&gt;&lt;/parameter&gt;&lt;parameter&gt;&lt;key&gt;2&lt;/key&gt;&lt;value&gt;goodbye&lt;/value&gt;&lt;/parameter&gt;&lt;parameter&gt;&lt;key&gt;3&lt;/key&gt;&lt;value/&gt;&lt;/parameter&gt;&lt;/parameters&gt;&lt;/event-data&gt;"
+		EVENT_DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data&gt;&lt;sql&gt;insert into TEST_TRACKING values (?, ?, ?)&lt;/sql&gt;&lt;parameters&gt;&lt;param&gt;2&lt;/param&gt;&lt;param&gt;goodbye&lt;/param&gt;&lt;param/&gt;&lt;/parameters&gt;&lt;/event-data&gt;"
 		USER_ID="dbUser" SESSION_ID="ABCDEF123" ></BEHAVIOR_TRACKING_EVENT>
 	<BEHAVIOR_TRACKING_EVENT EVENT_ID="6" APPLICATION="testBT"
 		EVENT_TYPE="jdbc" EVENT_NAME="executeUpdate"
@@ -47,6 +47,6 @@
 	<BEHAVIOR_TRACKING_EVENT EVENT_ID="10" APPLICATION="testBT"
 		EVENT_TYPE="behavior-tracking" EVENT_NAME="flush" 
 		EVENT_START="2008-06-26 16:34:25.681" DURATION_MS="100" 
-		EVENT_DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data&gt;&lt;count&gt;5&lt;/count&gt;&lt;/event-data&gt;" 
+		EVENT_DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data count=&quot;5&quot;&gt;&lt;/event-data&gt;" 
 		USER_ID="dbUser" SESSION_ID="ABCDEF123"></BEHAVIOR_TRACKING_EVENT>
 </dataset>

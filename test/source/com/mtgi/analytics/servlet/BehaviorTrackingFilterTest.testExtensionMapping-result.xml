@@ -22,11 +22,11 @@
 	<BEHAVIOR_TRACKING_EVENT EVENT_ID="0" APPLICATION="testBT"
 		EVENT_TYPE="http-request" EVENT_NAME="/app/foo.ext"
 		EVENT_START="2008-06-26 16:34:25.681" DURATION_MS="100"
-		EVENT_DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data&gt;&lt;uri&gt;/app/foo.ext&lt;/uri&gt;&lt;protocol&gt;HTTP/1.1&lt;/protocol&gt;&lt;method&gt;GET&lt;/method&gt;&lt;remote-address&gt;127.0.0.1&lt;/remote-address&gt;&lt;remote-host&gt;127.0.0.1&lt;/remote-host&gt;&lt;response-status/&gt;&lt;response-message/&gt;&lt;parameters&gt;&lt;parameter&gt;&lt;name&gt;param3&lt;/name&gt;&lt;value&gt;72&amp;lt;&lt;/value&gt;&lt;/parameter&gt;&lt;parameter&gt;&lt;name&gt;param2&lt;/name&gt;&lt;value&gt;&lt;/value&gt;&lt;/parameter&gt;&lt;parameter&gt;&lt;name&gt;param1&lt;/name&gt;&lt;value&gt;hello&lt;/value&gt;&lt;value&gt;world&lt;/value&gt;&lt;/parameter&gt;&lt;/parameters&gt;&lt;/event-data&gt;"
+		EVENT_DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data uri=&quot;/app/foo.ext&quot; protocol=&quot;HTTP/1.1&quot; method=&quot;GET&quot; remote-address=&quot;127.0.0.1&quot; remote-host=&quot;127.0.0.1&quot;&gt;&lt;parameters&gt;&lt;param name=&quot;param3&quot;&gt;&lt;value&gt;72&amp;lt;&lt;/value&gt;&lt;/param&gt;&lt;param name=&quot;param2&quot;&gt;&lt;value&gt;&lt;/value&gt;&lt;/param&gt;&lt;param name=&quot;param1&quot;&gt;&lt;value&gt;hello&lt;/value&gt;&lt;value&gt;world&lt;/value&gt;&lt;/param&gt;&lt;/parameters&gt;&lt;/event-data&gt;"
 		USER_ID="testUser" SESSION_ID="ABCDEF123" />
 	<BEHAVIOR_TRACKING_EVENT EVENT_ID="2" APPLICATION="testBT"
 		EVENT_TYPE="behavior-tracking" EVENT_NAME="flush" 
 		EVENT_START="2008-06-26 16:34:25.681" DURATION_MS="100" 
-		EVENT_DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data&gt;&lt;count&gt;1&lt;/count&gt;&lt;/event-data&gt;" 
+		EVENT_DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data count=&quot;1&quot;&gt;&lt;/event-data&gt;" 
 		USER_ID="testUser" SESSION_ID="ABCDEF123"/>
 </dataset>

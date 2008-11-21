@@ -79,28 +79,22 @@ public class EventDataElementSerializer {
 			writer.writeCharacters(DUMMY_TEXT, 0, 0);
 		} else {
 			writer.writeStartElement(name);
-			
+
+			//add attributes for properties.
+			Iterator<Entry<String,Object>> props = element.iterateProperties();
+			while (props.hasNext()) {
+				Entry<String,Object> prop = props.next();
+				Object value = prop.getValue();
+				if (value != null) {
+					String propName = getXMLElementName(prop.getKey());
+					writer.writeAttribute(propName, value.toString());
+				}
+			}
+
 			//add text to the element if applicable.
 			String text = element.getText();
 			if (text != null)
 				writer.writeCharacters(text);
-			
-			//add child elements for properties.
-			Iterator<Entry<String,Object>> props = element.iterateProperties();
-			while (props.hasNext()) {
-				Entry<String,Object> prop = props.next();
-				
-				String propName = getXMLElementName(prop.getKey());
-				Object value = prop.getValue();
-				
-				if (value != null) {
-					writer.writeStartElement(propName);
-					writer.writeCharacters(value.toString());
-					writer.writeEndElement();
-				} else {
-					writer.writeEmptyElement(propName);
-				}
-			}
 			
 			//add child elements for children.
 			Iterator<EventDataElement> children = element.iterateChildren();

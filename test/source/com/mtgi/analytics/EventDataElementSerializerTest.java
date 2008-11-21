@@ -39,8 +39,8 @@ public class EventDataElementSerializerTest {
 		root.add("foo", new Double(1.5));
 		root.add("---bar-7", "hello");
 		root.add("baz", null);
-		root.add("qux", "world&escaped\nmaybe?");
-		assertEquals("<?xml version='1.0' encoding='utf-8'?><event-data><foo>1.5</foo><bar-7>hello</bar-7><baz/><qux>world&amp;escaped\nmaybe?</qux></event-data>", 
+		root.add("qux 8", "world&escaped\nmaybe?");
+		assertEquals("<?xml version='1.0' encoding='utf-8'?><event-data foo=\"1.5\" bar-7=\"hello\" qux-8=\"world&amp;escaped&#10;maybe?\"></event-data>", 
 					 serializer.serialize(root, true));
 	}
 	
@@ -52,16 +52,15 @@ public class EventDataElementSerializerTest {
 		EventDataElement child = root.addElement("9-foo@bar.baz");
 		child.add("hello", "world");
 		child.setText("bar");
-		child.addElement("baz-quux").add("first", null);
-		child.addElement("baz-quux").add("second", null);
+		child.addElement("baz-quux").addElement("first");
+		child.addElement("baz-quux").add("second", "");
 		assertEquals("<?xml version='1.0' encoding='utf-8'?>" +
 					"<data>" +
 						"<Leading-Trailing-7>&lt;hello&amp;amp;world&gt;</Leading-Trailing-7>" +
-						"<foo-bar-baz>" +
+						"<foo-bar-baz hello=\"world\">" +
 							"bar" +
-							"<hello>world</hello>" +
 							"<baz-quux><first/></baz-quux>" +
-							"<baz-quux><second/></baz-quux>" +
+							"<baz-quux second=\"\"></baz-quux>" +
 						"</foo-bar-baz>" +
 					"</data>", 
 					serializer.serialize(root, true));

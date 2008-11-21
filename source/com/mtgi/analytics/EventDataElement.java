@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -18,7 +19,7 @@ public class EventDataElement implements Serializable {
 	private String name;
 	private String text;
 
-	private ArrayList<Map.Entry<String,Object>> properties;
+	private LinkedHashMap<String,Object> properties;
 	private ArrayList<EventDataElement> children;
 	
 	public EventDataElement(String name) {
@@ -44,13 +45,12 @@ public class EventDataElement implements Serializable {
 	}
 	
 	/**
-	 * Set a named attribute on this element.  Replaces any prior
-	 * value for the same name, case-sensitive.  Values may be null.
+	 * Set a named attribute on this element.  Values may be null.
 	 */
 	public void add(String name, Object value) {
 		if (properties == null)
-			properties = new ArrayList<Map.Entry<String,Object>>();
-		properties.add(new Property(name, value));
+			properties = new LinkedHashMap<String,Object>();
+		properties.put(name, value);
 	}
 
 	/**
@@ -74,39 +74,11 @@ public class EventDataElement implements Serializable {
 	
 	public Iterator<Map.Entry<String,Object>> iterateProperties() {
 		return properties == null ? Collections.<Map.Entry<String,Object>>emptySet().iterator()
-								  : properties.iterator();
+								  : properties.entrySet().iterator();
 	}
 	
 	public Iterator<EventDataElement> iterateChildren() {
 		return children == null ? Collections.<EventDataElement>emptyList().iterator() 
 								: children.iterator();
-	}
-	
-	private static class Property implements Map.Entry<String, Object> {
-
-		private String key;
-		private Object value;
-		
-		protected Property(String key, Object value) {
-			super();
-			this.key = key;
-			this.value = value;
-		}
-		
-		public String getKey() {
-			return key;
-		}
-		public void setKey(String key) {
-			this.key = key;
-		}
-		public Object getValue() {
-			return value;
-		}
-		public Object setValue(Object value) {
-			Object old = this.value;
-			this.value = value;
-			return old;
-		}
-		
 	}
 }

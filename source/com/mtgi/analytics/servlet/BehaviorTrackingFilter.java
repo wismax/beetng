@@ -139,10 +139,10 @@ public class BehaviorTrackingFilter implements Filter {
 	}
 	
 	private static final void addParameter(EventDataElement parameters, String name, String[] values) {
-		EventDataElement param = parameters.addElement("parameter");
+		EventDataElement param = parameters.addElement("param");
 		param.add("name", name);
 		for (String v : values)
-			param.add("value", v);
+			param.addElement("value").setText(v);
 	}
 	
 	private static final void handleServerError(BehaviorEvent event, Throwable e) throws ServletException, IOException {
