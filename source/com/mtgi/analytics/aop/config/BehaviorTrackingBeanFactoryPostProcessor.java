@@ -2,95 +2,51 @@ package com.mtgi.analytics.aop.config;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanInitializationException;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
 import com.mtgi.analytics.BehaviorTrackingManager;
 import com.mtgi.analytics.BehaviorTrackingManagerImpl;
-import com.mtgi.analytics.aop.BehaviorTrackingAdvice;
 
+/** intelligently assigns a matching BehaviorTrackingManager instance to a BehaviorTrackingAdvice bean, creating one if necessary */
 public class BehaviorTrackingBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
 
-	@SuppressWarnings("unchecked")
+	private String application;
+	
+	public void setApplication(String application) {
+		this.application = application;
+	}
+
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-		BehaviorTrackingAdvice advice = (BehaviorTrackingAdvice) beanFactory.getBean("btAdvice");
-		if (advice == null)
-			return;
-		BehaviorTrackingManager manager = advice.getTrackingManager();
-		if (manager == null) {
-			manager = getDefaultBehaviorTrackingManager(beanFactory, advice.getApplication());
+
+		try {
+			BeanDefinition def = beanFactory.getBeanDefinition("defaultTrackingManager");
+			if (def != null)
+				return; //nothing to do.
+		} catch (NoSuchBeanDefinitionException notFound) {
 		}
 
-		if (!checkConsistenceOfApplication(advice, manager)) {
-			throw new BeanInitializationException(
-					"The application value in Advice bean is inconsistent with the one in BehaviorTrackingManager bean!"
-				);
-		}
+		//no default BehaviorTrackingManager instances defined, choose an available instance or create one.
+		String[] matches = beanFactory.getBeanNamesForType(BehaviorTrackingManager.class, false, false);
+		if (matches.length > 0) {
+			beanFactory.registerAlias(matches[0], "defaultTrackingManager");
+		} else {
+			if (application == null)
+				throw new BeanInitializationException("'application' is required on bt:advice when not specified anywhere else in the configuration");
 
-		advice.setTrackingManager(manager);
-	}
-
-	/**
-	 * provide a default BehaviorTrackingManager instance
-	 * 
-	 * @param beanFactory
-	 * @return a BehaviorTrackingAdvice instance
-	 * @throws BeansException
-	 */
-	protected BehaviorTrackingManager getDefaultBehaviorTrackingManager(ConfigurableListableBeanFactory beanFactory,
-			String application) throws BeansException {
-		BehaviorTrackingManager manager = (BehaviorTrackingManager) getFirstExistingBean(beanFactory,
-				BehaviorTrackingManager.class);
-		if (manager == null) {
-			manager = (BehaviorTrackingManager) beanFactory.createBean(BehaviorTrackingManagerImpl.class,
-					ConfigurableListableBeanFactory.AUTOWIRE_AUTODETECT, false);
-			BehaviorTrackingManagerImpl managerImpl = (BehaviorTrackingManagerImpl) manager;
-			managerImpl.setApplication(application);
-			beanFactory.registerSingleton("defaultTrackingManager", manager);
-		}
-
-		return manager;
-	}
-
-	/**
-	 * Try to find the first bean of a given type
-	 * 
-	 * @param beanFactory
-	 * @param clz -
-	 *            given type
-	 * @return the first bean instance if existing; null - if not existing
-	 * @throws BeansException
-	 */
-	protected Object getFirstExistingBean(ConfigurableListableBeanFactory beanFactory, Class clz) throws BeansException {
-		String[] beanNames = beanFactory.getBeanNamesForType(clz);
-		if (beanNames.length > 0) {
-			return beanFactory.getBean(beanNames[0]);
-		}
-		return null;
-	}
-
-	/**
-	 * check whether advice and manager define the same application name
-	 * 
-	 * @param advice
-	 * @param manager
-	 * @return false - application names are different; <br>
-	 *         true - 1. application names are the same <br>
-	 *         2.manager is not a instance of BehaviorTrackingManagerImpl <br>
-	 *         3.BehaviorTrackingManager has no application defined, one will be
-	 *         assiged from the advice
-	 */
-	protected boolean checkConsistenceOfApplication(BehaviorTrackingAdvice advice, BehaviorTrackingManager manager) {
-		if (manager instanceof BehaviorTrackingManagerImpl) {
-			BehaviorTrackingManagerImpl managerImpl = (BehaviorTrackingManagerImpl) manager;
-			String managerApp = managerImpl.getApplication();
-			String adviceApp = advice.getApplication();
-			if (managerApp != null) {
-				return managerApp.equalsIgnoreCase(adviceApp);
+			BehaviorTrackingManagerImpl inst = new BehaviorTrackingManagerImpl();
+			inst.setApplication(application);
+			beanFactory.autowireBeanProperties(inst, ConfigurableListableBeanFactory.AUTOWIRE_BY_TYPE, false);
+			try {
+				inst.afterPropertiesSet();
+			} catch (Exception e) {
+				throw new BeanInitializationException("Error initializing default tracking manager instance", e);
 			}
-			//else
-			managerImpl.setApplication(adviceApp);
+			beanFactory.registerSingleton("defaultTrackingManager", inst);
 		}
-		return true;
+		
 	}
+
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <ivy-module version="1.0">
-    <info organisation="mtgi" module="BehaviorTracking" status="milestone" revision="1.2.0">
+    <info organisation="mtgi" module="BehaviorTracking" status="milestone" revision="1.2.1">
     	<description>
     	The BehaviorTracking library adds aspect-oriented user behavior tracking
     	and performance monitoring capabilities to a Java application.  It is designed
