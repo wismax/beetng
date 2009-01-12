@@ -4,6 +4,7 @@ import java.util.LinkedList;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.core.task.TaskExecutor;
@@ -26,7 +27,7 @@ import com.mtgi.analytics.servlet.SpringSessionContext;
  */
 @ManagedResource(objectName="com.mtgi:group=analytics,name=BehaviorTracking", 
 		 		 description="Monitor and control user behavior tracking")
-public class BehaviorTrackingManagerImpl implements BehaviorTrackingManager, InitializingBean {
+public class BehaviorTrackingManagerImpl implements BehaviorTrackingManager, InitializingBean, BeanNameAware {
 
 	/*
 	 * Implementation is complicated by many issues, the first of which is performance.
@@ -65,7 +66,10 @@ public class BehaviorTrackingManagerImpl implements BehaviorTrackingManager, Ini
 	 */
 	
 	private static final Log log = LogFactory.getLog(BehaviorTrackingManagerImpl.class);
+
+	private boolean warned;
 	
+	private String name;
 	private SessionContext sessionContext;
 	private BehaviorEventPersister persister;
 	private String application;
@@ -94,6 +98,14 @@ public class BehaviorTrackingManagerImpl implements BehaviorTrackingManager, Ini
 	};
 	
 	public BehaviorTrackingManagerImpl() {
+	}
+	
+	public void setBeanName(String name) {
+		this.name = name;
+	}
+
+	public String getBeanName() {
+		return name;
 	}
 	
 	public BehaviorEvent createEvent(String type, String name) {
@@ -186,7 +198,11 @@ public class BehaviorTrackingManagerImpl implements BehaviorTrackingManager, Ini
 		//we don't call our own start/stop/createEvents methods, because that could
 		//recursively lead to another flush() or other nasty problems if the flush 
 		//threshold is set too small
-		BehaviorEvent flushEvent = new FlushEvent();
+		BehaviorEvent flushEvent = new FlushEvent(event.get());
+		if (!warned && !flushEvent.isRoot()) {
+			warned = true;
+			log.warn("Flush is being called from inside an application thread!  It is strongly advised the flush only be called from a dedicated, reduced-priority thread pool (are you using a SyncTaskExecutor in your spring configuration?).");
+		}
 		EventDataElement data = flushEvent.addData();
 		flushEvent.start();
 
@@ -206,7 +222,8 @@ public class BehaviorTrackingManagerImpl implements BehaviorTrackingManager, Ini
 			return count;
 			
 		} finally {
-			event.set(null);
+			//restore stack state
+			event.set(flushEvent.getParent());
 			
 			data.add("count", count);
 			flushEvent.stop();
@@ -262,6 +279,10 @@ public class BehaviorTrackingManagerImpl implements BehaviorTrackingManager, Ini
 		this.sessionContext = sessionContext;
 	}
 
+	public SessionContext getSessionContext() {
+		return sessionContext;
+	}
+
 	/**
 	 * Provide a persister for saving finished events to the behavior tracking database.
 	 * @param persister
@@ -269,6 +290,10 @@ public class BehaviorTrackingManagerImpl implements BehaviorTrackingManager, Ini
 	@Required
 	public void setPersister(BehaviorEventPersister persister) {
 		this.persister = persister;
+	}
+
+	public BehaviorEventPersister getPersister() {
+		return persister;
 	}
 
 	/**
@@ -279,6 +304,10 @@ public class BehaviorTrackingManagerImpl implements BehaviorTrackingManager, Ini
 		this.executor = executor;
 	}
 
+	public TaskExecutor getExecutor() {
+		return executor;
+	}
+	
 	/**
 	 * Specify the maximum number of completed events to queue in memory before
 	 * forcing a flush to the persister.  Default is 100 if unspecified.
@@ -304,9 +333,10 @@ public class BehaviorTrackingManagerImpl implements BehaviorTrackingManager, Ini
 
 		private static final long serialVersionUID = 3182195013219330932L;
 
-		protected FlushEvent() {
-			super(null, "behavior-tracking", "flush", application, sessionContext.getContextUserId(), sessionContext.getContextSessionId());
+		protected FlushEvent(BehaviorEvent parent) {
+			super(parent, "behavior-tracking", "flush", application, sessionContext.getContextUserId(), sessionContext.getContextSessionId());
 		}
 		
 	}
+
 }

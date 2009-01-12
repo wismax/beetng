@@ -9,6 +9,7 @@ import java.util.concurrent.Semaphore;
 
 import org.junit.After;
 import org.junit.Test;
+import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -455,6 +456,31 @@ public class BehaviorTrackingManagerTest extends JdbcEventTestCase {
 		//let each thread verify that all of its data was committed
 		for (EventGenerator g : threads)
 			g.verifyEvents();
+	}
+	
+	/** verify that synchronous event persistence works as expected (though a warning should be logged) */
+	@Test
+	public void testSynchronousFlush() throws Exception {
+		SyncTaskExecutor ste = new SyncTaskExecutor();
+		BehaviorTrackingManagerImpl impl = new BehaviorTrackingManagerImpl();
+		impl.setExecutor(ste);
+		impl.setApplication(manager.getApplication());
+		impl.setPersister(persister);
+		impl.setFlushThreshold(2);
+		impl.afterPropertiesSet();
+		
+		BehaviorEvent root = impl.createEvent("test", "hello");
+		impl.start(root);
+		
+		//flush should be handled synchronously from inside call to stop().
+		for (int i = 0; i < 6; ++i) {
+			BehaviorEvent child = impl.createEvent("test", "foo");
+			child.addData().add("index", i);
+			impl.start(child);
+			impl.stop(child);
+		}
+		
+		impl.stop(root);
 	}
 	
 	private int countEventsOfType(String type) throws SQLException {
