@@ -21,7 +21,8 @@
 		</property>
 	</bean>
 	
-	<bean id="com.mtgi.analytics.btPersister" class="com.mtgi.analytics.XmlBehaviorEventPersisterImpl">
+	<bean id="com.mtgi.analytics.btPersister" 
+		  class="com.mtgi.analytics.XmlBehaviorEventPersisterImpl">
 		<property name="file" value="behavior-tracking.xml"/>
 		<property name="binary" value="true"/>
 		<property name="compress" value="true"/>
@@ -67,6 +68,7 @@
 
 	<bean id="com.mtgi.analytics.btScheduler" 
 		  class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="schedulerName" value="BehaviorTrackingScheduler"/>
 		<property name="taskExecutor">
 			<ref local="com.mtgi.analytics.btExecutor"/>
 		</property>

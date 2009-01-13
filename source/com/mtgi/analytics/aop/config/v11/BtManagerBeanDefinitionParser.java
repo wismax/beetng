@@ -6,6 +6,9 @@ import static com.mtgi.analytics.aop.config.v11.ConfigurationConstants.CONFIG_NA
 import static com.mtgi.analytics.aop.config.v11.ConfigurationConstants.CONFIG_SCHEDULER;
 import static com.mtgi.analytics.aop.config.v11.ConfigurationConstants.CONFIG_TEMPLATE;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.springframework.aop.aspectj.AspectJExpressionPointcut;
 import org.springframework.aop.config.AopNamespaceUtils;
 import org.springframework.aop.support.DefaultBeanFactoryPointcutAdvisor;
@@ -117,6 +120,11 @@ public class BtManagerBeanDefinitionParser extends TemplateBeanDefinitionParser 
 			parserContext.popAndRegisterContainingComponent();
 		}
 		
+		if (!def.nestedProperties.contains("persister")) {
+			//custom persister not registered.  schedule default log rotation trigger.
+			BtXmlPersisterBeanDefinitionParser.configureLogRotation(parserContext, factory, null);
+		}
+		
 		return super.decorate(factory, template, element, parserContext);
 	}
 	
@@ -131,6 +139,8 @@ public class BtManagerBeanDefinitionParser extends TemplateBeanDefinitionParser 
 			props.removePropertyValue(parentProperty);
 			props.addPropertyValue(parentProperty, nested);
 			
+			((ManagerComponentDefinition)parent).addNestedProperty(parentProperty);
+			
 			//bean definition has been handled, nothing to do.
 			return null;
 		}
@@ -141,8 +151,14 @@ public class BtManagerBeanDefinitionParser extends TemplateBeanDefinitionParser 
 	
 	public static class ManagerComponentDefinition extends CompositeComponentDefinition {
 
+		private Set<String> nestedProperties = new HashSet<String>();
+		
 		public ManagerComponentDefinition(String name, Object source) {
 			super(name, source);
+		}
+		
+		public void addNestedProperty(String property) {
+			nestedProperties.add(property);
 		}
 
 	}

@@ -82,8 +82,10 @@ public class SchedulerActivationPostProcessor implements BeanFactoryPostProcesso
 	 */
 	public static void configureTriggerDefinition(BeanDefinition trigger, String cronExpression, String name) {
 		MutablePropertyValues props = trigger.getPropertyValues();
-		props.removePropertyValue("cronExpression");
-		props.addPropertyValue("cronExpression", cronExpression);
+		if (cronExpression != null) {
+			props.removePropertyValue("cronExpression");
+			props.addPropertyValue("cronExpression", cronExpression);
+		}
 		props.addPropertyValue("name", name + "_trigger");
 		
 		unwrapInnerBean(trigger, "jobDetail").getPropertyValues().addPropertyValue("name", name + "_job");

@@ -17,7 +17,7 @@ public class BtXmlPersisterBeanDefinitionParser<P extends XmlBehaviorEventPersis
 	private static final String[] PROPS = { "file", "binary", "compress" };
 	
 	private static final String CONFIG_PERSISTER = CONFIG_NAMESPACE + ".btPersister";
-	private static final String CONFIG_ROTATE_TRIGGER = CONFIG_NAMESPACE + ".btRotateTrigger";
+	public static final String CONFIG_ROTATE_TRIGGER = CONFIG_NAMESPACE + ".btRotateTrigger";
 	
 	public BtXmlPersisterBeanDefinitionParser() {
 		this(XmlBehaviorEventPersisterImpl.class);
@@ -32,14 +32,17 @@ public class BtXmlPersisterBeanDefinitionParser<P extends XmlBehaviorEventPersis
 	protected BeanDefinition decorate(ConfigurableListableBeanFactory factory, BeanDefinition template, Element element, ParserContext parserContext) {
 		for (String p : PROPS)
 			overrideAttribute(p, template, element);
+		//schedule periodic log rotation with Quartz
 		String rotateSchedule = element.getAttribute("rotate-schedule");
-		if (rotateSchedule != null) {
-			//schedule periodic log rotation with Quartz
-			BeanDefinition trigger = factory.getBeanDefinition(CONFIG_ROTATE_TRIGGER);
-			configureTriggerDefinition(trigger, rotateSchedule, parserContext.getReaderContext().generateBeanName(trigger) + "_rotate");
-			registerPostProcessor(parserContext, factory, CONFIG_SCHEDULER, CONFIG_ROTATE_TRIGGER);
-		}
+		if (rotateSchedule != null)
+			configureLogRotation(parserContext, factory, rotateSchedule);
+
 		return super.decorate(factory, template, element, parserContext);
 	}
 
+	public static void configureLogRotation(ParserContext parserContext, ConfigurableListableBeanFactory factory, String schedule) {
+		BeanDefinition trigger = factory.getBeanDefinition(CONFIG_ROTATE_TRIGGER);
+		configureTriggerDefinition(trigger, schedule, parserContext.getReaderContext().generateBeanName(trigger) + "_rotate");
+		registerPostProcessor(parserContext, factory, CONFIG_SCHEDULER, CONFIG_ROTATE_TRIGGER);
+	}
 }
