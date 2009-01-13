@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans" 
+	   default-lazy-init="true"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<bean id="com.mtgi.analytics.embedded" 
+		  class="com.mtgi.analytics.aop.config.TemplateBeanDefinitionParserTest$Embed">
+		  <property name="inner">
+		  	<ref local="com.mtgi.analytics.inner"/>
+		  </property>
+	</bean>
+	
+	<bean id="com.mtgi.analytics.inner" 
+		  class="com.mtgi.analytics.aop.config.TemplateBeanDefinitionParserTest$InnerBean">
+		  <property name="data" value="default"/>
+	</bean>
+
+</beans>

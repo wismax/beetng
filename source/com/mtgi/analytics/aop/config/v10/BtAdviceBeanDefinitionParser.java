@@ -1,4 +1,4 @@
-package com.mtgi.analytics.aop.config;
+package com.mtgi.analytics.aop.config.v10;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
@@ -10,7 +10,7 @@ import com.mtgi.analytics.aop.BehaviorTrackingAdvice;
 public class BtAdviceBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 
 	@Override
-	protected Class getBeanClass(Element element) {
+	protected Class<?> getBeanClass(Element element) {
 		return BehaviorTrackingAdvice.class;
 	}
 

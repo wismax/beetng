@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<xsd:schema xmlns="http://www.mantis-tgi.com/schema/bt/1.1"
+		xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+		xmlns:beans="http://www.springframework.org/schema/beans"
+		xmlns:tool="http://www.springframework.org/schema/tool"
+		xmlns:bt="http://www.mantis-tgi.com/schema/bt/1.1"
+		targetNamespace="http://www.mantis-tgi.com/schema/bt/1.1"
+		elementFormDefault="qualified"
+		attributeFormDefault="unqualified">
+
+	<xsd:import namespace="http://www.springframework.org/schema/beans"/>
+	<xsd:import namespace="http://www.springframework.org/schema/tool"/>
+
+	<xsd:annotation>
+		<xsd:documentation><![CDATA[
+	Defines the elements used in the mantis-tgi behavior tracking management infrastructure.
+		]]></xsd:documentation>
+	</xsd:annotation>
+
+	<xsd:element name="config">
+		<xsd:annotation>
+			<xsd:documentation><![CDATA[
+		Defines one or more BehaviorTrackingManager instances to record the behavior of
+		the application.
+			]]></xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="manager" minOccurs="1" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	 
+	<xsd:element name="manager">
+		<xsd:annotation>
+			<xsd:documentation source="java:com.mtgi.analytics.aop.BehaviorTrackingManager"><![CDATA[
+	Defines a behavior tracking manager and optionally configures what application behaviors are
+	monitored.
+			]]></xsd:documentation>
+			<xsd:appinfo>
+				<tool:annotation>
+					<tool:exports type="com.mtgi.analytics.BehaviorTrackingManagerImpl"/>
+				</tool:annotation>
+			</xsd:appinfo>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="beans:identifiedType">
+					<xsd:sequence>
+						<xsd:choice minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation><![CDATA[
+								Specify an event persister for this manager.  Defaults to a basic
+								file-based XML logging configuration if unspecified.
+								]]></xsd:documentation>
+							</xsd:annotation>
+							<xsd:element ref="bt:xml-persister"/>
+							<xsd:element ref="bt:jdbc-persister"/>
+							<xsd:element ref="bt:custom-persister"/>
+						</xsd:choice>
+						<xsd:element ref="session-context" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation><![CDATA[
+								Specify a SessionContext implementation to use with this BehaviorTrackingManager.
+								Defaults to JAASSessionContext if unspecified.
+								]]></xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+					</xsd:sequence>
+					<xsd:attribute name="application" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation><![CDATA[
+							Arbitrary text string recorded as the "application" attribute of each event recorded by this manager.
+							]]></xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="flush-threshold" type="xsd:int" use="optional">
+						<xsd:annotation>
+							<xsd:documentation><![CDATA[
+							Maximum number of events recorded before data is automatically flushed to the persister.  Default is 100 if unspecified.
+							]]></xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="task-executor" type="xsd:string">
+						<xsd:annotation>
+							<xsd:documentation><![CDATA[
+							Reference to a task executor for performing event logging operations.  If unspecified, a
+							private thread pool if maintained for this purpose.  The default behavior is strongly recommended,
+							as unbounded memory growth is possible if events cannot be logged in a timely fashion as they
+							are recorded.
+							]]></xsd:documentation>
+							<xsd:appinfo>
+								<tool:annotation kind="ref">
+									<tool:expected-type type="org.springframework.core.task.TaskExecutor"/>
+								</tool:annotation>
+							</xsd:appinfo>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="track-method-expression" type="xsd:string" use="optional">
+						<xsd:annotation>
+							<xsd:documentation><![CDATA[
+							Specify an AOP pointcut expression identifying methods that should generate behavior tracking
+							events.  This is a shortcut alternative to using bt:advice in combination with standard
+							Spring AOP configuration.
+							]]></xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="flush-schedule" default="0 0/5 * * * ?">
+						<xsd:annotation>
+							<xsd:documentation>Quartz scheduler expression describing how often events should be flushed to the persister.
+							Default is every 5 minutes if unspecified.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="scheduler" type="xsd:string">
+						<xsd:annotation>
+							<xsd:documentation>ID of a Quartz scheduler bean to use for timed flush operations.
+							If unspecified, a private instance will be created.  The default behavior
+							is strongly recommended.</xsd:documentation>
+							<xsd:appinfo>
+								<tool:annotation kind="ref">
+									<tool:expected-type type="org.quartz.Scheduler"/>
+								</tool:annotation>
+							</xsd:appinfo>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:extension>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="advice">
+		<xsd:complexType>
+			<xsd:annotation>
+				<xsd:documentation source="java:com.mtgi.analytics.aop.BehaviorTrackingAdvice"><![CDATA[
+	Defines the tracking semantics of the AOP advice that is to be
+	executed.
+				]]></xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation>
+						<tool:exports type="com.mtgi.analytics.aop.BehaviorTrackingAdvice"/>
+					</tool:annotation>
+				</xsd:appinfo>
+			</xsd:annotation>
+			
+			<xsd:complexContent>
+				<xsd:extension base="beans:identifiedType">
+					<xsd:attribute name="tracking-manager" type="xsd:string" use="optional">
+						<xsd:annotation>
+							<xsd:documentation source="java:com.mtgi.analytics.BehaviorTrackingManager"><![CDATA[
+	The bean name of the BehaviorTrackingManager that is to be used
+	to drive trackings.
+	
+	This attribute is not required, and only needs to be specified
+	explicitly if there is more than one BehaviorTrackingManager defined
+	by the application.
+							]]></xsd:documentation>
+							<xsd:appinfo>
+								<tool:annotation kind="ref">
+									<tool:expected-type type="com.mtgi.analytics.BehaviorTrackingManager"/>
+								</tool:annotation>
+							</xsd:appinfo>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:extension>
+			</xsd:complexContent>
+			
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="xml-persister">
+		<xsd:complexType>
+			<xsd:annotation>
+				<xsd:appinfo>
+					<tool:annotation>
+						<tool:exports type="com.mtgi.analytics.XmlBehaviorEventPersisterImpl"/>
+					</tool:annotation>
+				</xsd:appinfo>
+			</xsd:annotation>
+			<xsd:complexContent>
+				<xsd:extension base="beans:identifiedType">
+					<xsd:attribute name="file" default="behavior-tracking.xml" type="xsd:string">
+						<xsd:annotation>
+							<xsd:documentation>Path to XML log file.  Defaults to behavior-tracking.xml in the process working directory.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="rotate-schedule" default="0 0 0 * * ?" type="xsd:string">
+						<xsd:annotation>
+							<xsd:documentation>Log file rotation schedule.  Defaults to daily at midnight if unspecified.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="binary" default="true" type="xsd:boolean">
+						<xsd:annotation>
+							<xsd:documentation>Enable binary (FastInfoset) XML logging.  Defaults to true.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="compress" default="true" type="xsd:boolean">
+						<xsd:annotation>
+							<xsd:documentation>Enable GZIP logfile compression.  Defaults to true.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:extension>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="jdbc-persister">
+		<xsd:complexType>
+			<xsd:annotation>
+				<xsd:appinfo>
+					<tool:annotation>
+						<tool:exports type="com.mtgi.analytics.JdbcBehaviorEventPersisterImpl"/>
+					</tool:annotation>
+				</xsd:appinfo>
+			</xsd:annotation>
+			<xsd:complexContent>
+				<xsd:extension base="beans:identifiedType">
+					<xsd:sequence>
+						<xsd:element name="data-source" minOccurs="1" maxOccurs="1">
+							<xsd:annotation>
+								<xsd:documentation>Specifies the data source to which events are persisted.</xsd:documentation>
+							</xsd:annotation>
+							<xsd:complexType>
+								<xsd:sequence>
+									<xsd:group ref="beans:beanElements"/>
+									<xsd:choice minOccurs="0" maxOccurs="1">
+										<xsd:element ref="beans:ref"/>
+										<xsd:element ref="beans:idref"/>
+									</xsd:choice>
+								</xsd:sequence>
+								<xsd:attribute name="ref" type="xsd:string"/>
+								<xsd:attributeGroup ref="beans:beanAttributes"/>
+							</xsd:complexType>
+						</xsd:element>
+						<xsd:element name="id-sql" type="xsd:string" minOccurs="0" maxOccurs="1">
+							<xsd:annotation>
+								<xsd:documentation>Overrides the default SQL statement used to retrieve new event IDs.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+					</xsd:sequence>
+					<xsd:attribute name="batch-size" default="25" type="xsd:long">
+						<xsd:annotation>
+							<xsd:documentation>Statement batch size for persistence operations, only used if underlying JDBC driver
+							supports batching.  Default is 25.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:extension>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="custom-persister" type="beanType">
+		<xsd:annotation>
+			<xsd:documentation>Specifies a custom BehaviorEventPersister implementation.</xsd:documentation>
+			<xsd:appinfo>
+				<tool:annotation>
+					<tool:exports type="com.mtgi.analytics.BehaviorEventPersister"/>
+				</tool:annotation>
+			</xsd:appinfo>
+		</xsd:annotation>
+	</xsd:element>
+	
+	<xsd:element name="session-context" type="beanType">
+		<xsd:annotation>
+			<xsd:documentation>Specifies a custom SessionContext implementation.</xsd:documentation>
+			<xsd:appinfo>
+				<tool:annotation>
+					<tool:exports type="com.mtgi.analytics.SessionContext"/>
+				</tool:annotation>
+			</xsd:appinfo>
+		</xsd:annotation>
+	</xsd:element>
+	
+	<xsd:attribute name="tracking-manager" type="xsd:string">
+		<xsd:annotation>
+			<xsd:documentation>Identifies a tracking manager used to monitor activity
+			on the annotated bean definition.  
+			Currently this attribute is only supported for DataSource beans.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:attribute>
+
+	<xsd:complexType name="beanType">
+		<xsd:complexContent>
+			<xsd:extension base="beans:identifiedType">
+				<xsd:group ref="beans:beanElements"/>
+				<xsd:attributeGroup ref="beans:beanAttributes"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	
+</xsd:schema>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.mantis-tgi.com/test" 
+			xmlns:beans="http://www.springframework.org/schema/beans" 
+			xmlns:tool="http://www.springframework.org/schema/tool" 
+			xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+			attributeFormDefault="unqualified" elementFormDefault="qualified" 
+			targetNamespace="http://www.mantis-tgi.com/test">
+
+	<xsd:import namespace="http://www.springframework.org/schema/beans"/>
+	<xsd:import namespace="http://www.springframework.org/schema/tool"/>
+
+	<xsd:annotation>
+		<xsd:documentation><![CDATA[
+	Defines the elements used in the mantis-tgi behavior tracking management infrastructure.
+		]]></xsd:documentation>
+	</xsd:annotation>
+
+	<xsd:element name="embed">
+		<xsd:annotation>
+			<xsd:documentation source="java:com.mtgi.analytics.aop.config.TemplateBeanDefinitionParserTest$Embed"><![CDATA[
+			Defines a bean definition that is imported from an embedded spring context configuration file.
+			]]></xsd:documentation>
+			<xsd:appinfo>
+				<tool:annotation>
+					<tool:exports type="com.mtgi.analytics.aop.config.TemplateBeanDefinitionParserTest$Embed"/>
+				</tool:annotation>
+			</xsd:appinfo>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="beans:identifiedType">
+					<xsd:attribute name="inner" type="xsd:string"/>
+				</xsd:extension>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	 
+</xsd:schema>

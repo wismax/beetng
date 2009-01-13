@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans" 
+	   default-lazy-init="true"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<bean id="com.mtgi.analytics.btManager" 
+		  class="com.mtgi.analytics.BehaviorTrackingManagerImpl">
+		<description>Default configuration values for a bt:manager tag.  This definition is
+		loaded by BtManagerBeanDefinitionParser, and then manipulated to suit the attributes
+		and sub-elements provided at runtime.</description>
+		<property name="persister">
+			<ref local="com.mtgi.analytics.btPersister"/>
+		</property>
+		<property name="executor">
+			<ref local="com.mtgi.analytics.btExecutor"/>
+		</property>
+		<property name="sessionContext">
+			<bean class="com.mtgi.analytics.JAASSessionContext"/>
+		</property>
+	</bean>
+	
+	<bean id="com.mtgi.analytics.btPersister" class="com.mtgi.analytics.XmlBehaviorEventPersisterImpl">
+		<property name="file" value="behavior-tracking.xml"/>
+		<property name="binary" value="true"/>
+		<property name="compress" value="true"/>
+	</bean>
+	
+   <bean id="com.mtgi.analytics.btExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+		<property name="corePoolSize" value="1"/>
+		<property name="maxPoolSize" value="1"/>
+		<property name="queueCapacity" value="100"/>
+		<property name="threadFactory">
+			<bean class="org.springframework.scheduling.concurrent.CustomizableThreadFactory">
+				<!-- one below normal priority.  we stay out of the way of http request threads, but get an equal share with other background tasks. -->
+				<property name="threadPriority" value="4"/>
+				<property name="threadNamePrefix" value="BehaviorTracking-"/>
+			</bean>
+		</property>
+	</bean>
+
+	<!-- cron triggers are not registered here, but are modified and then registered by BtManager parser. -->
+	<bean id="com.mtgi.analytics.btFlushTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="cronExpression" value="0 0/5 * * * ?"/>
+		<property name="group" value="BehaviorTracking"/>
+		<property name="jobDetail">
+			<bean class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+				<property name="group" value="BehaviorTracking"/>
+				<property name="targetBeanName" value="com.mtgi.analytics.btManager"/>
+				<property name="targetMethod" value="flush"/>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="com.mtgi.analytics.btRotateTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="cronExpression" value="0 0 0 * * ?"/>
+		<property name="group" value="BehaviorTracking"/>
+		<property name="jobDetail">
+			<bean class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+				<property name="group" value="BehaviorTracking"/>
+				<property name="targetBeanName" value="com.mtgi.analytics.btPersister"/>
+				<property name="targetMethod" value="rotateLog"/>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="com.mtgi.analytics.btScheduler" 
+		  class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="taskExecutor">
+			<ref local="com.mtgi.analytics.btExecutor"/>
+		</property>
+	</bean>
+	
+</beans>

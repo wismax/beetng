@@ -1,4 +1,4 @@
-package com.mtgi.analytics.aop.config;
+package com.mtgi.analytics.aop.config.v10;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 

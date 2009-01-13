@@ -132,7 +132,7 @@ public class XmlBehaviorEventPersisterImpl
 	}
 	
 	public void afterPropertiesSet() throws Exception {
-		File dir = file.getParentFile();
+		File dir = file.getCanonicalFile().getParentFile();
 		if (!dir.isDirectory() && !dir.mkdirs())
 			throw new IOException("Unable to create directories for log file " + file.getAbsolutePath());
 		

@@ -9,5 +9,6 @@
 	<classpathentry kind="lib" path="db"/>
 	<classpathentry kind="lib" path="config"/>
 	<classpathentry kind="con" path="org.apache.ivyde.eclipse.cpcontainer.IVYDE_CONTAINER/ivy.xml/*"/>
+	<classpathentry kind="con" path="org.apache.ivyde.eclipse.cpcontainer.IVYDE_CONTAINER/utils/ivy.xml/*"/>
 	<classpathentry kind="output" path="ide"/>
 </classpath>
