@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<!-- 
+	Template definitions for bt configuration tags.  These definitions are loaded and manipulated by the
+	BtNamespaceHandler during spring configuration, and ultimately handed back out to the calling application context.
+	Lazy-init must be true, since many of these bean definitions won't be needed unless explicitly referenced by
+	external configuration.
+ -->
 <beans xmlns="http://www.springframework.org/schema/beans" 
 	   default-lazy-init="true"
 	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
@@ -23,12 +29,17 @@
 	
 	<bean id="com.mtgi.analytics.btPersister" 
 		  class="com.mtgi.analytics.XmlBehaviorEventPersisterImpl">
+		<description>Default configuration values for a bt:persister tag.  This definition is
+		loaded by BtXmlPersisterBeanDefinitionParser, and then manipulated to suit the attributes
+		and sub-elements provided at runtime.</description>
 		<property name="file" value="behavior-tracking.xml"/>
 		<property name="binary" value="true"/>
 		<property name="compress" value="true"/>
 	</bean>
 	
    <bean id="com.mtgi.analytics.btExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+		<description>Private task executor used for asynchronous behavior tracking operations,
+		unless the user specifies an application executor.</description>
 		<property name="corePoolSize" value="1"/>
 		<property name="maxPoolSize" value="1"/>
 		<property name="queueCapacity" value="100"/>
@@ -43,6 +54,8 @@
 
 	<!-- cron triggers are not registered here, but are modified and then registered by BtManager parser. -->
 	<bean id="com.mtgi.analytics.btFlushTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<description>Quartz Trigger to flush the behavior tracking manager every five minutes.  Modified
+		and registered with the scheduler by BtManagerBeanDefinitionParser</description>
 		<property name="cronExpression" value="0 0/5 * * * ?"/>
 		<property name="group" value="BehaviorTracking"/>
 		<property name="jobDetail">
@@ -55,6 +68,8 @@
 	</bean>
 	
 	<bean id="com.mtgi.analytics.btRotateTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<description>Quartz Trigger to rotate the behavior tracking xml log every day at midnight.  Modified
+		and registered with the scheduler by BtXmlPersisterBeanDefinitionParser</description>
 		<property name="cronExpression" value="0 0 0 * * ?"/>
 		<property name="group" value="BehaviorTracking"/>
 		<property name="jobDetail">
@@ -68,6 +83,8 @@
 
 	<bean id="com.mtgi.analytics.btScheduler" 
 		  class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<description>Private scheduler used for asynchronous behavior tracking operations,
+		unless the user specifies an application scheduler.</description>
 		<property name="schedulerName" value="BehaviorTrackingScheduler"/>
 		<property name="taskExecutor">
 			<ref local="com.mtgi.analytics.btExecutor"/>
