@@ -12,7 +12,6 @@ import org.junit.runner.RunWith;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
 import org.quartz.impl.StdSchedulerFactory;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.unitils.UnitilsJUnit4TestClassRunner;
@@ -20,25 +19,18 @@ import org.unitils.spring.annotation.SpringApplicationContext;
 import org.unitils.spring.annotation.SpringBeanByName;
 
 import com.mtgi.analytics.BehaviorTrackingManagerImpl;
-import com.mtgi.analytics.JAASSessionContext;
 import com.mtgi.analytics.SessionContext;
 import com.mtgi.analytics.XmlBehaviorEventPersisterImpl;
 
-@SpringApplicationContext("com/mtgi/analytics/aop/config/v11/DefaultConfigurationTest-applicationContext.xml")
+@SpringApplicationContext("com/mtgi/analytics/aop/config/v11/SessionContextConfigurationTest-applicationContext.xml")
 @RunWith(UnitilsJUnit4TestClassRunner.class)
-public class DefaultConfigurationTest {
-
-	@SpringBeanByName
-	private ThreadPoolTaskExecutor testExecutor;
+public class SessionContextConfigurationTest {
 
 	@SpringBeanByName
 	private BehaviorTrackingManagerImpl defaultTrackingManager;
-
+	
 	@SpringBeanByName
-	private Scheduler testScheduler;
-
-	@SpringApplicationContext
-	private ConfigurableApplicationContext spring;
+	private TestBean testBean;
 
 	@Test
 	public void testDefaultConfiguration() throws Exception {
@@ -56,18 +48,9 @@ public class DefaultConfigurationTest {
 		TaskExecutor executor = defaultTrackingManager.getExecutor();
 		assertEquals("default executor type provided", ThreadPoolTaskExecutor.class, executor.getClass());
 
-		assertNotSame("private executor created", testExecutor, executor);
-
-		String[] groups = testScheduler.getTriggerGroupNames();
-		for (String g : groups) {
-			String[] names = testScheduler.getTriggerNames(g);
-			assertEquals("no triggers scheduled in application scheduler for " + g + ": " + Arrays.asList(names), 0, names.length);
-		}
-
 		//test the state of the global scheduler configuration.
 		SchedulerFactory factory = new StdSchedulerFactory();
 		Scheduler sched = factory.getScheduler("BehaviorTrackingScheduler");
-		assertNotSame("private scheduler instance initialized", testScheduler, sched);
 		
 		List<String> triggers = Arrays.asList(sched.getTriggerNames("BehaviorTracking"));
 		assertEquals("flush and rotate jobs scheduled", 2, triggers.size());
@@ -75,30 +58,41 @@ public class DefaultConfigurationTest {
 		assertTrue("rotate job scheduled", triggers.contains("org.springframework.scheduling.quartz.CronTriggerBean_rotate_trigger"));
 		
 		Collection<?> schedulers = factory.getAllSchedulers();
-		assertEquals("private scheduler and application scheduler created", 2, schedulers.size());
+		assertEquals("private scheduler created", 1, schedulers.size());
 		assertTrue(schedulers.contains(sched));
-		assertTrue(schedulers.contains(testScheduler));
 		
 		//verify the default session context implementation has been selected.
 		SessionContext context = defaultTrackingManager.getSessionContext();
 		assertNotNull(context);
-		assertTrue("JAAS context used by default", context instanceof JAASSessionContext);
+		
+		assertTrue("application context class used", context instanceof TestContext);
+		assertSame("application dependency injected into context", testBean, ((TestContext)context).innerBean);
+		assertEquals("literal property injected into context", "Hello from testland", ((TestContext)context).prop);
 	}
 	
-	@Test
-	public void testCleanup() throws Exception {
-		assertFalse("test executor is running", testExecutor.getThreadPoolExecutor().isShutdown());
-		assertFalse("private executor is running", ((ThreadPoolTaskExecutor)defaultTrackingManager.getExecutor()).getThreadPoolExecutor().isShutdown());
+	public static class TestBean {
+	}
+	
+	public static class TestContext implements SessionContext {
 
-		Scheduler sched = new StdSchedulerFactory().getScheduler("BehaviorTrackingScheduler");
-		assertTrue("private scheduler is running", sched.isStarted());
-		assertFalse("private scheduler is running", sched.isShutdown());
+		private String prop;
+		private TestBean innerBean;
 		
-		spring.close();
+		public String getContextSessionId() {
+			return "12345";
+		}
+
+		public String getContextUserId() {
+			return "test";
+		}
+
+		public void setProp(String prop) {
+			this.prop = prop;
+		}
+
+		public void setInnerBean(TestBean innerBean) {
+			this.innerBean = innerBean;
+		}
 		
-		assertTrue("test executor is stopped", testExecutor.getThreadPoolExecutor().isShutdown());
-		assertTrue("private executor is stopped", ((ThreadPoolTaskExecutor)defaultTrackingManager.getExecutor()).getThreadPoolExecutor().isShutdown());
-		assertTrue("private scheduler is stopped", sched.isShutdown());
 	}
-	
 }

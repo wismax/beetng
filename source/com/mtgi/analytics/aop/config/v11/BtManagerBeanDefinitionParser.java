@@ -117,6 +117,8 @@ public class BtManagerBeanDefinitionParser extends TemplateBeanDefinitionParser 
 					String childName = (String)child.getAttribute("id");
 					if (StringUtils.hasText(childName))
 						parserContext.getRegistry().registerBeanDefinition(childName, child);
+					else
+						parserContext.getReaderContext().registerWithGeneratedName(child);
 				}
 			}
 		}
