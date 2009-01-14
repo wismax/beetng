@@ -31,7 +31,7 @@ public class BtXmlPersisterBeanDefinitionParser<P extends XmlBehaviorEventPersis
 	@Override
 	protected BeanDefinition decorate(ConfigurableListableBeanFactory factory, BeanDefinition template, Element element, ParserContext parserContext) {
 		for (String p : PROPS)
-			overrideAttribute(p, template, element);
+			overrideProperty(p, template, element, false);
 		//schedule periodic log rotation with Quartz
 		String rotateSchedule = element.getAttribute("rotate-schedule");
 		if (rotateSchedule != null)

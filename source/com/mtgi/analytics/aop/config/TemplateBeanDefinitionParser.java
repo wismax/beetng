@@ -48,7 +48,7 @@ public class TemplateBeanDefinitionParser extends AbstractSingleBeanDefinitionPa
 	protected Class<?> getBeanClass(Element element) {
 		return TemplateBeanDefinitionFactory.class;
 	}
-	
+
 	@Override
 	protected final void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 
@@ -71,7 +71,7 @@ public class TemplateBeanDefinitionParser extends AbstractSingleBeanDefinitionPa
 
 			//push component definition onto the parser stack for the benefit of
 			//nested bean definitions.
-			tcd = new TemplateComponentDefinition(element.getNodeName(), parserContext.extractSource(element), templateFactory);
+			tcd = newComponentDefinition(element.getNodeName(), parserContext.extractSource(element), templateFactory);
 			parserContext.pushContainingComponent(tcd);
 		}
 
@@ -101,6 +101,10 @@ public class TemplateBeanDefinitionParser extends AbstractSingleBeanDefinitionPa
 		return template;
 	}
 
+	protected TemplateComponentDefinition newComponentDefinition(String name, Object source, DefaultListableBeanFactory factory) {
+		return new TemplateComponentDefinition(name, source, factory);
+	}
+	
 	@Override
 	protected String resolveId(Element element,
 			AbstractBeanDefinition definition, ParserContext parserContext)
@@ -122,7 +126,7 @@ public class TemplateBeanDefinitionParser extends AbstractSingleBeanDefinitionPa
 	public static String overrideAttribute(String attribute, BeanDefinition template, Element overrides) {
 		String value = (String)template.getAttribute(attribute);
 		if (overrides.hasAttribute(attribute)) {
-			value = overrides.getAttribute("attribute");
+			value = overrides.getAttribute(attribute);
 			template.setAttribute(attribute, value);
 		}
 		return value;

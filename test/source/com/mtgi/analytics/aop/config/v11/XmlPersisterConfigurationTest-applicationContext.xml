@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns:bt="http://www.mantis-tgi.com/schema/bt/1.1" 
+	   xmlns="http://www.springframework.org/schema/beans" 
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	   xsi:schemaLocation="
+	   		http://www.springframework.org/schema/beans		http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+			http://www.mantis-tgi.com/schema/bt/1.1			http://www.mantis-tgi.com/schema/bt/mtgi-bt-1.1.xsd">
+
+	<bt:config>
+
+	  <bt:manager id="xmlTracking" application="testApp" 
+	  			  scheduler="testScheduler" task-executor="testExecutor"
+	  			  track-method-expression="execution(* com.mtgi.analytics.aop.config..*Xml(..))">
+	  	<bt:xml-persister binary="false" compress="false" file="xml-tracking.xml"/>
+	  </bt:manager>
+
+	</bt:config>
+	
+	<bean id="testExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+		<property name="corePoolSize" value="1"/>
+		<property name="maxPoolSize" value="1"/>
+		<property name="queueCapacity" value="100"/>
+		<property name="threadFactory">
+			<bean class="org.springframework.scheduling.concurrent.CustomizableThreadFactory"/>
+		</property>
+	</bean>
+	
+	<bean id="testScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="taskExecutor" ref="testExecutor"/>
+	</bean>
+
+</beans>

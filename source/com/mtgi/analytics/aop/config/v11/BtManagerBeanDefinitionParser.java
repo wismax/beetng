@@ -18,7 +18,9 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.RuntimeBeanNameReference;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.parsing.CompositeComponentDefinition;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.RootBeanDefinition;
+import org.springframework.beans.factory.xml.NamespaceHandler;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.beans.factory.xml.XmlReaderContext;
 import org.springframework.util.StringUtils;
@@ -98,26 +100,25 @@ public class BtManagerBeanDefinitionParser extends TemplateBeanDefinitionParser 
 		
 		//ManagerComponentDefinition is a flag to nested parsers that they should push their parsed bean definitions into
 		//the manager bean definition.  for example, see BtPersisterBeanDefinitionParser.
-		ManagerComponentDefinition def = new ManagerComponentDefinition(element.getTagName(), parserContext.extractSource(element));
-		parserContext.pushContainingComponent(def);
-		try {
-			//descend on nested child nodes to pick up persister and session context configuration
-			NodeList children = element.getChildNodes();
-			for (int i = 0; i < children.getLength(); i++) {
-				Node node = children.item(i);
-				if (node.getNodeType() == Node.ELEMENT_NODE) {
-					BeanDefinition child = parserContext.getDelegate().parseCustomElement((Element)node, template);
-					if (child != null) {
-						String childName = (String)child.getAttribute("id");
-						if (StringUtils.hasText(childName))
-							parserContext.getRegistry().registerBeanDefinition(childName, child);
-						else
-							parserContext.getReaderContext().registerWithGeneratedName(child);
-					}
+		//descend on nested child nodes to pick up persister and session context configuration
+		ManagerComponentDefinition def = (ManagerComponentDefinition)parserContext.getContainingComponent();
+		NodeList children = element.getChildNodes();
+		for (int i = 0; i < children.getLength(); i++) {
+			Node node = children.item(i);
+			if (node.getNodeType() == Node.ELEMENT_NODE) {
+				
+				String namespaceUri = node.getNamespaceURI();
+				NamespaceHandler handler = parserContext.getReaderContext().getNamespaceHandlerResolver().resolve(namespaceUri);
+				ParserContext nestedCtx = new ParserContext(parserContext.getReaderContext(), parserContext.getDelegate(), template);
+				nestedCtx.pushContainingComponent(def);
+				BeanDefinition child = handler.parse((Element)node, nestedCtx);
+
+				if (child != null) {
+					String childName = (String)child.getAttribute("id");
+					if (StringUtils.hasText(childName))
+						parserContext.getRegistry().registerBeanDefinition(childName, child);
 				}
 			}
-		} finally {
-			parserContext.popAndRegisterContainingComponent();
 		}
 		
 		if (!def.nestedProperties.contains("persister")) {
@@ -126,6 +127,12 @@ public class BtManagerBeanDefinitionParser extends TemplateBeanDefinitionParser 
 		}
 		
 		return super.decorate(factory, template, element, parserContext);
+	}
+	
+	@Override
+	protected TemplateComponentDefinition newComponentDefinition(String name,
+			Object source, DefaultListableBeanFactory factory) {
+		return new ManagerComponentDefinition(name, source, factory);
 	}
 	
 	protected static BeanDefinition registerNestedBean(BeanDefinition nested, String parentProperty, ParserContext parserContext) {
@@ -148,18 +155,20 @@ public class BtManagerBeanDefinitionParser extends TemplateBeanDefinitionParser 
 		//bean is not nested inside bt:manager, return it to be registered further up the stack.
 		return nested;
 	}
-	
-	public static class ManagerComponentDefinition extends CompositeComponentDefinition {
+
+	public static class ManagerComponentDefinition extends TemplateComponentDefinition {
+
+		protected ManagerComponentDefinition(String name, Object source,
+				DefaultListableBeanFactory factory) {
+			super(name, source, factory);
+		}
 
 		private Set<String> nestedProperties = new HashSet<String>();
-		
-		public ManagerComponentDefinition(String name, Object source) {
-			super(name, source);
-		}
-		
+
 		public void addNestedProperty(String property) {
 			nestedProperties.add(property);
 		}
 
 	}
+
 }
