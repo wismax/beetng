@@ -37,7 +37,7 @@
 		<property name="compress" value="true"/>
 	</bean>
 	
-   <bean id="com.mtgi.analytics.btExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+	<bean id="com.mtgi.analytics.btExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
 		<description>Private task executor used for asynchronous behavior tracking operations,
 		unless the user specifies an application executor.</description>
 		<property name="corePoolSize" value="1"/>

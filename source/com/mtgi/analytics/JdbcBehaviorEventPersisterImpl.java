@@ -59,6 +59,10 @@ public class JdbcBehaviorEventPersisterImpl extends JdbcDaoSupport
 		this.idSql = idSql;
 	}
 
+	public String getIdSql() {
+		return idSql;
+	}
+	
 	/**
 	 * Set the SQL statement used to insert a new behavior event record into the database.
 	 * The SQL statement must take exactly 11 parameters, which must accept the following 

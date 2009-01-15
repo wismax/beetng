@@ -16,7 +16,7 @@ public class BtNamespaceHandler extends NamespaceHandlerSupport {
 		registerBeanDefinitionParser("manager", new BtManagerBeanDefinitionParser());
 		registerBeanDefinitionParser("xml-persister", new BtXmlPersisterBeanDefinitionParser<XmlBehaviorEventPersisterImpl>());
 		registerBeanDefinitionParser("session-context", new BtSessionContextDefinitionParser());
-//		registerBeanDefinitionParser("jdbc-persister", new BtAdviceBeanDefinitionParser());
+		registerBeanDefinitionParser("jdbc-persister", new BtJdbcPersisterBeanDefinitionParser());
 //		registerBeanDefinitionParser("custom-persister", new BtAdviceBeanDefinitionParser());
 
 		//register tracking-manager attribute for decorating standard bean definitions

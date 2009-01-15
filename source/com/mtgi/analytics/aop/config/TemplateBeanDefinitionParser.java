@@ -17,6 +17,7 @@ import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.core.Conventions;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 /**
  * Base class to assist in building Spring XML extensions.  Out of the box, Spring's Extensible XML Authoring
@@ -134,22 +135,34 @@ public class TemplateBeanDefinitionParser extends AbstractSingleBeanDefinitionPa
 	
 	/**
 	 * Convenience method to update a template bean definition from overriding XML data.  
-	 * If <code>overrides</code> contains attribute <code>attribute</code>, transfer that
+	 * If <code>overrides</code> contains attribute <code>attribute</code> or a child element
+	 * with name <code>attribute</code>, transfer that
 	 * attribute as a bean property onto <code>template</code>, overwriting the default value.
 	 * @param reference if true, the value of the attribute is to be interpreted as a runtime bean name reference; otherwise it is interpreted as a literal value
 	 */
 	public static boolean overrideProperty(String attribute, BeanDefinition template, Element overrides, boolean reference) {
+		Object value = null;
 		if (overrides.hasAttribute(attribute)) {
-			String propName = Conventions.attributeNameToPropertyName(attribute);
-			Object value = overrides.getAttribute(attribute);
+			value = overrides.getAttribute(attribute);
+		} else {
+			NodeList children = overrides.getElementsByTagNameNS("*", attribute);
+			if (children.getLength() == 1) {
+				Element child = (Element)children.item(0);
+				value = child.getTextContent();
+			}
+		}
+		
+		if (value != null) {
 			if (reference)
 				value = new RuntimeBeanReference(value.toString());
 			
+			String propName = Conventions.attributeNameToPropertyName(attribute);
 			MutablePropertyValues props = template.getPropertyValues();
 			props.removePropertyValue(propName);
 			props.addPropertyValue(propName, value);
 			return true;
 		}
+		
 		return false;
 	}
 
