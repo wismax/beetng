@@ -2,7 +2,6 @@ package com.mtgi.analytics.aop.config.v11;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
-import com.mtgi.analytics.XmlBehaviorEventPersisterImpl;
 import com.mtgi.analytics.aop.config.v10.BtAdviceBeanDefinitionParser;
 
 /**
@@ -14,10 +13,10 @@ public class BtNamespaceHandler extends NamespaceHandlerSupport {
 	public void init() {
 		registerBeanDefinitionParser("config", new BtConfigBeanDefinitionParser());
 		registerBeanDefinitionParser("manager", new BtManagerBeanDefinitionParser());
-		registerBeanDefinitionParser("xml-persister", new BtXmlPersisterBeanDefinitionParser<XmlBehaviorEventPersisterImpl>());
-		registerBeanDefinitionParser("session-context", new BtSessionContextDefinitionParser());
+		registerBeanDefinitionParser("xml-persister", new BtXmlPersisterBeanDefinitionParser());
+		registerBeanDefinitionParser("session-context", new BtInnerBeanDefinitionParser("sessionContext"));
 		registerBeanDefinitionParser("jdbc-persister", new BtJdbcPersisterBeanDefinitionParser());
-//		registerBeanDefinitionParser("custom-persister", new BtAdviceBeanDefinitionParser());
+		registerBeanDefinitionParser("custom-persister", new BtInnerBeanDefinitionParser("persister"));
 
 		//register tracking-manager attribute for decorating standard bean definitions
 		registerBeanDefinitionDecoratorForAttribute("tracking-manager", new BtDataSourceBeanDefinitionDecorator());
