@@ -7,6 +7,7 @@ import static com.mtgi.analytics.aop.config.v11.SchedulerActivationPostProcessor
 import static com.mtgi.analytics.aop.config.v11.SchedulerActivationPostProcessor.registerPostProcessor;
 
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
@@ -17,7 +18,7 @@ public class BtXmlPersisterBeanDefinitionParser extends TemplateBeanDefinitionPa
 {
 	private static final String[] PROPS = { "file", "binary", "compress" };
 	
-	private static final String CONFIG_PERSISTER = CONFIG_NAMESPACE + ".btPersister";
+	public static final String CONFIG_PERSISTER = CONFIG_NAMESPACE + ".btPersister";
 	public static final String CONFIG_ROTATE_TRIGGER = CONFIG_NAMESPACE + ".btRotateTrigger";
 	
 	public BtXmlPersisterBeanDefinitionParser() {
@@ -26,13 +27,18 @@ public class BtXmlPersisterBeanDefinitionParser extends TemplateBeanDefinitionPa
 
 	@Override
 	protected BeanDefinition decorate(ConfigurableListableBeanFactory factory, BeanDefinition template, Element element, ParserContext parserContext) {
+		String id = overrideAttribute("id", template, element);
 		for (String p : PROPS)
 			overrideProperty(p, template, element, false);
 		//schedule periodic log rotation with Quartz
 		String rotateSchedule = element.getAttribute("rotate-schedule");
 		if (rotateSchedule != null)
 			configureLogRotation(parserContext, factory, rotateSchedule);
-		BtManagerBeanDefinitionParser.registerNestedBean(template, "persister", parserContext);
+		if (parserContext.isNested()) {
+			if (id == null)
+				id = parserContext.getReaderContext().generateBeanName(template);
+			BtManagerBeanDefinitionParser.registerNestedBean(new BeanDefinitionHolder(template, id), "persister", parserContext);
+		}
 		return super.decorate(factory, template, element, parserContext);
 	}
 

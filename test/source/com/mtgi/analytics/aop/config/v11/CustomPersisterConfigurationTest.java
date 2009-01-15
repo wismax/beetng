@@ -23,7 +23,6 @@ import com.mtgi.analytics.BehaviorEventPersister;
 import com.mtgi.analytics.BehaviorTrackingManagerImpl;
 import com.mtgi.analytics.JAASSessionContext;
 import com.mtgi.analytics.SessionContext;
-import com.mtgi.analytics.XmlBehaviorEventPersisterImpl;
 
 @SpringApplicationContext("com/mtgi/analytics/aop/config/v11/CustomPersisterConfigurationTest-applicationContext.xml")
 @RunWith(UnitilsJUnit4TestClassRunner.class)

@@ -1,5 +1,6 @@
 package com.mtgi.analytics.aop.config.v11;
 
+import static com.mtgi.analytics.aop.config.v11.BtXmlPersisterBeanDefinitionParser.CONFIG_PERSISTER;
 import static com.mtgi.analytics.aop.config.v11.ConfigurationConstants.CONFIG_EXECUTOR;
 import static com.mtgi.analytics.aop.config.v11.ConfigurationConstants.CONFIG_MANAGER;
 import static com.mtgi.analytics.aop.config.v11.ConfigurationConstants.CONFIG_NAMESPACE;
@@ -14,6 +15,7 @@ import org.springframework.aop.config.AopNamespaceUtils;
 import org.springframework.aop.support.DefaultBeanFactoryPointcutAdvisor;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.RuntimeBeanNameReference;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
@@ -23,7 +25,6 @@ import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.factory.xml.NamespaceHandler;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.beans.factory.xml.XmlReaderContext;
-import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -40,6 +41,7 @@ public class BtManagerBeanDefinitionParser extends TemplateBeanDefinitionParser 
 	public static final String ATT_SCHEDULER = "scheduler";
 	public static final String ATT_FLUSH_SCHEDULE = "flush-schedule";
 	public static final String ATT_METHOD_EXPRESSION = "track-method-expression";
+	public static final String ATT_PERSISTER = "persister";
 
 	public BtManagerBeanDefinitionParser() {
 		super(CONFIG_TEMPLATE, CONFIG_MANAGER);
@@ -49,6 +51,8 @@ public class BtManagerBeanDefinitionParser extends TemplateBeanDefinitionParser 
 	protected BeanDefinition decorate(ConfigurableListableBeanFactory factory,
 			BeanDefinition template, Element element,
 			ParserContext parserContext) {
+
+		ManagerComponentDefinition def = (ManagerComponentDefinition)parserContext.getContainingComponent();
 		
 		String managerId = overrideAttribute(ATT_ID, template, element);
 		if (managerId == null)
@@ -62,6 +66,12 @@ public class BtManagerBeanDefinitionParser extends TemplateBeanDefinitionParser 
 		
 		if (element.hasAttribute(ATT_TASK_EXECUTOR))
 			factory.registerAlias(element.getAttribute(ATT_TASK_EXECUTOR), CONFIG_EXECUTOR);
+		
+		if (element.hasAttribute(ATT_PERSISTER)) {
+			//override default persister definition with reference
+			def.addNestedProperty(ATT_PERSISTER);
+			factory.registerAlias(element.getAttribute(ATT_PERSISTER), CONFIG_PERSISTER);
+		}
 
 		//handle AOP configuration if needed
 		if (element.hasAttribute(ATT_METHOD_EXPRESSION)) {
@@ -101,29 +111,19 @@ public class BtManagerBeanDefinitionParser extends TemplateBeanDefinitionParser 
 		//ManagerComponentDefinition is a flag to nested parsers that they should push their parsed bean definitions into
 		//the manager bean definition.  for example, see BtPersisterBeanDefinitionParser.
 		//descend on nested child nodes to pick up persister and session context configuration
-		ManagerComponentDefinition def = (ManagerComponentDefinition)parserContext.getContainingComponent();
 		NodeList children = element.getChildNodes();
 		for (int i = 0; i < children.getLength(); i++) {
 			Node node = children.item(i);
 			if (node.getNodeType() == Node.ELEMENT_NODE) {
-				
 				String namespaceUri = node.getNamespaceURI();
 				NamespaceHandler handler = parserContext.getReaderContext().getNamespaceHandlerResolver().resolve(namespaceUri);
 				ParserContext nestedCtx = new ParserContext(parserContext.getReaderContext(), parserContext.getDelegate(), template);
 				nestedCtx.pushContainingComponent(def);
-				BeanDefinition child = handler.parse((Element)node, nestedCtx);
-
-				if (child != null) {
-					String childName = (String)child.getAttribute("id");
-					if (StringUtils.hasText(childName))
-						parserContext.getRegistry().registerBeanDefinition(childName, child);
-					else
-						parserContext.getReaderContext().registerWithGeneratedName(child);
-				}
+				handler.parse((Element)node, nestedCtx);
 			}
 		}
 		
-		if (!def.nestedProperties.contains("persister")) {
+		if (!def.nestedProperties.contains(ATT_PERSISTER)) {
 			//custom persister not registered.  schedule default log rotation trigger.
 			BtXmlPersisterBeanDefinitionParser.configureLogRotation(parserContext, factory, null);
 		}
@@ -137,7 +137,7 @@ public class BtManagerBeanDefinitionParser extends TemplateBeanDefinitionParser 
 		return new ManagerComponentDefinition(name, source, factory);
 	}
 	
-	protected static BeanDefinition registerNestedBean(BeanDefinition nested, String parentProperty, ParserContext parserContext) {
+	protected static boolean registerNestedBean(BeanDefinitionHolder nested, String parentProperty, ParserContext parserContext) {
 		//add parsed session context element to containing manager definition.
 		CompositeComponentDefinition parent = parserContext.getContainingComponent();
 		if (parent instanceof ManagerComponentDefinition) {
@@ -149,13 +149,10 @@ public class BtManagerBeanDefinitionParser extends TemplateBeanDefinitionParser 
 			props.addPropertyValue(parentProperty, nested);
 			
 			((ManagerComponentDefinition)parent).addNestedProperty(parentProperty);
-			
-			//bean definition has been handled, nothing to do.
-			return null;
+			return true;
 		}
-		
-		//bean is not nested inside bt:manager, return it to be registered further up the stack.
-		return nested;
+		//bean is not nested inside bt:manager
+		return false;
 	}
 
 	public static class ManagerComponentDefinition extends TemplateComponentDefinition {
@@ -168,7 +165,8 @@ public class BtManagerBeanDefinitionParser extends TemplateBeanDefinitionParser 
 		private Set<String> nestedProperties = new HashSet<String>();
 
 		public void addNestedProperty(String property) {
-			nestedProperties.add(property);
+			if (!nestedProperties.add(property))
+				throw new IllegalArgumentException("Property " + property + " specified more than once");
 		}
 
 	}

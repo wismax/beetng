@@ -124,6 +124,17 @@
 							</xsd:appinfo>
 						</xsd:annotation>
 					</xsd:attribute>
+					<xsd:attribute name="persister" type="xsd:string">
+						<xsd:annotation>
+							<xsd:documentation>ID of a BehaviorEventPersister implementation defined
+							in the applicaton context.  Use in place of a nested bt:*-persister element.</xsd:documentation>
+							<xsd:appinfo>
+								<tool:annotation kind="ref">
+									<tool:expected-type type="com.mtgi.analytics.BehaviorEventPersister"/>
+								</tool:annotation>
+							</xsd:appinfo>
+						</xsd:annotation>
+					</xsd:attribute>
 				</xsd:extension>
 			</xsd:complexContent>
 		</xsd:complexType>

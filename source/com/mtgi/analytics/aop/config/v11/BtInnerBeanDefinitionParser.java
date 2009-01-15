@@ -4,6 +4,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.xml.BeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
 
 public class BtInnerBeanDefinitionParser implements BeanDefinitionParser {
@@ -18,10 +19,23 @@ public class BtInnerBeanDefinitionParser implements BeanDefinitionParser {
 		//session-context element is really just a standard bean class definition, so delegate to default behavior.
 		BeanDefinitionHolder ret = parserContext.getDelegate().parseBeanDefinitionElement(element);
 		if (ret != null) {
-			//add parsed inner bean to containing manager definition.
-			return BtManagerBeanDefinitionParser.registerNestedBean(ret.getBeanDefinition(), property, parserContext);
+			//add parsed inner bean to containing manager definition if applicable
+			if (!BtManagerBeanDefinitionParser.registerNestedBean(ret, property, parserContext)) {
+				
+				//add bean to global registry
+				BeanDefinition def = ret.getBeanDefinition();
+				
+				String id = element.getAttribute("id");
+				if (StringUtils.hasText(id))
+					parserContext.getRegistry().registerBeanDefinition(id, def);
+				else
+					parserContext.getReaderContext().registerWithGeneratedName(def);
+
+				return def;
+			}
+				
 		}
-		//maybe a parse error -- bean definition not created.
+		//global bean definition not created.
 		return null;
 	}
 
