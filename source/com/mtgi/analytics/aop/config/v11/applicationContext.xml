@@ -23,10 +23,16 @@
 			<ref local="com.mtgi.analytics.btExecutor"/>
 		</property>
 		<property name="sessionContext">
-			<bean class="com.mtgi.analytics.JAASSessionContext"/>
+			<ref local="com.mtgi.analytics.btSessionContext"/>
 		</property>
 	</bean>
 	
+	<bean id="com.mtgi.analytics.btSessionContext" 
+		  class="com.mtgi.analytics.JAASSessionContext">
+		  <description>Default SessionContext implementation.  Defaults to com.mtgi.analytics.servlet.SpringSessionContext
+		  if we are in a servlet environment, otherwise defaults to JAASSessionContext.</description>
+	</bean>
+		  
 	<bean id="com.mtgi.analytics.btPersister" 
 		  class="com.mtgi.analytics.XmlBehaviorEventPersisterImpl">
 		<description>Default configuration values for a bt:persister tag.  This definition is

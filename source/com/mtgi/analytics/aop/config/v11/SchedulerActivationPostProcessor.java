@@ -17,9 +17,9 @@ import org.springframework.scheduling.quartz.JobDetailAwareTrigger;
 import com.mtgi.analytics.aop.config.TemplateBeanDefinitionParser;
 
 /**
- * A bean factory post-processor which schedules a trigger with a Quartz scheduler.
+ * Adds a trigger to a Quartz scheduler automatically after a bean factory is initialized.
  * Note that the source of the scheduler and the trigger does not necessarily
- * have to be the bean factory that is being processed.  This is intended to assist in
+ * have to be the bean factory that contains this bean.  This is intended to assist in
  * processing of a {@link TemplateBeanDefinitionParser}, in which beans are
  * defined in a source template factory and then promoted out into a target factory after
  * transformation.

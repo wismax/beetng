@@ -5,6 +5,7 @@ import static com.mtgi.analytics.aop.config.v11.ConfigurationConstants.CONFIG_EX
 import static com.mtgi.analytics.aop.config.v11.ConfigurationConstants.CONFIG_MANAGER;
 import static com.mtgi.analytics.aop.config.v11.ConfigurationConstants.CONFIG_NAMESPACE;
 import static com.mtgi.analytics.aop.config.v11.ConfigurationConstants.CONFIG_SCHEDULER;
+import static com.mtgi.analytics.aop.config.v11.ConfigurationConstants.CONFIG_SESSION_CONTEXT;
 import static com.mtgi.analytics.aop.config.v11.ConfigurationConstants.CONFIG_TEMPLATE;
 
 import java.util.HashSet;
@@ -25,6 +26,7 @@ import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.factory.xml.NamespaceHandler;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.beans.factory.xml.XmlReaderContext;
+import org.springframework.web.context.WebApplicationContext;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -34,6 +36,7 @@ import com.mtgi.analytics.BehaviorTrackingManagerImpl;
 import com.mtgi.analytics.XmlBehaviorEventPersisterImpl;
 import com.mtgi.analytics.aop.BehaviorTrackingAdvice;
 import com.mtgi.analytics.aop.config.TemplateBeanDefinitionParser;
+import com.mtgi.analytics.servlet.SpringSessionContext;
 
 /**
  * Parser for &lt;bt:manager&gt; configuration tags, the most significant tag in behavior tracking configuration.
@@ -166,6 +169,15 @@ public class BtManagerBeanDefinitionParser extends TemplateBeanDefinitionParser 
 		if (!def.nestedProperties.contains(ATT_PERSISTER)) {
 			//custom persister not registered.  schedule default log rotation trigger.
 			BtXmlPersisterBeanDefinitionParser.configureLogRotation(parserContext, factory, null);
+		}
+		
+		if (!def.nestedProperties.contains("sessionContext")) {
+			//custom session context not registered.  select appropriate default class
+			//depending on whether we are in a web context or not.
+			if (parserContext.getReaderContext().getReader().getResourceLoader() instanceof WebApplicationContext) {
+				BeanDefinition scDef = factory.getBeanDefinition(CONFIG_SESSION_CONTEXT);
+				scDef.setBeanClassName(SpringSessionContext.class.getName());
+			}
 		}
 	}
 	
