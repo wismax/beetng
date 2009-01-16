@@ -59,7 +59,7 @@ public class BehaviorTrackingFilter implements Filter {
 		if (managerName == null) {
 			//if there is no bean name configured, we assume there
 			//must be exactly one such bean in the application context.
-			Map managers = context.getBeansOfType(BehaviorTrackingManager.class);
+			Map<?,?> managers = context.getBeansOfType(BehaviorTrackingManager.class);
 			if (managers.isEmpty())
 				throw new ServletException("Unable to find a bean of class " + BehaviorTrackingManager.class.getName() + " in the Spring application context; perhaps it has not been configured?");
 			if (managers.size() > 1)
@@ -107,7 +107,7 @@ public class BehaviorTrackingFilter implements Filter {
 			}
 		} else {
 			//include all parameters
-			for (Enumeration params = request.getParameterNames(); params.hasMoreElements(); ) {
+			for (Enumeration<?> params = request.getParameterNames(); params.hasMoreElements(); ) {
 				String name = (String)params.nextElement();
 				String[] values = request.getParameterValues(name);
 				addParameter(parameters, name, values);
