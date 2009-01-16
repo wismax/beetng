@@ -52,7 +52,12 @@ public class XmlPersisterConfigurationTest {
 		XmlBehaviorEventPersisterImpl persister = (XmlBehaviorEventPersisterImpl)xmlTracking.getPersister();
 		assertFalse("default setting overridden", persister.isBinary());
 		assertFalse("default setting overridden", persister.isCompress());
-		assertTrue("custom file name [" + persister.getFile() + "]", new File(persister.getFile()).getName().startsWith("xml-tracking"));
+		
+		File location = new File(persister.getFile());
+		assertTrue("custom file name [" + persister.getFile() + "]", location.getName().startsWith("xml-tracking"));
+		assertEquals("custom XML attributes can be post-processed by property resolver", 
+					 new File(System.getProperty("java.io.tmpdir")).getCanonicalPath(), 
+					 location.getParentFile().getCanonicalPath());
 		
 		TaskExecutor executor = xmlTracking.getExecutor();
 		assertSame("application executor is used", testExecutor, executor);

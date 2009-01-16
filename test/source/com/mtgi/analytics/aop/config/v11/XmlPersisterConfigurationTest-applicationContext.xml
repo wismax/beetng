@@ -7,12 +7,14 @@
 	   		http://www.springframework.org/schema/beans		http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
 			http://www.mantis-tgi.com/schema/bt/1.1			http://www.mantis-tgi.com/schema/bt/mtgi-bt-1.1.xsd">
 
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+
 	<bt:config>
 
 	  <bt:manager id="xmlTracking" application="testApp" 
 	  			  scheduler="testScheduler" task-executor="testExecutor"
 	  			  track-method-expression="execution(* com.mtgi.analytics.aop.config..*Xml(..))">
-	  	<bt:xml-persister binary="false" compress="false" file="xml-tracking.xml"/>
+	  	<bt:xml-persister binary="false" compress="false" file="${java.io.tmpdir}/xml-tracking.xml"/>
 	  </bt:manager>
 
 	</bt:config>

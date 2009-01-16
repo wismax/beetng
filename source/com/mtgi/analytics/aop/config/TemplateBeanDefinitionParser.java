@@ -10,6 +10,7 @@ import org.springframework.beans.factory.parsing.CompositeComponentDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.beans.factory.xml.ResourceEntityResolver;
@@ -30,6 +31,11 @@ import org.w3c.dom.NodeList;
  * <p>Subclasses specify a classpath resource containing the template XML bean definitions in the constructor.
  * Subclasses should then override {@link #decorate(ConfigurableBeanFactory, BeanDefinition, Element, ParserContext)}
  * to transform the template bean definition according to runtime values.</p>
+ * 
+ * <p>This class makes use of {@link ChainingBeanFactoryPostProcessor} so that factory post-processing
+ * operations carry over into the bean factory containing template definitions.  This allows
+ * our custom tags' attributes to be subject to property replacement using PropertyPlaceholderConfigurer,
+ * for example.</p>
  */
 public class TemplateBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 
@@ -61,30 +67,39 @@ public class TemplateBeanDefinitionParser extends AbstractSingleBeanDefinitionPa
 		if (templateFactory == null) {
 			
 			//no nesting -- load the template XML configuration from the classpath.
-			final ConfigurableBeanFactory parentFactory = (ConfigurableBeanFactory)parserContext.getRegistry();
+			final ConfigurableListableBeanFactory parentFactory = (ConfigurableListableBeanFactory)parserContext.getRegistry();
 			templateFactory = new DefaultListableBeanFactory(parentFactory);
+			
+			//load template bean definitions
 			DefaultResourceLoader loader = new DefaultResourceLoader();
-	
 			XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(templateFactory);
 			reader.setResourceLoader(loader);
 			reader.setEntityResolver(new ResourceEntityResolver(loader));
 			reader.loadBeanDefinitions(templateResource);
 
+			//propagate factory post-processors from the source factory into the template
+			//factory.
+			BeanDefinition ppChain = new RootBeanDefinition(ChainingBeanFactoryPostProcessor.class);
+			ppChain.getPropertyValues().addPropertyValue("targetFactory", templateFactory);
+			parserContext.getReaderContext().registerWithGeneratedName(ppChain);
+			
 			//push component definition onto the parser stack for the benefit of
 			//nested bean definitions.
 			tcd = newComponentDefinition(element.getNodeName(), parserContext.extractSource(element), templateFactory);
 			parserContext.pushContainingComponent(tcd);
+			
 		}
 
 		try {
 			//allow subclasses to apply overrides to the template bean definition.
 			BeanDefinition def = templateFactory.getBeanDefinition(templateId);
 			decorate(templateFactory, def, element, parserContext);
-	
+
 			//setup our factory bean to instantiate the modified bean definition upon request.
 			builder.addPropertyValue("beanFactory", templateFactory);
 			builder.addPropertyValue("beanName", templateId);
 			builder.getRawBeanDefinition().setAttribute("id", def.getAttribute("id"));
+
 		} finally {
 			if (tcd != null)
 				parserContext.popContainingComponent();

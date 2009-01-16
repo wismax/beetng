@@ -4,13 +4,11 @@ import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
-import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.scheduling.SchedulingException;
@@ -28,26 +26,12 @@ import com.mtgi.analytics.aop.config.TemplateBeanDefinitionParser;
  * 
  * @see TemplateBeanDefinitionParser
  */
-public class SchedulerActivationPostProcessor implements BeanFactoryPostProcessor {
+public class SchedulerActivationPostProcessor implements InitializingBean {
 
 	private BeanFactory sourceFactory; 
 	private String schedulerName;
 	private String triggerName;
 	
-	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-		Scheduler scheduler = (Scheduler)sourceFactory.getBean(schedulerName, Scheduler.class);
-		Trigger trigger = (Trigger)sourceFactory.getBean(triggerName, Trigger.class);
-		try {
-			if (trigger instanceof JobDetailAwareTrigger) {
-				JobDetail job = ((JobDetailAwareTrigger)trigger).getJobDetail();
-				scheduler.addJob(job, false);
-			}
-			scheduler.scheduleJob(trigger);
-		} catch (SchedulerException e) {
-			throw new SchedulingException("error scheduling trigger [" + trigger + "]", e);
-		}
-	}
-
 	public void setSourceFactory(BeanFactory sourceFactory) {
 		this.sourceFactory = sourceFactory;
 	}
@@ -60,6 +44,20 @@ public class SchedulerActivationPostProcessor implements BeanFactoryPostProcesso
 		this.triggerName = triggerName;
 	}
 
+	public void afterPropertiesSet() throws Exception {
+		Scheduler scheduler = (Scheduler)sourceFactory.getBean(schedulerName, Scheduler.class);
+		Trigger trigger = (Trigger)sourceFactory.getBean(triggerName, Trigger.class);
+		try {
+			if (trigger instanceof JobDetailAwareTrigger) {
+				JobDetail job = ((JobDetailAwareTrigger)trigger).getJobDetail();
+				scheduler.addJob(job, false);
+			}
+			scheduler.scheduleJob(trigger);
+		} catch (SchedulerException e) {
+			throw new SchedulingException("error scheduling trigger [" + trigger + "]", e);
+		}
+	}
+	
 	/**
 	 * Convenience method to register a {@link SchedulerActivationPostProcessor} in the given BeanFactory
 	 * parse context with the given properties.
@@ -73,6 +71,7 @@ public class SchedulerActivationPostProcessor implements BeanFactoryPostProcesso
 		scheduleBootstrap.addPropertyValue("sourceFactory", sourceFactory);
 		scheduleBootstrap.addPropertyValue("schedulerName", schedulerName);
 		scheduleBootstrap.addPropertyValue("triggerName", triggerName);
+		scheduleBootstrap.setLazyInit(false);
 		parseContext.getReaderContext().registerWithGeneratedName(scheduleBootstrap.getBeanDefinition());
 	}
 	
@@ -101,4 +100,5 @@ public class SchedulerActivationPostProcessor implements BeanFactoryPostProcesso
 			return ((BeanDefinitionHolder)value).getBeanDefinition();
 		throw new IllegalArgumentException("Don't know how to convert " + value.getClass() + " into a BeanDefinition for property " + property);
 	}
+
 }
