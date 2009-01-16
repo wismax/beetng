@@ -82,12 +82,11 @@ public class TemplateBeanDefinitionParserTest {
 		}
 
 		@Override
-		protected BeanDefinition decorate(ConfigurableListableBeanFactory factory, BeanDefinition template, Element element, ParserContext parserContext) {
+		protected void transform(ConfigurableListableBeanFactory factory, BeanDefinition template, Element element, ParserContext parserContext) {
 			if (element.hasAttribute("inner")) {
 				//replace template inner bean configuration with substituted value at runtime.
 				factory.registerAlias(element.getAttribute("inner"), "com.mtgi.analytics.inner");
 			}
-			return super.decorate(factory, template, element, parserContext);
 		}
 	}
 	

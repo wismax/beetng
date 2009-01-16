@@ -29,10 +29,11 @@ import org.w3c.dom.NodeList;
  * from scratch.
  * 
  * <p>Subclasses specify a classpath resource containing the template XML bean definitions in the constructor.
- * Subclasses should then override {@link #decorate(ConfigurableBeanFactory, BeanDefinition, Element, ParserContext)}
+ * This is just a standard Spring XML application context configuration file.
+ * Subclasses should then override {@link #transform(ConfigurableBeanFactory, BeanDefinition, Element, ParserContext)}
  * to transform the template bean definition according to runtime values.</p>
  * 
- * <p>This class makes use of {@link ChainingBeanFactoryPostProcessor} so that factory post-processing
+ * <p>We also make use of {@link ChainingBeanFactoryPostProcessor} so that factory post-processing
  * operations carry over into the bean factory containing template definitions.  This allows
  * our custom tags' attributes to be subject to property replacement using PropertyPlaceholderConfigurer,
  * for example.</p>
@@ -56,6 +57,16 @@ public class TemplateBeanDefinitionParser extends AbstractSingleBeanDefinitionPa
 		return TemplateBeanDefinitionFactory.class;
 	}
 
+	/**
+	 * <p>Load the template BeanDefinition and call {@link #transform(ConfigurableListableBeanFactory, BeanDefinition, Element, ParserContext)}
+	 * to apply runtime configuration value to it.  <code>builder</code> will be configured to instantiate the bean
+	 * in the Spring context that we are parsing.</p>
+	 * 
+	 * <p>During parsing, an instance of {@link TemplateComponentDefinition} is pushed onto <code>ParserContext</code> so
+	 * that nested tags can access the enclosing template configuration with a call to {@link #findEnclosingTemplateFactory(ParserContext)}.
+	 * Subclasses can override {@link #newComponentDefinition(String, Object, DefaultListableBeanFactory)} to provide a 
+	 * subclass of {@link TemplateComponentDefinition} to the parser context if necessary.</p>
+	 */
 	@Override
 	protected final void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 
@@ -93,7 +104,7 @@ public class TemplateBeanDefinitionParser extends AbstractSingleBeanDefinitionPa
 		try {
 			//allow subclasses to apply overrides to the template bean definition.
 			BeanDefinition def = templateFactory.getBeanDefinition(templateId);
-			decorate(templateFactory, def, element, parserContext);
+			transform(templateFactory, def, element, parserContext);
 
 			//setup our factory bean to instantiate the modified bean definition upon request.
 			builder.addPropertyValue("beanFactory", templateFactory);
@@ -107,20 +118,26 @@ public class TemplateBeanDefinitionParser extends AbstractSingleBeanDefinitionPa
 	}
 
 	/**
-	 * Hook by which subclasses can modify template configuration values.  Default behavior does nothing.
+	 * Hook by which subclasses can modify template configuration values.  Default behavior does nothing to the template.
+	 * 
 	 * @param template the template bean definition
 	 * @param factory the bean factory from which <code>template</code> was loaded
 	 * @param element XML configuration fragment containing overrides that should be applied to the template
 	 * @param parserContext XML parse context supplying the configuration values
 	 */
-	protected BeanDefinition decorate(ConfigurableListableBeanFactory factory, BeanDefinition template, Element element, ParserContext parserContext) {
-		return template;
+	protected void transform(ConfigurableListableBeanFactory factory, BeanDefinition template, Element element, ParserContext parserContext) {
 	}
 
+	/** create the component definition that will be pushed onto the parser context in {@link #doParse(Element, ParserContext, BeanDefinitionBuilder)}. */
 	protected TemplateComponentDefinition newComponentDefinition(String name, Object source, DefaultListableBeanFactory factory) {
 		return new TemplateComponentDefinition(name, source, factory);
 	}
 	
+	/** 
+	 * Overridden to prefer the <code>id</code> attribute of <code>definition</code> if it is defined, over whatever
+	 * is in <code>element</code> (which would be the superclass behavior).  This allows subclasses to specify an ID
+	 * value in {@link #transform(ConfigurableListableBeanFactory, BeanDefinition, Element, ParserContext)} if required. 
+	 */
 	@Override
 	protected String resolveId(Element element,
 			AbstractBeanDefinition definition, ParserContext parserContext)
@@ -129,6 +146,10 @@ public class TemplateBeanDefinitionParser extends AbstractSingleBeanDefinitionPa
 		return id == null ? super.resolveId(element, definition, parserContext) : id;
 	}
 
+	/** 
+	 * returns true to prevent parse errors if an ID is not specified via the usual means, since we allow subclasses
+	 * to generate bean IDs.  See {@link #resolveId(Element, AbstractBeanDefinition, ParserContext)}. 
+	 */
 	@Override
 	protected boolean shouldGenerateIdAsFallback() {
 		return true;
@@ -181,6 +202,10 @@ public class TemplateBeanDefinitionParser extends AbstractSingleBeanDefinitionPa
 		return false;
 	}
 
+	/** 
+	 * If the given parse operation is nested inside an instance of {@link TemplateComponentDefinition}, return
+	 * the template bean configuration associated with that component.  Otherwise return null.
+	 */
 	private static DefaultListableBeanFactory findEnclosingTemplateFactory(ParserContext context) {
 		if (context.isNested()) {
 			CompositeComponentDefinition parent = context.getContainingComponent();
@@ -190,6 +215,10 @@ public class TemplateBeanDefinitionParser extends AbstractSingleBeanDefinitionPa
 		return null;
 	}
 	
+	/** 
+	 * A component definition providing access to the template bean configuration, for the benefit
+	 * of nested configuration tags.
+	 */
 	public static class TemplateComponentDefinition extends CompositeComponentDefinition {
 
 		private DefaultListableBeanFactory templateFactory;

@@ -7,16 +7,25 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
 
+import com.mtgi.analytics.BehaviorTrackingManagerImpl;
+
+/**
+ * Generic parser for inner bean definitions enclosed by a <code>bt:manager</code> tag.  These bean definitions
+ * are generally the same as standard Spring XML bean definitions, with a <code>class</code> attribute and nested
+ * <code>property</code> elements rather than custom XML attributes.  At time of writing, this parser handles both
+ * <code>bt:custom-persister</code> and <code>bt:session-context</code> tags.
+ */
 public class BtInnerBeanDefinitionParser implements BeanDefinitionParser {
 
 	private String property;
-	
+
+	/** @param property the property of {@link BehaviorTrackingManagerImpl} that should receive this bean definition. */
 	public BtInnerBeanDefinitionParser(String property) {
 		this.property = property;
 	}
 
 	public BeanDefinition parse(Element element, ParserContext parserContext) {
-		//session-context element is really just a standard bean class definition, so delegate to default behavior.
+		//no custom attributes, delegate to default definition parser.
 		BeanDefinitionHolder ret = parserContext.getDelegate().parseBeanDefinitionElement(element);
 		if (ret != null) {
 			//add parsed inner bean to containing manager definition if applicable
@@ -35,7 +44,7 @@ public class BtInnerBeanDefinitionParser implements BeanDefinitionParser {
 			}
 				
 		}
-		//global bean definition not created.
+		//global bean definition not created, probably some parse error.
 		return null;
 	}
 

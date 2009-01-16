@@ -8,6 +8,10 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+/**
+ * Parses the <code>bt:config</code> tag.  This tag does not export a bean definition by itself, but is rather just
+ * a container for multiple <code>bt:manager</code> tags (in the rare cases where such a thing is desired).
+ */
 public class BtConfigBeanDefinitionParser implements BeanDefinitionParser {
 
 	public BeanDefinition parse(Element element, ParserContext parserContext) {

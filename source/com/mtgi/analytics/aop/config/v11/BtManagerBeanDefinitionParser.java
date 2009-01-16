@@ -29,18 +29,58 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.mtgi.analytics.BehaviorEventPersister;
+import com.mtgi.analytics.BehaviorTrackingManagerImpl;
+import com.mtgi.analytics.XmlBehaviorEventPersisterImpl;
 import com.mtgi.analytics.aop.BehaviorTrackingAdvice;
 import com.mtgi.analytics.aop.config.TemplateBeanDefinitionParser;
 
+/**
+ * Parser for &lt;bt:manager&gt; configuration tags, the most significant tag in behavior tracking configuration.
+ * Each such tag will configure an instance of {@link BehaviorTrackingManagerImpl} and bind it into the Spring application
+ * context.  This includes configuring an implementation of {@link BehaviorEventPersister}, {@link SessionContext},
+ * registering AOP advice for tracking method calls, and automatically scheduling event flushes and log rotation
+ * according to sensible default values.
+ */
 public class BtManagerBeanDefinitionParser extends TemplateBeanDefinitionParser  {
 
+	/** The bean name of the bt manager instance, defaults to <code>defaultTrackingManager</code>. */
 	public static final String ATT_ID = "id";
+	/** 
+	 * The name of the application, required to be specified at runtime.  
+	 * @see BehaviorTrackingManagerImpl#setApplication(String) 
+	 */
 	public static final String ATT_APPLICATION = "application";
+	/** 
+	 * Bean name reference to a TaskExecutor for executing event flushes and other scheduled operations.  
+	 * A private instance is created if one is not specified.
+	 * @see BehaviorTrackingManagerImpl#setExecutor(org.springframework.core.task.TaskExecutor)
+	 */
 	public static final String ATT_TASK_EXECUTOR = "task-executor";
+	/** @see BehaviorTrackingManagerImpl#setFlushThreshold(int)  */
 	public static final String ATT_FLUSH_THRESHOLD = "flush-threshold";
+	/** 
+	 * Bean name reference to a Quartz Scheduler used for scheduled operations like event flush and log rotation.
+	 * A private instance is created if one is not specified.
+	 */
 	public static final String ATT_SCHEDULER = "scheduler";
+	/**
+	 * Quartz Cron Expression identifying how often behavior events are flushed to the persister.  Defaults
+	 * to once every 5 minutes if unspecified.
+	 */
 	public static final String ATT_FLUSH_SCHEDULE = "flush-schedule";
+	/**
+	 * AOP method pattern identifying which methods should be logged as behavior tracking events.  Defaults to
+	 * null if unspecified.
+	 */
 	public static final String ATT_METHOD_EXPRESSION = "track-method-expression";
+	/**
+	 * Bean name reference to an implementation of {@link BehaviorEventPersister} defined in the application context.
+	 * A private instance of {@link XmlBehaviorEventPersisterImpl} is created if none is specified.  This attribute
+	 * cannot be used in combination with a nested persister tag (<code>xml-persister</code>, <code>jdbc-persister</code>,
+	 * <code>custom-persister</code>).
+	 * @see BehaviorTrackingManagerImpl#setPersister(BehaviorEventPersister)
+	 */
 	public static final String ATT_PERSISTER = "persister";
 
 	public BtManagerBeanDefinitionParser() {
@@ -48,7 +88,7 @@ public class BtManagerBeanDefinitionParser extends TemplateBeanDefinitionParser 
 	}
 
 	@Override
-	protected BeanDefinition decorate(ConfigurableListableBeanFactory factory,
+	protected void transform(ConfigurableListableBeanFactory factory,
 			BeanDefinition template, Element element,
 			ParserContext parserContext) {
 
@@ -127,21 +167,26 @@ public class BtManagerBeanDefinitionParser extends TemplateBeanDefinitionParser 
 			//custom persister not registered.  schedule default log rotation trigger.
 			BtXmlPersisterBeanDefinitionParser.configureLogRotation(parserContext, factory, null);
 		}
-		
-		return super.decorate(factory, template, element, parserContext);
 	}
 	
+	/** overridden to return an instance of {@link ManagerComponentDefinition} */
 	@Override
 	protected TemplateComponentDefinition newComponentDefinition(String name,
 			Object source, DefaultListableBeanFactory factory) {
 		return new ManagerComponentDefinition(name, source, factory);
 	}
 	
+	/** 
+	 * called by nested tags to push inner beans into the enclosing {@link BehaviorTrackingManagerImpl}.
+	 * @return <span>true if the inner bean was added to an enclosing {@link BehaviorTrackingManagerImpl}.  Otherwise, the bean definition
+	 * is not nested inside a &lt;bt:manager&gt; tag and therefore will have to be registered as a global bean in the application
+	 * context.</span>
+	 */
 	protected static boolean registerNestedBean(BeanDefinitionHolder nested, String parentProperty, ParserContext parserContext) {
-		//add parsed session context element to containing manager definition.
+		//add parsed inner bean element to containing manager definition; e.g. persister or SessionContext impls.
 		CompositeComponentDefinition parent = parserContext.getContainingComponent();
 		if (parent instanceof ManagerComponentDefinition) {
-			//push the inner session context bean into the parent manager bean.
+			//we are nested; add to enclosing bean def.
 			BeanDefinition managerDef = parserContext.getContainingBeanDefinition();
 
 			MutablePropertyValues props = managerDef.getPropertyValues();
@@ -155,6 +200,11 @@ public class BtManagerBeanDefinitionParser extends TemplateBeanDefinitionParser 
 		return false;
 	}
 
+	/** 
+	 * Specialized {@link TemplateComponentDefinition} for the <code>bt:manager</code> config tag.
+	 * Adds some extra validation to make sure that duplicate definitions are not given for dependencies
+	 * (for example, specifying a persister both as a nested element and as a reference attribute).
+	 */
 	public static class ManagerComponentDefinition extends TemplateComponentDefinition {
 
 		protected ManagerComponentDefinition(String name, Object source,

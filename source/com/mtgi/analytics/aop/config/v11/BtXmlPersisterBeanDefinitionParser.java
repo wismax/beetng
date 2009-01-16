@@ -12,8 +12,13 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
+import com.mtgi.analytics.XmlBehaviorEventPersisterImpl;
 import com.mtgi.analytics.aop.config.TemplateBeanDefinitionParser;
 
+/** 
+ * Parses the <code>bt:xml-persister</code> tag to produce an {@link XmlBehaviorEventPersisterImpl} bean,
+ * for inclusion in an enclosing <code>bt:manager</code> tag or as a standalone managed bean.
+ */
 public class BtXmlPersisterBeanDefinitionParser extends TemplateBeanDefinitionParser 
 {
 	private static final String[] PROPS = { "file", "binary", "compress" };
@@ -26,7 +31,7 @@ public class BtXmlPersisterBeanDefinitionParser extends TemplateBeanDefinitionPa
 	}
 
 	@Override
-	protected BeanDefinition decorate(ConfigurableListableBeanFactory factory, BeanDefinition template, Element element, ParserContext parserContext) {
+	protected void transform(ConfigurableListableBeanFactory factory, BeanDefinition template, Element element, ParserContext parserContext) {
 		String id = overrideAttribute("id", template, element);
 		for (String p : PROPS)
 			overrideProperty(p, template, element, false);
@@ -39,7 +44,6 @@ public class BtXmlPersisterBeanDefinitionParser extends TemplateBeanDefinitionPa
 				id = parserContext.getReaderContext().generateBeanName(template);
 			BtManagerBeanDefinitionParser.registerNestedBean(new BeanDefinitionHolder(template, id), "persister", parserContext);
 		}
-		return super.decorate(factory, template, element, parserContext);
 	}
 
 	public static void configureLogRotation(ParserContext parserContext, ConfigurableListableBeanFactory factory, String schedule) {

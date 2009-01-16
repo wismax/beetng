@@ -13,6 +13,10 @@ import org.w3c.dom.NodeList;
 
 import com.mtgi.analytics.JdbcBehaviorEventPersisterImpl;
 
+/** 
+ * Parses the <code>bt:jdbc-persister</code> tag to produce an {@link JdbcBehaviorEventPersisterImpl} bean,
+ * for inclusion in an enclosing <code>bt:manager</code> tag or as a standalone managed bean.
+ */
 public class BtJdbcPersisterBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 
 	@Override
