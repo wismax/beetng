@@ -3,16 +3,15 @@ package com.mtgi.analytics.servlet;
 import static org.springframework.web.context.support.WebApplicationContextUtils.getRequiredWebApplicationContext;
 
 import java.io.IOException;
-import java.util.Enumeration;
 import java.util.Map;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
@@ -43,19 +42,32 @@ public class BehaviorTrackingFilter implements Filter {
 	public static final String PARAM_EVENT_TYPE = "com.mtgi.analytics.servlet.event";
 	/** filter parameter specifying a list of parameters to include in logging; defaults to all if unspecified */
 	public static final String PARAM_PARAMETERS_INCLUDE = "com.mtgi.analytics.parameters.include";
+
+	public static final String ATT_FILTER_REGISTERED = BehaviorTrackingFilter.class.getName() + ".count";
 	
-	private String eventType = "http-request";
-	private BehaviorTrackingManager manager;
-	private String[] parameters;
+	public static boolean isFiltered(ServletContext context) {
+		Integer count = (Integer)context.getAttribute(ATT_FILTER_REGISTERED);
+		return count != null && count > 0;
+	}
+	
+	private ServletContext servletContext;
+	private ServletRequestBehaviorTrackingAdapter delegate;
 	
 	public void destroy() {
-		manager = null;
+		delegate = null;
+		Integer count = (Integer)servletContext.getAttribute(ATT_FILTER_REGISTERED);
+		if (count == null || count == 1)
+			servletContext.removeAttribute(ATT_FILTER_REGISTERED);
+		else
+			servletContext.setAttribute(ATT_FILTER_REGISTERED, count - 1);
 	}
 
 	public void init(FilterConfig config) throws ServletException {
-		WebApplicationContext context = getRequiredWebApplicationContext(config.getServletContext());
+		servletContext = config.getServletContext();
+		WebApplicationContext context = getRequiredWebApplicationContext(servletContext);
 		String managerName = config.getInitParameter(PARAM_MANAGER_NAME);
 		
+		BehaviorTrackingManager manager;
 		if (managerName == null) {
 			//if there is no bean name configured, we assume there
 			//must be exactly one such bean in the application context.
@@ -72,57 +84,28 @@ public class BehaviorTrackingFilter implements Filter {
 		}
 
 		//see if there is an event type name configured.
-		String type = config.getInitParameter(PARAM_EVENT_TYPE);
-		if (type != null)
-			eventType = type;
-		
+		String eventType = config.getInitParameter(PARAM_EVENT_TYPE);
 		String params = config.getInitParameter(PARAM_PARAMETERS_INCLUDE);
-		if (params != null)
-			parameters = params.split("[\\r\\n\\s,;]+");
+		String[] parameters = params == null ? null : params.split("[\\r\\n\\s,;]+");
+
+		delegate = new ServletRequestBehaviorTrackingAdapter(eventType, manager, parameters, null);
+
+		//increment count of tracking filters registered in the servlet context.  the filter
+		//and alternative request listener check this attribute to make sure both are not registered at once.
+		Integer count = (Integer)servletContext.getAttribute(ATT_FILTER_REGISTERED);
+		servletContext.setAttribute(ATT_FILTER_REGISTERED, count == null ? 1 : count + 1);
 	}
 
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-
-		HttpServletRequest req = (HttpServletRequest)request;
-
-		//use the request path as an event name, excluding proto, host, and query string.
-		String eventName = req.getRequestURI();
-		BehaviorEvent event = manager.createEvent(eventType, eventName);
-
-		//log relevant request data and parameters to the event.
-		EventDataElement data = event.addData();
-		data.add("uri", eventName);
-		data.add("protocol", req.getProtocol());
-		data.add("method", req.getMethod());
-		data.add("remote-address", req.getRemoteAddr());
-		data.add("remote-host", req.getRemoteHost());
-		
-		EventDataElement parameters = data.addElement("parameters");
-		if (this.parameters != null) {
-			//include only configured parameters
-			for (String name : this.parameters) {
-				String[] values = request.getParameterValues(name);
-				if (values != null)
-					addParameter(parameters, name, values);
-			}
-		} else {
-			//include all parameters
-			for (Enumeration<?> params = request.getParameterNames(); params.hasMoreElements(); ) {
-				String name = (String)params.nextElement();
-				String[] values = request.getParameterValues(name);
-				addParameter(parameters, name, values);
-			}
-		}
-		
 		//wrap the response so that we can intercept response status if the application
 		//sets it.
 		BehaviorTrackingResponse btr = new BehaviorTrackingResponse((HttpServletResponse)response);
-
-		manager.start(event);
+		BehaviorEvent event = delegate.start(request);
 		try {
 			chain.doFilter(request, btr);
 			
 			//log response codes.
+			EventDataElement data = event.getData();
 			data.add("response-status", btr.status);
 			data.add("response-message", btr.message);
 			
@@ -134,15 +117,8 @@ public class BehaviorTrackingFilter implements Filter {
 			//log exception messages to event data.
 			handleServerError(event, error);
 		} finally {
-			manager.stop(event);
+			delegate.stop(event);
 		}
-	}
-	
-	private static final void addParameter(EventDataElement parameters, String name, String[] values) {
-		EventDataElement param = parameters.addElement("param");
-		param.add("name", name);
-		for (String v : values)
-			param.addElement("value").setText(v);
 	}
 	
 	private static final void handleServerError(BehaviorEvent event, Throwable e) throws ServletException, IOException {

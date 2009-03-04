@@ -6,10 +6,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Queue;
 
 import javax.sql.DataSource;
 import javax.xml.stream.XMLOutputFactory;
@@ -24,7 +21,6 @@ import org.unitils.spring.annotation.SpringApplicationContext;
 import org.unitils.spring.annotation.SpringBeanByName;
 
 import com.mtgi.analytics.BehaviorEvent;
-import com.mtgi.analytics.BehaviorEventPersister;
 import com.mtgi.analytics.BehaviorTrackingManagerImpl;
 import com.mtgi.analytics.EventDataElementSerializer;
 import com.mtgi.analytics.sql.BehaviorTrackingDataSource;
@@ -40,7 +36,7 @@ public class DataSourceDecoratorTest {
 	private Service testBean;
 	
 	@SpringBeanByName
-	private Persister testPersister;
+	private TestPersister testPersister;
 	
 	@SpringBeanByName
 	private BehaviorTrackingManagerImpl defaultTrackingManager;
@@ -91,27 +87,6 @@ public class DataSourceDecoratorTest {
 		assertSame(be, child.getParent());
 		String data = new EventDataElementSerializer(XMLOutputFactory.newInstance()).serialize(child.getData(), false);
 		assertEquals("<event-data><sql>insert into test values (1,'hello')</sql></event-data>", data);
-	}
-	
-	public static class Persister implements BehaviorEventPersister {
-
-		private List<BehaviorEvent> events = Collections.synchronizedList(new ArrayList<BehaviorEvent>());
-
-		public synchronized ArrayList<BehaviorEvent> events() {
-			return new ArrayList<BehaviorEvent>(events);
-		}
-		
-		public synchronized int count() {
-			return events.size();
-		}
-		
-		public synchronized int persist(Queue<BehaviorEvent> events) {
-			this.events.addAll(events);
-			int c = events.size();
-			events.clear();
-			return c;
-		}
-		
 	}
 	
 	public static class Service {

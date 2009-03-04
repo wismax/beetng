@@ -27,7 +27,13 @@
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:sequence>
-				<xsd:element ref="manager" minOccurs="1" maxOccurs="unbounded"/>
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="manager"/>
+					<xsd:element ref="session-context"/>
+					<xsd:element ref="xml-persister"/>
+					<xsd:element ref="jdbc-persister"/>
+					<xsd:element ref="custom-persister"/>
+				</xsd:choice>
 			</xsd:sequence>
 		</xsd:complexType>
 	</xsd:element>
@@ -66,6 +72,53 @@
 								Defaults to JAASSessionContext if unspecified.
 								]]></xsd:documentation>
 							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="http-requests" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation><![CDATA[
+								Activate logging of http requests using this manager.  All parameters are logged
+								unless the "parameters" attribute is specified.  Similarly, all requests are logged,
+								unless one or more "uri-patterns" are specified.
+								
+								This element cannot be used in a web application that already has BehaviorTrackingFilters
+								configured in web.xml.  BehaviorTrackingFilters are a more complex, but more powerful
+								alternative to configuration using this element.  However, the relatively more
+								concise bt:http-requests tag in spring configuration may suffice in simple
+								applications.
+								]]></xsd:documentation>
+							</xsd:annotation>
+							<xsd:complexType>
+								<xsd:sequence>
+									<xsd:element name="uri-pattern" type="xsd:string" minOccurs="0" maxOccurs="unbounded">
+										<xsd:annotation>
+											<xsd:documentation><![CDATA[A regular expression identifying URIs that should be
+											logged to the behavior event persister.  The value of HttpServletRequest.getServletURI()
+											will be matched against this expression.
+											This attribute has equivalent behavior to the uri-pattern attribute.  Multiple
+											patterns can be specified using additional uri-pattern elements.
+											]]></xsd:documentation>
+										</xsd:annotation>
+									</xsd:element>
+								</xsd:sequence>
+								<xsd:attribute name="parameters" type="xsd:string">
+										<xsd:annotation>
+											<xsd:documentation><![CDATA[If specified, a comma-separated list of request parameters that
+											should be logged with behavior events.  If unspecified, all parameters are logged.]]></xsd:documentation>
+										</xsd:annotation>
+								</xsd:attribute>
+								<xsd:attribute name="uri-pattern" type="xsd:string">
+										<xsd:annotation>
+											<xsd:documentation><![CDATA[Equivalent to a single nested uri-pattern element, provided
+											as an attribute for syntactic convenience.]]></xsd:documentation>
+										</xsd:annotation>
+								</xsd:attribute>
+								<xsd:attribute name="event-type" type="xsd:string">
+										<xsd:annotation>
+											<xsd:documentation><![CDATA[The value to log for event type when recording http requests.  
+											Defaults to "http-request" if unspecified.]]></xsd:documentation>
+										</xsd:annotation>
+								</xsd:attribute>
+							</xsd:complexType>
 						</xsd:element>
 					</xsd:sequence>
 					<xsd:attribute name="application" type="xsd:string" use="required">
@@ -131,6 +184,17 @@
 							<xsd:appinfo>
 								<tool:annotation kind="ref">
 									<tool:expected-type type="com.mtgi.analytics.BehaviorEventPersister"/>
+								</tool:annotation>
+							</xsd:appinfo>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="session-context" type="xsd:string">
+						<xsd:annotation>
+							<xsd:documentation>ID of a SessionContext implementation defined
+							in the applicaton context.  Use in place of a nested bt:session-context element.</xsd:documentation>
+							<xsd:appinfo>
+								<tool:annotation kind="ref">
+									<tool:expected-type type="com.mtgi.analytics.SessionContext"/>
 								</tool:annotation>
 							</xsd:appinfo>
 						</xsd:annotation>

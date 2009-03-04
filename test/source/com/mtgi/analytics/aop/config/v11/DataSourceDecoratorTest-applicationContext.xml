@@ -11,8 +11,8 @@
   			  track-method-expression="execution(* com.mtgi.analytics.aop.config.v11..*Tracked(..))"
   			  flush-schedule="0/2 * * * * ?"
   			  persister="testPersister"/>
-  	<bt:custom-persister id="testPersister" class="com.mtgi.analytics.aop.config.v11.DataSourceDecoratorTest$Persister"/>
-  						 
+  	<bt:custom-persister id="testPersister" class="com.mtgi.analytics.aop.config.v11.TestPersister"/>
+
 	<bean id="testBean" class="com.mtgi.analytics.aop.config.v11.DataSourceDecoratorTest$Service">
 		<property name="dataSource" ref="unitilsDS"/>
 	</bean>

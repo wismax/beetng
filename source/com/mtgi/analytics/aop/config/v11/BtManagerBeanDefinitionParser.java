@@ -33,6 +33,7 @@ import org.w3c.dom.NodeList;
 
 import com.mtgi.analytics.BehaviorEventPersister;
 import com.mtgi.analytics.BehaviorTrackingManagerImpl;
+import com.mtgi.analytics.SessionContext;
 import com.mtgi.analytics.XmlBehaviorEventPersisterImpl;
 import com.mtgi.analytics.aop.BehaviorTrackingAdvice;
 import com.mtgi.analytics.aop.config.TemplateBeanDefinitionParser;
@@ -85,6 +86,13 @@ public class BtManagerBeanDefinitionParser extends TemplateBeanDefinitionParser 
 	 * @see BehaviorTrackingManagerImpl#setPersister(BehaviorEventPersister)
 	 */
 	public static final String ATT_PERSISTER = "persister";
+	/**
+	 * Bean name reference to an implementation of {@link SessionContext} defined in the application context.
+	 * A private instance is created if none is specified.  This attribute
+	 * cannot be used in combination with a nested bt:session-context tag.
+	 * @see BehaviorTrackingManagerImpl#setSessionContext(SessionContext)
+	 */
+	public static final String ATT_SESSION_CONTEXT = "session-context";
 
 	public BtManagerBeanDefinitionParser() {
 		super(CONFIG_TEMPLATE, CONFIG_MANAGER);
@@ -114,6 +122,12 @@ public class BtManagerBeanDefinitionParser extends TemplateBeanDefinitionParser 
 			//override default persister definition with reference
 			def.addNestedProperty(ATT_PERSISTER);
 			factory.registerAlias(element.getAttribute(ATT_PERSISTER), CONFIG_PERSISTER);
+		}
+		
+		if (element.hasAttribute(ATT_SESSION_CONTEXT)) {
+			//override default session context with reference
+			def.addNestedProperty("sessionContext");
+			factory.registerAlias(element.getAttribute(ATT_SESSION_CONTEXT), CONFIG_SESSION_CONTEXT);
 		}
 
 		//handle AOP configuration if needed
