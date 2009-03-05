@@ -50,13 +50,16 @@ public class BinaryToXSLTTest {
 		out.delete();
 	}
 	
-	public static File getResource(Class test, String name) {
+	public static File getResource(Class<?> test, String name) {
 		URL url = test.getResource(name);
 		if (url == null)
 			fail("unable to find test resource " + name);
 		String path = url.toExternalForm();
 		if (path.startsWith("file:/")) {
-			File file = new File(path.substring(6));
+			path = path.substring(6);
+			if (!path.startsWith("/"))
+				path = "/" + path;
+			File file = new File(path);
 			assertTrue("File exists at " + file.getAbsolutePath(), file.isFile());
 			return file;
 		}
