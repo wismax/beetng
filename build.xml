@@ -16,13 +16,11 @@
 	                  pattern="${utils.dist}/lib/[artifact]-[revision].[ext]"
 					  conf="default"/>
 	
-	    <copy todir="${utils.dist}">
-            <fileset dir="${build.root}/utils/dist/jars"
-                     includes="**/*.jar" excludes="**/*test*"/>
-	    </copy>
-		
 		<copy todir="${utils.dist}">
 			<fileset dir="db" includes="etl/**"/>
+            <fileset dir="${build.root}/utils/dist/jars"
+                     includes="**/*.jar" excludes="**/*test*"/>
+			<fileset dir="utils/bin" includes="**/**"/>
 		</copy>
 		
 		<zip file="${target.dir}/bt-utils.zip" >

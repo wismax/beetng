@@ -26,14 +26,24 @@ if [ ! -f $2 ]; then
 	usage;
 fi
 
-UNPACK="zcat $2"
-TRANSFORM="java -jar bt-utils.jar -tool xslt -xsl etl/insert_events.xsl -split event"
-LOAD="sqlldr $1 control=etl/load_event_csv.ctl 2>load_progress.log"
+if [ -z "$JAVA_HOME" ]; then
+	TRANSFORM_CMD=java
+else
+	TRANSFORM_CMD=$JAVA_HOME/bin/java
+fi
+
+UNPACK=zcat
+TRANSFORM_ARGS="-jar bt-utils.jar -tool xslt -xsl etl/insert_events.xsl -split event"
+LOAD="sqlldr $1 control=etl/load_event_csv.ctl,data=events.csv"
 
 ##stop the script on error
-set -e
+#set -e
 
 echo "Loading $2 into behavior tracking database at $1."
 echo "Start: " $(date)
-$UNPACK | $TRANSFORM | $LOAD
+
+"$UNPACK" "$2" | "$TRANSFORM_CMD" $TRANSFORM_ARGS > events.csv
+
+$LOAD 2>load_progress.log
+
 echo "End: " $(date)
