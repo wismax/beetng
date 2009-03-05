@@ -109,7 +109,7 @@ public class BinaryToXSLT extends BinaryXmlProcessor {
 	    	
 			public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException {
 				Element elt = null;
-				if (uri != null) {
+				if (!isBlank(uri)) {
 					elt = dom.createElementNS(uri, qName);
 				} else {
 					elt = dom.createElement(localName);
@@ -124,7 +124,7 @@ public class BinaryToXSLT extends BinaryXmlProcessor {
 						String auri = atts.getURI(a);
 						String avalue = atts.getValue(a);
 						
-						if (auri != null) {
+						if (!isBlank(auri)) {
 							elt.setAttributeNS(auri, atts.getQName(a), avalue);
 						} else {
 							elt.setAttribute(alocal, avalue);

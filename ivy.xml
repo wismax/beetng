@@ -39,6 +39,7 @@
 		<dependency org="unitils" name="unitils" rev="1.0" conf="test->junit,spring,easymock,dbunit,hsqldb"/>
 		<dependency org="apache" name="commons-io" rev="1.2" conf="test"/>
 		<dependency org="gargoylesoftware" name="htmlunit" rev="2.1" conf="test"/>
+		<dependency org="xmlunit" name="xmlunit" rev="1.2" conf="test"/>
 		
 	</dependencies>
 	

@@ -1,12 +1,17 @@
 package com.mtgi.analytics;
 
 import static org.junit.Assert.*;
+import static org.custommonkey.xmlunit.XMLAssert.assertXMLIdentical;
+
+import java.io.IOException;
 
 import javax.xml.stream.XMLOutputFactory;
 
+import org.custommonkey.xmlunit.Diff;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.xml.sax.SAXException;
 
 public class EventDataElementSerializerTest {
 
@@ -23,29 +28,29 @@ public class EventDataElementSerializerTest {
 	}
 	
 	@Test
-	public void testElementNames() {
+	public void testElementNames() throws SAXException, IOException {
 		//test conversion of input text into valid XML element names.
 		EventDataElement root = new EventDataElement("-0&9!@#$#$!!$");
 		root.addElement("--Leading&*(Trailing_7-#")
 			.addElement("9-foo@bar.baz");
-		assertEquals("<?xml version='1.0' encoding='utf-8'?><data><Leading-Trailing-7><foo-bar-baz/></Leading-Trailing-7></data>", 
-					 serializer.serialize(root, true));
+		assertXMLIdentical(new Diff("<?xml version='1.0'?><data><Leading-Trailing-7><foo-bar-baz/></Leading-Trailing-7></data>", serializer.serialize(root, true)), true);
 	}
 	
 	@Test
-	public void testProperties() {
+	public void testProperties() throws SAXException, IOException {
 		//test serialization of properties to elements.
 		EventDataElement root = new EventDataElement("event-data");
 		root.add("foo", new Double(1.5));
 		root.add("---bar-7", "hello");
 		root.add("baz", null);
-		root.add("qux 8", "world&escaped\nmaybe?");
-		assertEquals("<?xml version='1.0' encoding='utf-8'?><event-data foo=\"1.5\" bar-7=\"hello\" qux-8=\"world&amp;escaped&#10;maybe?\"></event-data>", 
-					 serializer.serialize(root, true));
+		root.add("qux 8", "world&escaped\nmaybe?"); //newline value should be normalized.
+		assertXMLIdentical(new Diff("<?xml version='1.0'?><event-data foo=\"1.5\" bar-7=\"hello\" qux-8=\"world&amp;escaped maybe?\"></event-data>", 
+									serializer.serialize(root, true)), 
+						   true);
 	}
 	
 	@Test
-	public void testMixed() {
+	public void testMixed() throws SAXException, IOException {
 		//test a complex case mixing text, properties, and nested elements.
 		EventDataElement root = new EventDataElement("-0&9!@#$#$!!$");
 		root.addElement("--Leading&*(Trailing_7-#").setText("<hello&amp;world>");
@@ -54,7 +59,7 @@ public class EventDataElementSerializerTest {
 		child.setText("bar");
 		child.addElement("baz-quux").addElement("first");
 		child.addElement("baz-quux").add("second", "");
-		assertEquals("<?xml version='1.0' encoding='utf-8'?>" +
+		assertXMLIdentical(new Diff("<?xml version='1.0'?>" +
 					"<data>" +
 						"<Leading-Trailing-7>&lt;hello&amp;amp;world&gt;</Leading-Trailing-7>" +
 						"<foo-bar-baz hello=\"world\">" +
@@ -63,17 +68,18 @@ public class EventDataElementSerializerTest {
 							"<baz-quux second=\"\"></baz-quux>" +
 						"</foo-bar-baz>" +
 					"</data>", 
-					serializer.serialize(root, true));
+					serializer.serialize(root, true)), true);
 	}
-	
+
 	@Test
 	public void testNull() {
 		assertNull("null data serializes as null string", serializer.serialize(null, true));
 	}
 	
 	@Test
-	public void testEmpty() {
+	public void testEmpty() throws SAXException, IOException {
 		EventDataElement element = new EventDataElement("event-data");
-		assertEquals("<?xml version='1.0' encoding='utf-8'?><event-data/>", serializer.serialize(element, true));
+		assertXMLIdentical(new Diff("<?xml version='1.0'?><event-data/>", serializer.serialize(element, true)), true);
 	}
+	
 }

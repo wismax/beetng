@@ -89,7 +89,7 @@ public class BinaryToXml extends BinaryXmlProcessor {
 
 				public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException {
 					try {
-						if (uri != null)
+						if (!isBlank(uri))
 							writer.writeStartElement(uri, localName);
 						else
 							writer.writeStartElement(localName);
@@ -100,7 +100,7 @@ public class BinaryToXml extends BinaryXmlProcessor {
 								String auri = atts.getURI(a);
 								String avalue = atts.getValue(a);
 								
-								if (auri != null) {
+								if (!isBlank(auri)) {
 									writer.writeAttribute(auri, alocal, avalue);
 								} else {
 									writer.writeAttribute(alocal, avalue);

@@ -25,7 +25,9 @@
 		<dependency org="sun" name="FastInfoset" rev="1.2.2"/>
 		<dependency org="saxon" name="saxon" rev="8.8"/>
 		<dependency org="apache" name="xerces" rev="2.8.1"/>
+
 		<dependency org="junit" name="junit" rev="4.4" conf="test"/>
+		<dependency org="xmlunit" name="xmlunit" rev="1.2" conf="test"/>
 		
 	</dependencies>
 	

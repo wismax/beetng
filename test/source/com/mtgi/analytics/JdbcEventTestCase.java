@@ -1,6 +1,5 @@
 package com.mtgi.analytics;
 
-import static org.dbunit.dataset.filter.DefaultColumnFilter.excludedColumnsTable;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
@@ -9,14 +8,22 @@ import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 
 import javax.sql.DataSource;
 
+import org.custommonkey.xmlunit.Diff;
 import org.dbunit.DatabaseUnitException;
 import org.dbunit.database.DatabaseConnection;
 import org.dbunit.database.IDatabaseConnection;
+import org.dbunit.dataset.Column;
+import org.dbunit.dataset.CompositeTable;
 import org.dbunit.dataset.DataSetException;
+import org.dbunit.dataset.DefaultTableMetaData;
 import org.dbunit.dataset.ITable;
+import org.dbunit.dataset.ITableMetaData;
+import org.dbunit.dataset.datatype.StringDataType;
+import org.dbunit.dataset.datatype.TypeCastException;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
 import org.junit.After;
 import org.junit.Before;
@@ -61,16 +68,42 @@ public abstract class JdbcEventTestCase {
 	public void assertEventDataMatches(String dataSetResource) throws SQLException, DataSetException, IOException, DatabaseUnitException  {
 		IDatabaseConnection connection = new DatabaseConnection(conn);
         ITable actualTable = connection.createDataSet().getTable("BEHAVIOR_TRACKING_EVENT");
-        actualTable = excludedColumnsTable(actualTable, new String[]{"EVENT_START", "DURATION_MS"});
+        actualTable = normalizedEventTable(actualTable);
 
 		InputStream expectedData = getClass().getResourceAsStream(dataSetResource);
 		FlatXmlDataSet expectedDataSet = new FlatXmlDataSet(expectedData, true);
 		ITable expectedTable = expectedDataSet.getTable("BEHAVIOR_TRACKING_EVENT");
-		
-		expectedTable = excludedColumnsTable(expectedTable, new String[]{"EVENT_START", "DURATION_MS"});
+		expectedTable = normalizedEventTable(expectedTable);
 
 		org.dbunit.Assertion.assertEquals(expectedTable, actualTable);
-		
+	}
+	
+	/** 
+	 * transform the given dbunit table into one that can be used to meaningfully compare
+	 * event data, without raising false negatives due to differences in start date or minor
+	 * changes in XML syntax for the event_data column.
+	 * @throws DataSetException 
+	 */
+	public static ITable normalizedEventTable(ITable table) throws DataSetException {
+		ITableMetaData metaData = table.getTableMetaData();
+        ArrayList<Column> columns = new ArrayList<Column>();
+        for (Column c : metaData.getColumns()) {
+        	String name = c.getColumnName();
+        	//strip out time columns.
+        	//TODO: leave in duration, with which we can compare with a tolerance value?
+        	if ("EVENT_START".equals(name) || "DURATION_MS".equals(name))
+        		continue;
+        	//replace string data type comparator with an xmlunit-based comparator
+        	if ("EVENT_DATA".equals(name))
+        		c = new Column("EVENT_DATA", new XmlStringDataType(c.getSqlTypeName(), c.getDataType().getSqlType()));
+        	columns.add(c);
+        }
+        return new CompositeTable(
+    		new DefaultTableMetaData(metaData.getTableName(), 
+    				columns.toArray(new Column[columns.size()]), 
+    				metaData.getPrimaryKeys()), 
+    		table
+        );
 	}
 	
 	protected void runResourceScript(String resource) 
@@ -89,5 +122,31 @@ public abstract class JdbcEventTestCase {
 		sql = sql.replaceAll("NUMBER", "NUMERIC");
 		sql = sql.replaceAll("CLOB", "LONGVARCHAR");
 		stmt.execute(sql);
+	}
+	
+	public static class XmlStringDataType extends StringDataType {
+
+		public XmlStringDataType(String name, int sqlType) {
+			super(name, sqlType);
+		}
+
+		@Override
+		public int compare(Object o1, Object o2) throws TypeCastException {
+			String s1 = asString(o1);
+			String s2 = asString(o2);
+			
+			if (s1 != null && s2 != null) {
+				Diff diff;
+				try {
+					diff = new Diff(s1, s2);
+				} catch (Exception e) {
+					throw new TypeCastException("Error parsing XML data", e);
+				}
+				if (diff.identical())
+					return 0;
+			}
+			return super.compare(o1, o2);
+		}
+		
 	}
 }

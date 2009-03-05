@@ -49,4 +49,8 @@ public abstract class BinaryXmlProcessor extends TransformInputOutput {
     	parse(argv.toArray(new String[argv.size()]));
     	return 0;
     }
+    
+    public static boolean isBlank(String value) {
+    	return value == null || value.trim().length() == 0;
+    }
 }
