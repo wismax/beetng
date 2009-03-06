@@ -14,7 +14,7 @@
 	    <ivy:resolve file="utils/ivy.xml"/>
 	    <ivy:retrieve useOrigin="true"
 	                  pattern="${utils.dist}/lib/[artifact]-[revision].[ext]"
-					  conf="default"/>
+					  conf="${target.java.version}"/>
 	
 		<copy todir="${utils.dist}">
 			<fileset dir="db" includes="etl/**"/>

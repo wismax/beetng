@@ -9,9 +9,12 @@
 	<configurations>
 		<conf name="base" description="core module without runtime dependencies"/>
 		<conf name="source" description="source jar"/>
-		<conf name="default" description="core module with runtime dependencies"/>
 		<conf name="compile" description="compile-time dependencies"/>
 		<conf name="test" description="dependencies used for junit testing"/>
+		
+		<conf name="1.5" extends="default" description="core module with dependencies, for SDK 1.5 and below"/>
+		<conf name="1.6" description="core module with runtime dependencies, for SDK 1.6 and higher"/>
+		<conf name="default" extends="1.6" description="alias for '1.6'" />
 	</configurations>
 
 	<publications>
@@ -19,13 +22,14 @@
 		<artifact name="bt-utils" type="source" ext="jar" conf="source"/>
 	</publications>
 	
-	<dependencies defaultconfmapping="default,compile,test->default">
+	<dependencies defaultconfmapping="1.5,1.6,default,compile,test->default">
 
-		<dependency org="bea" name="stax-impl" rev="1.2.0"/>
-		<dependency org="sun" name="FastInfoset" rev="1.2.2"/>
 		<dependency org="saxon" name="saxon" rev="8.8"/>
 		<dependency org="apache" name="xerces" rev="2.8.1"/>
 
+		<dependency org="bea" name="stax-impl" rev="1.2.0" conf="1.5,compile,test"/>
+		<dependency org="sun" name="FastInfoset" rev="1.2.2" conf="1.5,compile,test"/>
+		
 		<dependency org="junit" name="junit" rev="4.4" conf="test"/>
 		<dependency org="xmlunit" name="xmlunit" rev="1.2" conf="test"/>
 		
