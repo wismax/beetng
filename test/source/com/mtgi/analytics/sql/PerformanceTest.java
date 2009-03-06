@@ -40,7 +40,8 @@ public class PerformanceTest extends AbstractPerformanceTestCase {
 		Connection conn = dataSource.getConnection();
 		Statement stmt = conn.createStatement();
 		stmt.execute("create table TEST_TRACKING (" +
-				"	ID			NUMERIC(8) 		PRIMARY KEY," +
+				"	ID			IDENTITY," +
+				"	NUM			NUMERIC(16)		NOT NULL," +
 				"	NAME		VARCHAR(16)		NOT NULL," +
 				"	DESCRIPTION	VARCHAR(32) 	NULL" +
 				")");
@@ -82,7 +83,7 @@ public class PerformanceTest extends AbstractPerformanceTestCase {
 				//method call results in two events logged.
 				Connection conn = ds.getConnection();
 				try {
-					PreparedStatement ps = conn.prepareStatement("insert into TEST_TRACKING values (?, ?, ?)");
+					PreparedStatement ps = conn.prepareStatement("insert into TEST_TRACKING (NUM, NAME, DESCRIPTION) values (?, ?, ?)");
 					long s1 = ++SEQ, s2 = ++SEQ, s3 = ++SEQ, s4 = ++SEQ;
 					ps.setLong(1, s1);
 					ps.setString(2, "foo" + SEQ);
