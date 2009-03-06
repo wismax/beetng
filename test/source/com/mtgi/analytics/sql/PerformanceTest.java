@@ -83,7 +83,7 @@ public class PerformanceTest extends AbstractPerformanceTestCase {
 				Connection conn = ds.getConnection();
 				try {
 					PreparedStatement ps = conn.prepareStatement("insert into TEST_TRACKING values (?, ?, ?)");
-					long s1 = SEQ++, s2 = SEQ++, s3 = SEQ++, s4 = SEQ++;
+					long s1 = ++SEQ, s2 = ++SEQ, s3 = ++SEQ, s4 = ++SEQ;
 					ps.setLong(1, s1);
 					ps.setString(2, "foo" + SEQ);
 					ps.setString(3, "adesc");
