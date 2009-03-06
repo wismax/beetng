@@ -26,9 +26,9 @@
 
 		<dependency org="saxon" name="saxon" rev="8.8"/>
 		<dependency org="apache" name="xerces" rev="2.8.1"/>
+		<dependency org="sun" name="FastInfoset" rev="1.2.2"/>
 
 		<dependency org="bea" name="stax-impl" rev="1.2.0" conf="1.5,compile,test"/>
-		<dependency org="sun" name="FastInfoset" rev="1.2.2" conf="1.5,compile,test"/>
 		
 		<dependency org="junit" name="junit" rev="4.4" conf="test"/>
 		<dependency org="xmlunit" name="xmlunit" rev="1.2" conf="test"/>

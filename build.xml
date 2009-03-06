@@ -8,24 +8,32 @@
 	<target name="all-dist" depends="all,package-utils"/>
 	
 	<target name="package-utils" description="package command line utilities">
-	    <property name="utils.dist" value="${target.dir}/utils"/>
-	    <mkdir dir="${utils.dist}"/>
 	
 	    <ivy:resolve file="utils/ivy.xml"/>
-	    <ivy:retrieve useOrigin="true"
-	                  pattern="${utils.dist}/lib/[artifact]-[revision].[ext]"
-					  conf="${target.java.version}"/>
-	
-		<copy todir="${utils.dist}">
-			<fileset dir="db" includes="etl/**"/>
-            <fileset dir="${build.root}/utils/dist/jars"
-                     includes="**/*.jar" excludes="**/*test*"/>
-			<fileset dir="utils/bin" includes="**/**"/>
-		</copy>
+		<property name="utils.dist" value="${target.dir}/utils"/>
 		
-		<zip file="${target.dir}/bt-utils.zip" >
-			<zipfileset prefix="BehaviorTracking" dir="${utils.dist}" includes="**/*"/>
-		</zip>
+		<!-- create separate distributions for java 5 and 6 -->
+		<for list="5,6" param="current.version">
+			<sequential>
+				<var name="utils.dist" value="${target.dir}/java@{current.version}/utils"/>
+			    <mkdir dir="${utils.dist}"/>
+				
+			    <ivy:retrieve useOrigin="true"
+			                  pattern="${utils.dist}/lib/[artifact]-[revision].[ext]"
+							  conf="1.@{current.version}"/>
+			
+				<copy todir="${utils.dist}">
+					<fileset dir="db" includes="etl/**"/>
+		            <fileset dir="${build.root}/utils/dist/jars"
+		                     includes="**/*.jar" excludes="**/*test*"/>
+					<fileset dir="utils/bin" includes="**/**"/>
+				</copy>
+				
+				<zip file="${target.dir}/bt-utils-java@{current.version}.zip">
+					<zipfileset prefix="BehaviorTracking" dir="${utils.dist}" includes="**/*"/>
+				</zip>
+			</sequential>
+		</for>
 	
 	</target>
 	
