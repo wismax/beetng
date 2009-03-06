@@ -106,42 +106,20 @@ public class BehaviorEventTest {
 	public void testNesting() {
 		BehaviorEvent root = new BehaviorEvent(null, "request", "/foo", "test", "me", "1");
 		assertTrue("event with no parent is root", root.isRoot());
-		assertEquals("one node in tree", 1, root.getTreeSize());
 		
-		try {
-			new BehaviorEvent(root, "request", "/bad", "test", "me", "1");
-			fail("should not be able to construct child event before parent is started");
-		} catch (IllegalStateException expected) {
-		}
-		
-		assertEquals("still one node in tree", 1, root.getTreeSize());
 		root.start();
 		
 		BehaviorEvent c10 = new BehaviorEvent(root, "request", "/bad", "test", "me", "1");
 		assertSame("child points to parent", root, c10.getParent());
-		assertEquals("now two nodes in tree", 2, root.getTreeSize());
 		
 		assertFalse("child node is not a root", c10.isRoot());
-		assertEquals(1, c10.getTreeSize());
 		
 		BehaviorEvent c11 = new BehaviorEvent(root, "request", "/bad", "test", "me", "1");
 		assertSame("child points to parent", root, c11.getParent());
 		assertFalse("child node is not a root", c11.isRoot());
-		assertEquals("three nodes in tree", 3, root.getTreeSize());
-		assertEquals(1, c11.getTreeSize());
-		assertEquals(1, c10.getTreeSize());
 		
 		root.stop();
 		assertTrue("root event stopped", root.isEnded());
-		
-		try {
-			new BehaviorEvent(root, "request", "/bad", "test", "me", "1");
-			fail("attempt to add a new child to a completed event should fail");
-		} catch (IllegalStateException ise) {
-		}
-		
-		assertTrue("root event stopped", root.isEnded());
-		assertEquals("still three nodes in tree", 3, root.getTreeSize());
 	}
 
 	@Test

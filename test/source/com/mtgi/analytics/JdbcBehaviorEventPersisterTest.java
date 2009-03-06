@@ -85,23 +85,7 @@ public class JdbcBehaviorEventPersisterTest extends JdbcEventTestCase {
 		ResultSet rs = stmt.executeQuery("select sum(duration_ms) from BEHAVIOR_TRACKING_EVENT where PARENT_EVENT_ID = " + event.getId());
 		assertTrue(rs.next());
 		long childTotal = rs.getLong(1);
-		int childCount = countChildren(event.getId());
-		
-		if (event.getTreeSize() == 1) {
-			assertEquals("no children in db", 0, childTotal);
-		} else {
-			assertTrue("some children in DB", childCount > 0);
-			assertTrue("child count is less than tree size", childCount < event.getTreeSize());
-			assertTrue("child duration is less than parent event duration", childTotal <= total);
-		}
-	}
-
-	private int countChildren(Serializable id) throws SQLException {
-		ResultSet ret = stmt.executeQuery("select count(EVENT_ID) from BEHAVIOR_TRACKING_EVENT where PARENT_EVENT_ID = " + id);
-		assertTrue(ret.next());
-		int count = ret.getInt(1);
-		ret.close();
-		return count;
+		assertTrue("child duration is less than parent event duration", childTotal <= total);
 	}
 
 	private ResultSet getEventData(Serializable id) throws SQLException {

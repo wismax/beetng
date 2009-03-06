@@ -42,6 +42,7 @@ public abstract class AbstractPerformanceTestCase {
 
 		assertTrue("Average overhead per method cannot exceed .1 ms [ " + overhead + " ]",
 					 overhead < 0.1);
+		System.out.println("Average overhead: " + overhead);
 		
 		//deltaWorst, my favorite sausage.  mmmmmm, dellltttaaaWwwwooorrsstt.
 		double deltaWorst = test.getWorstMillis() - basis.getWorstMillis();
@@ -49,6 +50,7 @@ public abstract class AbstractPerformanceTestCase {
 		
 		assertTrue("Worst case per method overhead cannot exceed .5ms [ " + overhead + " ]",
 				  overhead < .5);
+		System.out.println("Worst case overhead: " + overhead);
 	}
 	
 	private void runTest(TestStats stats, Runnable job) throws Throwable {

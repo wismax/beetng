@@ -41,8 +41,6 @@ public class BehaviorEvent implements Serializable {
 	private EventDataElement data;
 	private String error;
 	
-	private int treeSize = 1;
-	
 	protected BehaviorEvent(BehaviorEvent parent, String type, String name, String application, String userId, String sessionId) {
 		this.parent = parent;
 		this.type = type;
@@ -50,13 +48,6 @@ public class BehaviorEvent implements Serializable {
 		this.application = application;
 		this.userId = userId;
 		this.sessionId = sessionId;
-		if (parent != null) {
-			if (!parent.isStarted())
-				throw new IllegalStateException("Parent event has not started");
-			if (parent.isEnded())
-				throw new IllegalStateException("Parent event has already ended");
-			parent.incrementTreeSize();
-		}
 	}
 
 	@Override
@@ -108,11 +99,6 @@ public class BehaviorEvent implements Serializable {
 	/** @return true if this event is not nested in some other event */
 	protected boolean isRoot() {
 		return parent == null;
-	}
-	
-	/** @return the total number of events rooted here, including this event */
-	protected int getTreeSize() {
-		return treeSize;
 	}
 	
 	/**
@@ -240,11 +226,5 @@ public class BehaviorEvent implements Serializable {
 		   .append(" error=\"").append(error).append('"');
 		
 		return buf.toString();
-	}
-	
-	protected void incrementTreeSize() {
-		++treeSize;
-		if (parent != null)
-			parent.incrementTreeSize();
 	}
 }
