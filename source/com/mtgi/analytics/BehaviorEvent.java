@@ -38,7 +38,7 @@ public class BehaviorEvent implements Serializable {
 	private String sessionId;
 	private Date start;
 	private Long duration;
-	private EventDataElement data;
+	private EventDataElement data = DeferredDataElement.INSTANCE;
 	private String error;
 	
 	protected BehaviorEvent(BehaviorEvent parent, String type, String name, String application, String userId, String sessionId) {
@@ -204,9 +204,7 @@ public class BehaviorEvent implements Serializable {
 	 * @return A container for event data.  Calling this method more than once always returns the same instance.
 	 */
 	public EventDataElement addData() {
-		if (data == null)
-			data = new EventDataElement("event-data");
-		return data;
+		return data.dereference(this);
 	}
 
 	@Override
@@ -226,5 +224,29 @@ public class BehaviorEvent implements Serializable {
 		   .append(" error=\"").append(error).append('"');
 		
 		return buf.toString();
+	}
+	
+	/** 
+	 * a singleton empty data element, for events that do not need to define any data.
+	 * Replaces itself with a new, standard EventDataElement instance on the first call
+	 * to {@link #dereference(BehaviorEvent)}.  This somewhat arcane construction is an optimization
+	 * for calls to {@link #addData}, so that they do not require a null check.
+	 */
+	private static class DeferredDataElement extends EventDataElement {
+		private static final long serialVersionUID = -4571142241188203441L;
+		private static final DeferredDataElement INSTANCE = new DeferredDataElement();
+		private DeferredDataElement() {
+			super("event-data");
+		}
+		
+		@Override
+		public boolean isEmpty() {
+			return true;
+		}
+
+		@Override
+		protected EventDataElement dereference(BehaviorEvent event) {
+			return event.data = new EventDataElement("event-data");
+		}
 	}
 }

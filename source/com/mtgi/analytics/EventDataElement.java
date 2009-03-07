@@ -1,11 +1,12 @@
 package com.mtgi.analytics;
 
+import java.io.ObjectStreamException;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 /**
  * Semi-structured (XML-like) data about a {@link BehaviorEvent}.
@@ -20,7 +21,13 @@ public class EventDataElement implements Serializable {
 	private String text;
 
 	private LinkedHashMap<String,Object> properties;
-	private ArrayList<EventDataElement> children;
+
+	//simple linked-list structure for child data elements, which has proven
+	//faster than java collections in hitting our performance test targets
+	private EventDataElement firstChild = ListHead.INSTANCE;
+	private EventDataElement lastChild = ListHead.INSTANCE;
+	
+	private EventDataElement nextSibling;
 	
 	public EventDataElement(String name) {
 		this.name = name;
@@ -58,18 +65,16 @@ public class EventDataElement implements Serializable {
 	 */
 	public EventDataElement addElement(String name) {
 		EventDataElement ret = new EventDataElement(name);
-		addElement(ret);
+		lastChild.setNext(this, ret);
 		return ret;
 	}
 	
 	public void addElement(EventDataElement child) {
-		if (children == null)
-			children = new ArrayList<EventDataElement>();
-		children.add(child);
+		lastChild.setNext(this, child);
 	}
 	
 	public boolean isEmpty() {
-		return text == null && properties == null && children == null;
+		return text == null && properties == null && firstChild == ListHead.INSTANCE;
 	}
 	
 	public Iterator<Map.Entry<String,Object>> iterateProperties() {
@@ -78,7 +83,62 @@ public class EventDataElement implements Serializable {
 	}
 	
 	public Iterator<EventDataElement> iterateChildren() {
-		return children == null ? Collections.<EventDataElement>emptyList().iterator() 
-								: children.iterator();
+		return firstChild == ListHead.INSTANCE ? Collections.<EventDataElement>emptyList().iterator() 
+											   : new ChildIterator();
+	}
+	
+	/** set the next sibling in the linked list of children under <code>parent</code>. */
+	protected void setNext(EventDataElement parent, EventDataElement next) {
+		parent.lastChild = this.nextSibling = next;
+	}
+	
+	/**
+	 * Return a concrete, fully-realized instance of this data, performing any deferred initialization
+	 * of internal data structures.  This implementation simply returns "this".
+	 * @param event the parent event
+	 */
+	protected EventDataElement dereference(BehaviorEvent event) {
+		return this;
+	}
+	
+	private class ChildIterator implements Iterator<EventDataElement> {
+
+		private EventDataElement current = firstChild;
+		
+		public boolean hasNext() {
+			return current != null;
+		}
+
+		public EventDataElement next() {
+			if (current == null)
+				throw new NoSuchElementException();
+			EventDataElement ret = current;
+			current = ret.nextSibling;
+			return ret;
+		}
+
+		public void remove() {
+			throw new UnsupportedOperationException();
+		}
+		
+	}
+	
+	private static class ListHead extends EventDataElement {
+		
+		private static final long serialVersionUID = 1511666816688289823L;
+		
+		static final ListHead INSTANCE = new ListHead();
+		
+		private ListHead() {
+			super("");
+		}
+		@Override
+		protected void setNext(EventDataElement parent, EventDataElement next) {
+			parent.firstChild = parent.lastChild = next;
+		}
+		
+		private Object readResolve() throws ObjectStreamException {
+			return ListHead.INSTANCE;
+		}
 	}
 }

@@ -33,7 +33,7 @@ public class BehaviorEventSerializer {
 		writeEventAttribute(writer, "error", event.getError());
 		
 		EventDataElement data = event.getData();
-		if (data != null)
+		if (!data.isEmpty())
 			dataSerializer.serializeElement(writer, data);
 		
 		writer.writeEndElement();
