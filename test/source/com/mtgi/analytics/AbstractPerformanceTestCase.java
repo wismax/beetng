@@ -11,15 +11,21 @@ import java.util.concurrent.Semaphore;
 public abstract class AbstractPerformanceTestCase {
 
 	private static final int TEST_ITERATIONS = 10;
-	private static final int TEST_LOOP = 50;
-	private static final int TEST_THREADS = 10;
-	
+
+	private int testLoop;
+	private int testThreads;
 	private int eventsPerJob;
 	
 	protected AbstractPerformanceTestCase(int eventsPerJob) {
-		this.eventsPerJob = eventsPerJob;
+		this(eventsPerJob, 10, 50);
 	}
 
+	protected AbstractPerformanceTestCase(int eventsPerJob, int testThreads, int testLoop) {
+		this.testThreads = testThreads;
+		this.eventsPerJob = eventsPerJob;
+		this.testLoop = testLoop;
+	}
+	
 	protected void testPerformance(Runnable basisJob, Runnable testJob) throws Throwable {
 
 		TestStats basis = new TestStats(),
@@ -36,7 +42,7 @@ public abstract class AbstractPerformanceTestCase {
 		
 		//compute the overhead as the difference between instrumented and uninstrumented
 		//runs.  we want the per-event overhead to be less than .5 ms.
-		double calls = TEST_LOOP * TEST_ITERATIONS * eventsPerJob;
+		double calls = testLoop * TEST_ITERATIONS * eventsPerJob;
 		double delta = test.getAverageMillis() - basis.getAverageMillis();
 		double overhead = delta / calls;
 
@@ -58,9 +64,9 @@ public abstract class AbstractPerformanceTestCase {
 		//set up the test iteration.
 		Semaphore in = new Semaphore(0),
 				  out = new Semaphore(0);
-		TestThread[] threads = new TestThread[TEST_THREADS];
-		for (int t = 0; t < TEST_THREADS; ++t) {
-			threads[t] = new TestThread(in, out, job);
+		TestThread[] threads = new TestThread[testThreads];
+		for (int t = 0; t < testThreads; ++t) {
+			threads[t] = new TestThread(in, out, job, testLoop);
 			threads[t].start();
 		}
 		
@@ -68,9 +74,9 @@ public abstract class AbstractPerformanceTestCase {
 		stats.start();
 		try {
 			//turn 'em loose.
-			in.release(TEST_THREADS);
+			in.release(testThreads);
 			//wait for finish.
-			out.acquire(TEST_THREADS);
+			out.acquire(testThreads);
 
 			//verify that all of the test threads are actually finished
 			for (TestThread t : threads) {
@@ -114,11 +120,13 @@ public abstract class AbstractPerformanceTestCase {
 		private Throwable error;
 		private Semaphore in, out;
 		private Runnable job;
+		private int testLoop;
 		
-		public TestThread(Semaphore in, Semaphore out, Runnable job) {
+		public TestThread(Semaphore in, Semaphore out, Runnable job, int testLoop) {
 			this.in = in;
 			this.out = out;
 			this.job = job;
+			this.testLoop = testLoop;
 		}
 
 		public void assertDone() throws Throwable{
@@ -131,7 +139,7 @@ public abstract class AbstractPerformanceTestCase {
 		public void run() {
 			try {
 				in.acquire(1);
-				for (int i = 0; i < TEST_LOOP; ++i)
+				for (int i = 0; i < testLoop; ++i)
 					job.run();
 			} catch (Throwable e) {
 				error = e;

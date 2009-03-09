@@ -1,0 +1,50 @@
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
+    version="2.4">
+
+	<description>test web application used by BehaviorTrackingFilterTest</description>
+
+	<!-- test spring context initialization.  this context includes the necessary configuration for behavior tracking. -->
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>
+			classpath:com/mtgi/analytics/aop/PerformanceTest-basis.xml,
+			classpath:com/mtgi/analytics/aop/PerformanceTest-tracking.xml
+		</param-value>
+	</context-param>
+	
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+
+	<!-- a trivial servlet that helps us verify behavior tracking of http requests -->	
+	<servlet>
+		<servlet-name>test</servlet-name>
+		<servlet-class>com.mtgi.analytics.servlet.PerformanceTest$TestServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<!-- two path mappings, one that is tracked, and one that isn't, so that we can compare performance -->
+	<servlet-mapping>
+		<servlet-name>test</servlet-name>
+		<url-pattern>/test/*</url-pattern>
+	</servlet-mapping>
+	
+	<servlet-mapping>
+		<servlet-name>test</servlet-name>
+		<url-pattern>/basis/*</url-pattern>
+	</servlet-mapping>
+	
+	<filter>
+		<description>Logs HTTP requests as Behavior Tracking events.</description>
+		<filter-name>tracking</filter-name>
+		<filter-class>com.mtgi.analytics.servlet.BehaviorTrackingFilter</filter-class>
+	</filter>
+	
+	<filter-mapping>
+		<filter-name>tracking</filter-name>
+		<url-pattern>/test/*</url-pattern>
+	</filter-mapping>
+	
+</web-app>
