@@ -77,8 +77,7 @@ public class BehaviorTrackingDataSource extends DelegatingDataSource {
 		 * Standard implementation of equals / hashCode for proxy handlers.  Returns a non-null result if
 		 * <code>method</code> is an identity check that can be handled here; null otherwise.
 		 */
-		protected final Object invokeIdentity(Object proxy, Method method, Object[] args) throws Throwable {
-			String op = method.getName();
+		protected final Object invokeIdentity(Object proxy, String op, Object[] args) throws Throwable {
 			if (op.equals("equals")) {
 				return (proxy == args[0] ? Boolean.TRUE : Boolean.FALSE);
 			} else if (op.equals("hashCode")) {
@@ -124,12 +123,7 @@ public class BehaviorTrackingDataSource extends DelegatingDataSource {
 			return suspended;
 		}
 
-		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-			//equals & hashCode handling.
-			Object stub = invokeIdentity(proxy, method, args);
-			if (stub != null)
-				return stub;
-			
+		public final Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 			//handle ConnectionProxy.getTargetConnection() for use by Spring.
 			String op = method.getName();
 			Class<?> deClass = method.getDeclaringClass();
@@ -147,6 +141,11 @@ public class BehaviorTrackingDataSource extends DelegatingDataSource {
 				return null;
 			}
 
+			//equals & hashCode handling.
+			Object stub = invokeIdentity(proxy, op, args);
+			if (stub != null)
+				return stub;
+			
 			//all other calls are delegated to the target connection.
 			Object ret = invokeTarget(method, args);
 
@@ -198,18 +197,30 @@ public class BehaviorTrackingDataSource extends DelegatingDataSource {
 		 * {@link #addBatch(EventDataElement, Object[])}, {@link #addExecuteParameters(BehaviorEvent, Object[])},
 		 * and {@link #addOperationData(String, Object[])}.
 		 */
-		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-			Object stub = invokeIdentity(proxy, method, args);
+		public final Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+			String op = method.getName();
+			Object stub = invokeIdentity(proxy, op, args);
 			if (stub != null)
 				return stub;
 			
 			//only bother with the event if tracking is enabled on the parent connection
 			if (!parent.isSuspended()) {
 				
-				String op = method.getName();
 				if (op.startsWith("execute")) {
+
+					BehaviorEvent event = createEvent(op);
+					if (op.endsWith("Batch")) {
+						//consolidate batch call execution data into root data element.
+						if (batch != null) {
+							event.addData().addElement(batch);
+							batch = null;
+						}
+					} else {
+						addExecuteParameters(event, args);
+					}
+					
 					//query or batch is being executed -- start the event timer.
-					BehaviorEvent event = start(op, args);
+					trackingManager.start(event);
 					try {
 						return invokeTarget(method, args);
 					} catch (Throwable t) {
@@ -239,28 +250,6 @@ public class BehaviorTrackingDataSource extends DelegatingDataSource {
 		 * various setXX() calls.  Default behavior does nothing.
 		 */
 		protected void addOperationData(String op, Object[] args) {
-		}
-		
-		/** 
-		 * Create and start a tracking event, corresponding to an executeXX() method call on
-		 * a statement object.
-		 * @param name the name of the execute method (e.g. execute, executeUpdate, executeBatch, etc).  {@link #createEvent(String)} will be called with this argument.
-		 * @param args the arguments passed to the execute method.  {@link #addExecuteParameters(BehaviorEvent, Object[])} will be called for non-batch executions.
-		 */
-		private BehaviorEvent start(String name, Object[] args) {
-			BehaviorEvent event = createEvent(name);
-			if (name.endsWith("Batch")) {
-				//consolidate batch call execution data into root data element.
-				if (batch != null) {
-					event.addData().addElement(batch);
-					batch = null;
-				}
-			} else {
-				addExecuteParameters(event, args);
-			}
-
-			trackingManager.start(event);
-			return event;
 		}
 		
 		/**
