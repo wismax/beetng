@@ -50,6 +50,23 @@ public class EventDataElementSerializerTest {
 	}
 	
 	@Test
+	public void testDuplicateProperties() throws SAXException, IOException {
+		//test overriding of prior property values.
+		EventDataElement root = new EventDataElement("event-data");
+		root.add("foo", new Double(1.5));
+		root.add("---bar-7", "hello");
+		root.add("baz", null);
+		root.add("qux 8", "world&escaped\nmaybe?"); //newline value should be normalized.
+		root.add("foo", new Double(2.7));
+		root.add("baz", "updated");
+		root.add("baz", null);
+		root.add("foo", new Double(4.7));
+		assertXMLIdentical(new Diff("<?xml version='1.0'?><event-data foo=\"4.7\" bar-7=\"hello\" qux-8=\"world&amp;escaped maybe?\"></event-data>", 
+									serializer.serialize(root, true)), 
+						   true);
+	}
+	
+	@Test
 	public void testMixed() throws SAXException, IOException {
 		//test a complex case mixing text, properties, and nested elements.
 		EventDataElement root = new EventDataElement("-0&9!@#$#$!!$");

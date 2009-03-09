@@ -3,8 +3,8 @@ package com.mtgi.analytics;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
@@ -13,21 +13,21 @@ import java.util.NoSuchElementException;
  * 
  * @see BehaviorEvent#getData()
  */
-public class EventDataElement implements Serializable {
+public class EventDataElement extends DataLink<EventDataElement> implements Serializable {
 
 	private static final long serialVersionUID = -7479072851562747744L;
 	
 	private String name;
 	private String text;
 
-	private LinkedHashMap<String,Object> properties;
-
 	//simple linked-list structure for child data elements, which has proven
 	//faster than java collections in hitting our performance test targets
-	private EventDataElement firstChild = ListHead.INSTANCE;
-	private EventDataElement lastChild = ListHead.INSTANCE;
-	
-	private EventDataElement nextSibling;
+	private EventDataElement firstChild = ChildListHead.INSTANCE;
+	private EventDataElement lastChild = ChildListHead.INSTANCE;
+
+	//a flat linked list for properties.
+	private Property firstProperty = PropertyListHead.INSTANCE;
+	private Property lastProperty = PropertyListHead.INSTANCE;
 	
 	public EventDataElement(String name) {
 		this.name = name;
@@ -52,12 +52,14 @@ public class EventDataElement implements Serializable {
 	}
 	
 	/**
-	 * Set a named attribute on this element.  Values may be null.
+	 * Set a named attribute on this element.  Values may be null.  Calling
+	 * this method multiple times with the same name will result in previous values
+	 * being overwritten.
 	 */
 	public void add(String name, Object value) {
-		if (properties == null)
-			properties = new LinkedHashMap<String,Object>();
-		properties.put(name, value);
+		//just append for speed -- we compact to a unique set of names
+		//when iterateProperties() is called.
+		lastProperty.setNext(this, new Property(name, value));
 	}
 
 	/**
@@ -75,7 +77,7 @@ public class EventDataElement implements Serializable {
 
 	/** @return true if this element has no child properties or child elements */
 	public boolean isEmpty() {
-		return text == null && properties == null && firstChild == ListHead.INSTANCE;
+		return text == null && firstProperty == PropertyListHead.INSTANCE && firstChild == ChildListHead.INSTANCE;
 	}
 	
 	/** @return true if this element is effectively null (should not be rendered in serialized output) */
@@ -83,19 +85,26 @@ public class EventDataElement implements Serializable {
 		return false;
 	}
 	
-	public Iterator<Map.Entry<String,Object>> iterateProperties() {
-		return properties == null ? Collections.<Map.Entry<String,Object>>emptySet().iterator()
-								  : properties.entrySet().iterator();
+	/** iterate all properties previously added with {@link #add(String, Object)} */
+	public Iterator<? extends Map.Entry<String,Object>> iterateProperties() {
+		return firstProperty.compact().iterate();
 	}
-	
+
+	/** 
+	 * iterate all child elements of this event data element previously added with
+	 * {@link #addElement(EventDataElement)} or {@link #addElement(String)} 
+	 */
 	public Iterator<EventDataElement> iterateChildren() {
-		return firstChild == ListHead.INSTANCE ? Collections.<EventDataElement>emptyList().iterator() 
-											   : new ChildIterator();
+		return firstChild.iterate();
 	}
 	
 	/** set the next sibling in the linked list of children under <code>parent</code>. */
 	protected void setNext(EventDataElement parent, EventDataElement next) {
-		parent.lastChild = this.nextSibling = next;
+		parent.lastChild = this.next = next;
+	}
+	/** iterate the list of sibling event data elements starting at this element */
+	protected Iterator<EventDataElement> iterate() {
+		return new DataLinkIterator<EventDataElement>(this);
 	}
 	
 	/**
@@ -108,19 +117,141 @@ public class EventDataElement implements Serializable {
 		return this;
 	}
 	
-	private class ChildIterator implements Iterator<EventDataElement> {
+	private static class ChildListHead extends ImmutableEventDataElement {
+		
+		private static final long serialVersionUID = 1511666816688289823L;
+		
+		static final ChildListHead INSTANCE = new ChildListHead();
+		
+		private ChildListHead() {
+			super("");
+		}
+		
+		@Override
+		protected void setNext(EventDataElement parent, EventDataElement next) {
+			//replace head/tail reference on parent with the provided real data element.
+			parent.firstChild = parent.lastChild = next;
+		}
+		
+		@Override
+		public Iterator<EventDataElement> iterate() {
+			return Collections.<EventDataElement>emptyList().iterator();
+		}
+		
+		private Object readResolve() throws ObjectStreamException {
+			return ChildListHead.INSTANCE;
+		}
+	}
 
-		private EventDataElement current = firstChild;
+	private static class PropertyListHead extends Property {
+		
+		public static final Property INSTANCE = new PropertyListHead();
+
+		private PropertyListHead() {
+			super(null, null);
+		}
+
+		@Override
+		protected void setNext(EventDataElement parent, Property next) {
+			//replace head / tail elements on parent with the provided link.
+			parent.firstProperty = parent.lastProperty = next;
+		}
+
+		@Override
+		protected Iterator<Property> iterate() {
+			return Collections.<Property>emptyList().iterator();
+		}
+		
+		@Override
+		protected Property compact() {
+			return this;
+		}
+	}
+	
+	private static class Property extends DataLink<Property> 
+		implements Map.Entry<String, Object> 
+	{
+		private String key;
+		private Object value;
+
+		protected Property(String key, Object value) {
+			this.key = key;
+			this.value = value;
+		}
+		
+		protected void setNext(EventDataElement parent, Property next) {
+			parent.lastProperty = this.next = next;
+		}
+		
+		public String getKey() {
+			return key;
+		}
+
+		public Object getValue() {
+			return value;
+		}
+
+		public Object setValue(Object value) {
+			Object ret = this.value;
+			this.value = value;
+			return ret;
+		}
+
+		protected Iterator<Property> iterate() {
+			return new DataLinkIterator<Property>(this);
+		}
+		
+		/**
+		 * Eliminate any duplicate keys from the linked list starting at this
+		 * link, returning a reference to the head of the compacted list
+		 * for convenient chaining of method calls.
+		 */
+		protected Property compact() {
+			HashMap<String,Property> uniq = new HashMap<String,Property>();
+			for (Property link = this, prev = null; 
+				 link != null; 
+				 prev = link, link = link.next) {
+				Property prior = uniq.get(link.key);
+				if (prior == null)
+					uniq.put(link.key, this);
+				else {
+					//previous link with same key; overwrite the
+					//value in the older entry and delete this link.
+					prior.value = link.value;
+					prev.next = link.next;
+					link = prev;
+				}
+			}
+			return this;
+		}
+	}
+}
+
+/**
+ * base class for a singly-linked list, with an iterator implementation.  provided
+ * for a measurable performance improvement over standard java collections.
+ */
+class DataLink<T extends DataLink<T>> {
+	
+	protected T next;
+	
+	static class DataLinkIterator<T extends DataLink<T>> implements Iterator<T> {
+
+		private T current;
+		
+		protected DataLinkIterator(T head) {
+			this.current = head;
+		}
 		
 		public boolean hasNext() {
 			return current != null;
 		}
 
-		public EventDataElement next() {
+		public T next() {
 			if (current == null)
 				throw new NoSuchElementException();
-			EventDataElement ret = current;
-			current = ret.nextSibling;
+			T ret = current;
+			current = ret.next;
 			return ret;
 		}
 
@@ -130,22 +261,4 @@ public class EventDataElement implements Serializable {
 		
 	}
 	
-	private static class ListHead extends ImmutableEventDataElement {
-		
-		private static final long serialVersionUID = 1511666816688289823L;
-		
-		static final ListHead INSTANCE = new ListHead();
-		
-		private ListHead() {
-			super("");
-		}
-		@Override
-		protected void setNext(EventDataElement parent, EventDataElement next) {
-			parent.firstChild = parent.lastChild = next;
-		}
-		
-		private Object readResolve() throws ObjectStreamException {
-			return ListHead.INSTANCE;
-		}
-	}
 }

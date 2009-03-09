@@ -59,7 +59,7 @@ public class BehaviorTrackingAdvice implements MethodInterceptor {
 		//out parameter names here.
 		EventDataElement data = event.addData();
 		EventDataElement parameters = data.addElement("parameters");
-		Class[] sig = m.getParameterTypes();
+		Class<?>[] sig = m.getParameterTypes();
 		Object[] args = invocation.getArguments();
 		
 		for (int i = 0; i < sig.length; ++i) {
@@ -86,12 +86,12 @@ public class BehaviorTrackingAdvice implements MethodInterceptor {
 	 * represented as "[qualified.type.name]" to avoid invoking
 	 * costly (or buggy) toString() methods.
 	 */
-	private static final void logValue(EventDataElement parent, String elementName, Class expectedType, Object arg) {
+	private static final void logValue(EventDataElement parent, String elementName, Class<?> expectedType, Object arg) {
 		EventDataElement element = parent.addElement(elementName);
 		if (arg == null)
 			return;
 		
-		Class type = arg.getClass();
+		Class<?> type = arg.getClass();
 		//log the concrete type of the argument if it differs from the expected type (i.e. is a subclass)
 		//the primitive type checks avoid logging redundant type info for autoboxed values
 		if (type != expectedType && !(expectedType.isPrimitive() || type.isPrimitive()))
@@ -125,7 +125,7 @@ public class BehaviorTrackingAdvice implements MethodInterceptor {
 		return ret.toString();
 	}
 	
-	private static final boolean shouldLog(Class type) {
+	private static final boolean shouldLog(Class<?> type) {
 		return (type.isPrimitive()) || type.isEnum() || type.getName().startsWith("java.lang");
 	}
 	

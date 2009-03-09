@@ -82,7 +82,7 @@ public class EventDataElementSerializer {
 				writer.writeStartElement(name);
 	
 				//add attributes for properties.
-				Iterator<Entry<String,Object>> props = element.iterateProperties();
+				Iterator<? extends Entry<String,Object>> props = element.iterateProperties();
 				while (props.hasNext()) {
 					Entry<String,Object> prop = props.next();
 					Object value = prop.getValue();
