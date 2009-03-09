@@ -137,11 +137,45 @@ public class BehaviorEventTest {
 	@Test
 	public void testEventDataElement() {
 		BehaviorEvent event = new BehaviorEvent(null, "application", "hello.world", "test", "me", "1");
-		assertNull("no event data yet created", event.getData());
 		
+		EventDataElement element = event.getData();
+		assertNotNull("data element not null", element);
+		assertTrue("no event data yet created", element.isNull());
+		assertSame("getData always returns same element", element, event.getData());
+		
+		//starting data element should be immutable.
+		try {
+			element.add("foo", "bar");
+			fail("starting data element should be shared, immutable instance");
+		} catch (UnsupportedOperationException expected) {}
+		
+		try {
+			element.addElement("test");
+			fail("starting data element should be shared, immutable instance");
+		} catch (UnsupportedOperationException expected) {}
+		
+		try {
+			element.addElement(new EventDataElement("child"));
+			fail("starting data element should be shared, immutable instance");
+		} catch (UnsupportedOperationException expected) {}
+		
+		try {
+			element.setText("fail");
+			fail("starting data element should be shared, immutable instance");
+		} catch (UnsupportedOperationException expected) {}
+
+		try {
+			element.setNext(element, new EventDataElement("foo"));
+			fail("starting data element should be shared, immutable instance");
+		} catch (UnsupportedOperationException expected) {}
+
+		//add data should lazily initialize a mutable data element.
 		EventDataElement data = event.addData();
 		assertNotNull("event data element created", data);
+		assertNotSame("new event data element returned", data, element);
 		assertEquals("data has correct name", "event-data", data.getName());
+		assertTrue("new data is empty", data.isEmpty());
+		assertFalse("new data is not null", data.isNull());
 		assertFalse("no children", data.iterateChildren().hasNext());
 		assertFalse("no properties", data.iterateProperties().hasNext());
 

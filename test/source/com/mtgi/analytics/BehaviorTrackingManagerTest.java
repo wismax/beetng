@@ -56,8 +56,8 @@ public class BehaviorTrackingManagerTest extends JdbcEventTestCase {
 		assertEquals("testEvent", event.getName());
 		assertEquals("foodaddy", event.getUserId());
 		assertEquals("anklebone", event.getSessionId());
+		assertTrue(event.getData().isNull());
 		assertNull(event.getParent());
-		assertNull(event.getData());
 		assertNull(event.getError());
 		assertNull(event.getStart());
 		assertNull(event.getDuration());
@@ -77,7 +77,7 @@ public class BehaviorTrackingManagerTest extends JdbcEventTestCase {
 		assertEquals("foodaddy", child.getUserId());
 		assertEquals("anklebone", child.getSessionId());
 		assertSame(event, child.getParent());
-		assertNull(child.getData());
+		assertTrue(child.getData().isNull());
 		assertNull(child.getError());
 		assertNull(child.getStart());
 		assertNull(child.getDuration());
@@ -114,7 +114,7 @@ public class BehaviorTrackingManagerTest extends JdbcEventTestCase {
 		assertEquals("foodaddy", child2.getUserId());
 		assertEquals("anklebone", child2.getSessionId());
 		assertSame("event stack has popped back up to root", event, child2.getParent());
-		assertNull(child2.getData());
+		assertTrue(child2.getData().isNull());
 		assertNull(child2.getError());
 		assertNull(child2.getStart());
 		assertNull(child2.getDuration());
@@ -163,7 +163,7 @@ public class BehaviorTrackingManagerTest extends JdbcEventTestCase {
 		assertEquals("testUser", event.getUserId());
 		assertEquals(request.getSession().getId(), event.getSessionId());
 		assertNull(event.getParent());
-		assertNull(event.getData());
+		assertTrue(event.getData().isNull());
 		assertNull(event.getError());
 		assertNull(event.getStart());
 		assertNull(event.getDuration());

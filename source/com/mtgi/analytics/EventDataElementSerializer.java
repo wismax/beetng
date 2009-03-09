@@ -31,7 +31,7 @@ public class EventDataElementSerializer {
 	 * @return the XML serialization, or null if <code>data</code> is null.
 	 */
 	public String serialize(EventDataElement data, boolean includeProlog) {
-		if (data == null)
+		if (data == null || data.isNull())
 			return null;
 		
 		try {
@@ -66,41 +66,43 @@ public class EventDataElementSerializer {
 	 */
 	protected void serializeElement(XMLStreamWriter writer, EventDataElement element) throws XMLStreamException {
 
-		//create a new node for the element and append it to the parent.
-		String name = getXMLElementName(element.getName());
-		
-		if (element.isEmpty()) {
-			writer.writeEmptyElement(name);
-			//TODO: remove when stax bug is fixed.
-			//this is a workaround for a bug in the 1.2 StAX implementation, where
-			//if the only element in your document is empty, the closing "/>" never gets written.
-			//any other API call fixes the problem, so here we do a no-op string append to force
-			//the element closed.
-			writer.writeCharacters(DUMMY_TEXT, 0, 0);
-		} else {
-			writer.writeStartElement(name);
-
-			//add attributes for properties.
-			Iterator<Entry<String,Object>> props = element.iterateProperties();
-			while (props.hasNext()) {
-				Entry<String,Object> prop = props.next();
-				Object value = prop.getValue();
-				if (value != null) {
-					String propName = getXMLElementName(prop.getKey());
-					writer.writeAttribute(propName, value.toString());
-				}
-			}
-
-			//add text to the element if applicable.
-			String text = element.getText();
-			if (text != null)
-				writer.writeCharacters(text);
+		if (!element.isNull()) {
+			//create a new node for the element and append it to the parent.
+			String name = getXMLElementName(element.getName());
 			
-			//add child elements for children.
-			Iterator<EventDataElement> children = element.iterateChildren();
-			while (children.hasNext())
-				serializeElement(writer, children.next());
-			writer.writeEndElement();
+			if (element.isEmpty()) {
+				writer.writeEmptyElement(name);
+				//TODO: remove when stax bug is fixed.
+				//this is a workaround for a bug in the 1.2 StAX implementation, where
+				//if the only element in your document is empty, the closing "/>" never gets written.
+				//any other API call fixes the problem, so here we do a no-op string append to force
+				//the element closed.
+				writer.writeCharacters(DUMMY_TEXT, 0, 0);
+			} else {
+				writer.writeStartElement(name);
+	
+				//add attributes for properties.
+				Iterator<Entry<String,Object>> props = element.iterateProperties();
+				while (props.hasNext()) {
+					Entry<String,Object> prop = props.next();
+					Object value = prop.getValue();
+					if (value != null) {
+						String propName = getXMLElementName(prop.getKey());
+						writer.writeAttribute(propName, value.toString());
+					}
+				}
+	
+				//add text to the element if applicable.
+				String text = element.getText();
+				if (text != null)
+					writer.writeCharacters(text);
+				
+				//add child elements for children.
+				Iterator<EventDataElement> children = element.iterateChildren();
+				while (children.hasNext())
+					serializeElement(writer, children.next());
+				writer.writeEndElement();
+			}
 		}
 	}
 	

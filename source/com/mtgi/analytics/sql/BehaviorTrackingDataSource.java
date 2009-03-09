@@ -25,7 +25,7 @@ import com.mtgi.analytics.EventDataElement;
  */
 public class BehaviorTrackingDataSource extends DelegatingDataSource {
 
-	private static Class[] PROXY_TYPE = { BehaviorTrackingConnectionProxy.class };
+	private static Class<?>[] PROXY_TYPE = { BehaviorTrackingConnectionProxy.class };
 	
 	private String eventType = "jdbc";
 	private BehaviorTrackingManager trackingManager;
@@ -134,7 +134,7 @@ public class BehaviorTrackingDataSource extends DelegatingDataSource {
 			
 			//handle ConnectionProxy.getTargetConnection() for use by Spring.
 			String op = method.getName();
-			Class deClass = method.getDeclaringClass();
+			Class<?> deClass = method.getDeclaringClass();
 			if (ConnectionProxy.class == deClass && "getTargetConnection".equals(op))
 				return target;
 			
@@ -153,7 +153,7 @@ public class BehaviorTrackingDataSource extends DelegatingDataSource {
 			Object ret = invokeTarget(method, args);
 
 			//if the return value is a statement, wrap the statement for behavior tracking.
-			Class type = method.getReturnType();
+			Class<?> type = method.getReturnType();
 			if (Statement.class.isAssignableFrom(type)) {
 				//for prepared statement, the SQL is provided when the statement is created.
 				//for other statements we get the exact SQL when the statement is executed.

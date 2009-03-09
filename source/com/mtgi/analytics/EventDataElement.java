@@ -72,9 +72,15 @@ public class EventDataElement implements Serializable {
 	public void addElement(EventDataElement child) {
 		lastChild.setNext(this, child);
 	}
-	
+
+	/** @return true if this element has no child properties or child elements */
 	public boolean isEmpty() {
 		return text == null && properties == null && firstChild == ListHead.INSTANCE;
+	}
+	
+	/** @return true if this element is effectively null (should not be rendered in serialized output) */
+	public boolean isNull() {
+		return false;
 	}
 	
 	public Iterator<Map.Entry<String,Object>> iterateProperties() {
@@ -94,10 +100,11 @@ public class EventDataElement implements Serializable {
 	
 	/**
 	 * Return a concrete, fully-realized instance of this data, performing any deferred initialization
-	 * of internal data structures.  This implementation simply returns "this".
+	 * of internal data structures.  This will likely be called many times for complex events, so it should
+	 * return quickly.  This implementation simply returns "this".
 	 * @param event the parent event
 	 */
-	protected EventDataElement dereference(BehaviorEvent event) {
+	protected EventDataElement initialize(BehaviorEvent event) {
 		return this;
 	}
 	
@@ -123,7 +130,7 @@ public class EventDataElement implements Serializable {
 		
 	}
 	
-	private static class ListHead extends EventDataElement {
+	private static class ListHead extends ImmutableEventDataElement {
 		
 		private static final long serialVersionUID = 1511666816688289823L;
 		

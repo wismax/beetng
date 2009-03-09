@@ -204,7 +204,7 @@ public class BehaviorEvent implements Serializable {
 	 * @return A container for event data.  Calling this method more than once always returns the same instance.
 	 */
 	public EventDataElement addData() {
-		return data.dereference(this);
+		return data.initialize(this);
 	}
 
 	@Override
@@ -232,7 +232,7 @@ public class BehaviorEvent implements Serializable {
 	 * to {@link #dereference(BehaviorEvent)}.  This somewhat arcane construction is an optimization
 	 * for calls to {@link #addData}, so that they do not require a null check.
 	 */
-	private static class DeferredDataElement extends EventDataElement {
+	private static class DeferredDataElement extends ImmutableEventDataElement {
 		private static final long serialVersionUID = -4571142241188203441L;
 		private static final DeferredDataElement INSTANCE = new DeferredDataElement();
 		private DeferredDataElement() {
@@ -240,12 +240,12 @@ public class BehaviorEvent implements Serializable {
 		}
 		
 		@Override
-		public boolean isEmpty() {
+		public boolean isNull() {
 			return true;
 		}
 
 		@Override
-		protected EventDataElement dereference(BehaviorEvent event) {
+		protected EventDataElement initialize(BehaviorEvent event) {
 			return event.data = new EventDataElement("event-data");
 		}
 	}
