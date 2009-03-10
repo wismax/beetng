@@ -22,5 +22,7 @@ SELECT SEQ_BEHAVIOR_TRACKING_SUMMARY.NEXTVAL, SYSDATE, evt.*
         WHERE event.summarized IS NULL
         GROUP BY event_name, event_type
     ) evt;
- UPDATE BEHAVIOR_TRACKING_EVENT SET summarized='Y';
+ UPDATE BEHAVIOR_TRACKING_EVENT SET summarized='Y' WHERE summarized IS NULL;
  COMMIT;
+
+ EXIT;
