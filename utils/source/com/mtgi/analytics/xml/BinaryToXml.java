@@ -28,99 +28,13 @@ public class BinaryToXml extends BinaryXmlProcessor {
     
     public void parse(InputStream finf, OutputStream xml) throws Exception {
     	
-    	final XMLStreamWriter writer = XMLOutputFactory.newInstance().createXMLStreamWriter(xml);
+    	XMLStreamWriter writer = XMLOutputFactory.newInstance().createXMLStreamWriter(xml);
     	try {
     		
     		SAXDocumentParser parser = new SAXDocumentParser();
     		parser.setParseFragments(true);
     		parser.setInputStream(finf);
-    		parser.setContentHandler(new ContentHandler() {
-    			
-				public void characters(char[] ch, int start, int length) throws SAXException {
-					try {
-						writer.writeCharacters(ch, start, length);
-					} catch (XMLStreamException e) {
-						throw new SAXException(e);
-					}
-				}
-
-				public void endDocument() {
-					//handled in finally block below.
-				}
-
-				public void endElement(String uri, String localName, String qName) throws SAXException {
-					try {
-						writer.writeEndElement();
-					} catch (XMLStreamException e) {
-						throw new SAXException(e);
-					}
-				}
-
-				public void endPrefixMapping(String prefix) throws SAXException {
-					//TODO: something? FI api doesn't support unbinding prefixes.
-				}
-
-				public void ignorableWhitespace(char[] ch, int start, int length) throws SAXException {
-					try {
-						writer.writeCharacters(ch, start, length);
-					} catch (XMLStreamException e) {
-						throw new SAXException(e);
-					}
-				}
-
-				public void processingInstruction(String target, String data) throws SAXException {
-					try {
-						writer.writeProcessingInstruction(target, data);
-					} catch (XMLStreamException e) {
-						throw new SAXException(e);
-					}
-				}
-
-				public void setDocumentLocator(Locator locator) {}
-				public void skippedEntity(String name)  {}
-
-				public void startDocument() throws SAXException {
-					try {
-						writer.writeStartDocument();
-					} catch (XMLStreamException e) {
-						throw new SAXException(e);
-					}
-				}
-
-				public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException {
-					try {
-						if (!isBlank(uri))
-							writer.writeStartElement(uri, localName);
-						else
-							writer.writeStartElement(localName);
-						
-						if (atts != null)
-							for (int a = 0; a < atts.getLength(); ++a) {
-								String alocal = atts.getLocalName(a);
-								String auri = atts.getURI(a);
-								String avalue = atts.getValue(a);
-								
-								if (!isBlank(auri)) {
-									writer.writeAttribute(auri, alocal, avalue);
-								} else {
-									writer.writeAttribute(alocal, avalue);
-								}
-							}
-					} catch (XMLStreamException e) {
-						throw new SAXException(e);
-					}
-				}
-
-				public void startPrefixMapping(String prefix, String uri) throws SAXException {
-					try {
-						writer.setPrefix(prefix, uri);
-					} catch (XMLStreamException e) {
-						throw new SAXException(e);
-					}
-				}
-				
-    		});
-    		
+    		parser.setContentHandler(new StreamingXmlContentHandler(writer));
     		parser.parse();
     		
     	} finally {
@@ -129,4 +43,98 @@ public class BinaryToXml extends BinaryXmlProcessor {
     		writer.close();
     	}
     }
+    
+	public static class StreamingXmlContentHandler implements ContentHandler {
+
+		private final XMLStreamWriter writer;
+
+		public StreamingXmlContentHandler(XMLStreamWriter writer) {
+			this.writer = writer;
+		}
+
+		public void characters(char[] ch, int start, int length) throws SAXException {
+			try {
+				writer.writeCharacters(ch, start, length);
+			} catch (XMLStreamException e) {
+				throw new SAXException(e);
+			}
+		}
+
+		public void endDocument() {
+			//handled in finally block below.
+		}
+
+		public void endElement(String uri, String localName, String qName) throws SAXException {
+			try {
+				writer.writeEndElement();
+			} catch (XMLStreamException e) {
+				throw new SAXException(e);
+			}
+		}
+
+		public void endPrefixMapping(String prefix) throws SAXException {
+			//TODO: something? FI api doesn't support unbinding prefixes.
+		}
+
+		public void ignorableWhitespace(char[] ch, int start, int length) throws SAXException {
+			try {
+				writer.writeCharacters(ch, start, length);
+			} catch (XMLStreamException e) {
+				throw new SAXException(e);
+			}
+		}
+
+		public void processingInstruction(String target, String data) throws SAXException {
+			try {
+				writer.writeProcessingInstruction(target, data);
+			} catch (XMLStreamException e) {
+				throw new SAXException(e);
+			}
+		}
+
+		public void setDocumentLocator(Locator locator) {}
+
+		public void skippedEntity(String name)  {}
+
+		public void startDocument() throws SAXException {
+			try {
+				writer.writeStartDocument();
+			} catch (XMLStreamException e) {
+				throw new SAXException(e);
+			}
+		}
+
+		public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException {
+			try {
+				if (!isBlank(uri))
+					writer.writeStartElement(uri, localName);
+				else
+					writer.writeStartElement(localName);
+				
+				if (atts != null)
+					for (int a = 0; a < atts.getLength(); ++a) {
+						String alocal = atts.getLocalName(a);
+						String auri = atts.getURI(a);
+						String avalue = atts.getValue(a);
+						
+						if (!isBlank(auri)) {
+							writer.writeAttribute(auri, alocal, avalue);
+						} else {
+							writer.writeAttribute(alocal, avalue);
+						}
+					}
+			} catch (XMLStreamException e) {
+				throw new SAXException(e);
+			}
+		}
+
+		public void startPrefixMapping(String prefix, String uri) throws SAXException {
+			try {
+				writer.setPrefix(prefix, uri);
+			} catch (XMLStreamException e) {
+				throw new SAXException(e);
+			}
+		}
+	}
+
 }

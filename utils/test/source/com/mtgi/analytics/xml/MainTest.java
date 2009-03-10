@@ -34,10 +34,11 @@ public class MainTest {
 	
 	@Test
 	public void testHelpMessages() throws Exception {
-		String[] tools = { "xml", "xslt" };
+		String[] tools = { "xml", "xslt", "csv" };
 		String[] expected = { 
 			"Usage: -tool xml [input] [output]",
-			"Usage: -tool xslt -split [xpath] -xsl [xsl source] [-format text|xml|html] [input] [output]"
+			"Usage: -tool xslt -split [xpath] -xsl [xsl source] [-format text|xml|html] [input] [output]",
+			"Usage: -tool csv [input] [output]"
 		};
 
 		for (int i = 0; i < tools.length; ++i) {
@@ -55,7 +56,7 @@ public class MainTest {
 		assertEquals("Tool returned non-zero status", 1, Main.process(args));
 		System.err.flush();
 		assertEquals("Tool help message displayed", 
-				"Usage: -tool xml|xslt [-help|--help|-?] [tool options]", 
+				"Usage: -tool xml|xslt|csv [-help|--help|-?] [tool options]", 
 				new String(err.toByteArray()).trim());
 	}
 	
@@ -65,7 +66,7 @@ public class MainTest {
 		assertEquals("Tool returned non-zero status", 1, Main.process(args));
 		System.err.flush();
 		assertEquals("Default xml tool help message displayed", 
-				"Usage: -tool xml|xslt [-help|--help|-?] [tool options]", 
+				"Usage: -tool xml|xslt|csv [-help|--help|-?] [tool options]", 
 				new String(err.toByteArray()).trim());
 	}
 }

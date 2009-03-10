@@ -4,11 +4,12 @@ import java.util.LinkedList;
 
 public class Main {
 
-	private static final String HELP_TEXT = "Usage: -tool xml|xslt [-help|--help|-?] [tool options]";
+	private static final String HELP_TEXT = "Usage: -tool xml|xslt|csv [-help|--help|-?] [tool options]";
 	
 	public static enum Tool { 
 		Xml  { protected BinaryXmlProcessor instantiate() { return new BinaryToXml(); }}, 
-		XSLT { protected BinaryXmlProcessor instantiate() { return new BinaryToXSLT(); }};
+		XSLT { protected BinaryXmlProcessor instantiate() { return new BinaryToXSLT(); }},
+		Csv  { protected BinaryXmlProcessor instantiate() { return new BinaryToCSV(); }};
 		protected abstract BinaryXmlProcessor instantiate();
 	};
 

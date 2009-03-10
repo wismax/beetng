@@ -24,6 +24,8 @@
 	
 	<dependencies defaultconfmapping="1.5,1.6,default,compile,test->default">
 
+		<dependency org="mtgi" name="BehaviorTracking" rev="latest.integration" conf="*->base"/>
+
 		<dependency org="saxon" name="saxon" rev="8.8"/>
 		<dependency org="apache" name="xerces" rev="2.8.1"/>
 		<dependency org="sun" name="FastInfoset" rev="1.2.2"/>

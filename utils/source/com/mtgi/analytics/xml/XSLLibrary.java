@@ -11,6 +11,8 @@ import org.apache.xml.serialize.XMLSerializer;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import com.mtgi.csv.CSVUtil;
+
 public class XSLLibrary {
 
 	private static ThreadLocal<Serializer> serializer = new ThreadLocal<Serializer>();
@@ -73,28 +75,8 @@ public class XSLLibrary {
     
     public static String quoteCsv(Object value) throws IOException {
     	String str = serialize(value);
-    	if (str == null)
-    		return "";
-    	StringBuffer escaped = new StringBuffer(2 + str.length());
-    	escaped.append('"');
-    	for (int i = 0; i < str.length(); ++i) {
-    		char c = str.charAt(i);
-    		switch (c) {
-    		case '\n':
-    			//convert \r\n or \n to single \r.
-    			if (i == 0 || str.charAt(i - 1) != '\r')
-    				escaped.append('\r');
-    			break;
-    		case '"':
-    			escaped.append('"'); //stutter quotes
-    		default:
-    			escaped.append(c);
-				break;
-    		}
-    	}
-    	escaped.append('"');
-    	return escaped.toString();
-    }
+		return CSVUtil.quoteCSV(str);
+	}
     
     private static class Serializer {
     	

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 ## function to echo a usage message and exit.
 function usage {
@@ -27,14 +27,10 @@ if [ ! -f $2 ]; then
 fi
 
 if [ -z "$JAVA_HOME" ]; then
-	TRANSFORM_CMD=java
+	JAVA=java
 else
-	TRANSFORM_CMD=$JAVA_HOME/bin/java
+	JAVA=$JAVA_HOME/bin/java
 fi
-
-UNPACK=zcat
-TRANSFORM_ARGS="-jar bt-utils.jar -tool xslt -xsl etl/insert_events.xsl -split event"
-LOAD="sqlldr $1 control=etl/load_event_csv.ctl,data=events.csv"
 
 ##stop the script on error
 #set -e
@@ -42,8 +38,28 @@ LOAD="sqlldr $1 control=etl/load_event_csv.ctl,data=events.csv"
 echo "Loading $2 into behavior tracking database at $1."
 echo "Start: " $(date)
 
-"$UNPACK" "$2" | "$TRANSFORM_CMD" $TRANSFORM_ARGS > events.csv
+# sqlldr doesn't support stdin on windows, so we have to use a temp file in cygwin.
+# on other unices, we push it all through a single process pipeline.
 
-$LOAD 2>load_progress.log
+case "`uname`" in
+CYGWIN*)
+	TEMPFILE=`mktemp --tmpdir=.`
+	zcat "$2" | "$JAVA" -jar bt-utils.jar -tool csv > $TEMPFILE
+	sqlldr $1 control=etl/load_event_csv.ctl,data="$TEMPFILE",silent=FEEDBACK
+	rm $TEMPFILE
+	;;
+
+SunOS*)
+	gzcat "$2" | 
+		"$JAVA" -jar bt-utils.jar -tool csv | 
+		sqlldr $1 control=etl/load_event_csv.ctl,data=-,silent=FEEDBACK
+	;;
+
+*)
+	zcat "$2" | 
+		"$JAVA" -jar bt-utils.jar -tool csv | 
+		sqlldr $1 control=etl/load_event_csv.ctl,data=-,silent=FEEDBACK
+	;;
+esac
 
 echo "End: " $(date)
