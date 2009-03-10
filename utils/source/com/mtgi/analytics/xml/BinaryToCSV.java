@@ -9,6 +9,7 @@ import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.EnumMap;
+import java.util.regex.Pattern;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
@@ -49,6 +50,8 @@ public class BinaryToCSV extends BinaryXmlProcessor {
 	static enum OutputMode {
 		XML, CSV, Skip;
 	}
+	
+	private static final Pattern XML_DATE = Pattern.compile("^(\\d\\d\\d\\d-\\d\\d-\\d\\d)T(\\d\\d:\\d\\d:\\d\\d).+$");
 	
 	public BinaryToCSV() {
 		super(HELP_TEXT);
@@ -136,8 +139,10 @@ public class BinaryToCSV extends BinaryXmlProcessor {
 								
 								CsvField field = CsvField.forElement(localName);
 								if (field != null) {
-									if (field == start) //strip incovenient 'T' char out of XSD date field.
-										str = str.replace('T', ' ');
+									if (field == start) {
+										//strip incovenient 'T' char and extra trailing numbers out of XSD date field.
+										str = XML_DATE.matcher(str).replaceFirst("$1 $2");
+									}
 									row.put(field, str);
 								}
 							}
