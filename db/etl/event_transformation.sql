@@ -1,8 +1,7 @@
 
-INSERT INTO BEHAVIOR_TRACKING_EVENT (event_id_pk, event_id, parent_event_id, event_type, event_name, 
+INSERT INTO BEHAVIOR_TRACKING_EVENT (event_id, parent_event_id, event_type, event_name, 
 	   		event_start, user_id, session_id, application, duration_ms, event_data, error)
-	SELECT SEQ_BEHAVIOR_TRACKING_EVENT.NEXTVAL as event_id_pk, 
-		 extractValue(value(x), '/event/@id') event_id,
+	SELECT extractValue(value(x), '/event/@id') event_id,
 	     extractValue(value(x), '/event/@parent-id') parent_event_id,
 	     extractValue(value(x), '/event/type') event_type, 
 	     extractValue(value(x), '/event/name') event_name,
