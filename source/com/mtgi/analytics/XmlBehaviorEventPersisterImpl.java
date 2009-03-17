@@ -212,9 +212,10 @@ public class XmlBehaviorEventPersisterImpl
 			file = getLogFile(file);
 			
 			//open a new stream, optionally compressed.
-			stream = new BufferedOutputStream(new FileOutputStream(file));
 			if (compress)
-				stream = new GZIPOutputStream(stream);
+				stream = new GZIPOutputStream(new FileOutputStream(file));
+			else
+				stream = new BufferedOutputStream(new FileOutputStream(file));
 			
 			//open a new writer over the stream.
 			if (binary) {
