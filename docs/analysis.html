@@ -1,0 +1,83 @@
+<html>
+<head>
+	<title>MTGI BehaviorTracking 1.x Reference</title>
+	<style lang="text/css">
+		
+		body { margin: 1em; font-size: 12pt;}
+		h1 { margin: 0; padding: 0;}
+		h2 { font-size: 16pt; }
+		h3 { font-size: 14pt; }
+		h4 { font-size: 12pt; }
+		p, table { margin-top: 1em; }
+		td { vertical-align: top; padding: 1ex;}
+		blockquote pre { background-color:#efefef; margin:0;padding:4ex;border:1px solid #999999; font-size: 8pt;}
+		
+	</style>
+</head>
+<body>
+
+<h2>Log Analysis</h2>
+<p>The BehaviorTracking build generates a command-line tool suite for 
+analyzing BehaviorTracking logs.&nbsp; The tool suite can be used to convert binary 
+logs to CSV or XML, apply custom XSL transforms, and perform efficient bulk 
+loads of BehaviorTracking data to an Oracle database.&nbsp; The tools require the 
+following:</p>
+<ul><li>Solaris, Linux, or Cygwin environment 
+</li><li>Local Java 5 or Java 6 SDK installation 
+</li><li>If you plan to use the Oracle ETL scripts, an Oracle 9i or higher client 
+install</li></ul>
+<p>There are two packages, for java 5 and java 6; you only need download the 
+version appropriate to your local SDK install.</p> 
+ 
+After you have unpacked the archive, you can run any of the following utilities 
+from a command prompt within the created <code>BehaviorTracking</code> directory.  All of these 
+instructions assume you are logging in the default format, GZIP-compressed FastInfoSet (i.e. binary XML).<br><h3>Upload to an Oracle Database</h3><ol><li><strong>(first time only)</strong> Run the provided etl/create_etl.sql script to create
+	the required data structures in your target Oracle database.</li>
+	<li>Run the import script:<blockquote><pre>&gt; ./load-event.sh user/pass@sid path/to/log.bxml.gz</pre></blockquote></li>
+	<li>The time required for this process will vary with available system resources, 
+	the size of the log, the speed of your connection to the database, and so on.  Examine the resulting log files
+	<code>load_event_csv.log</code> and (if there were error records) <code>BAD_EVENT_CSV.log</code>. 
+	Typically errors will only occur if you have tried to insert values to large for the target 
+	schema.  If this is the case, you may want to update the schema to accommodate the larger values, 
+	or truncate the bad data (in BAD_EVENT_CSV.log) and attempt the load again.&nbsp; The provided structures are adequate to handle most needs, so errors should be rare.<br></li>
+</ol>
+
+<blockquote><font color="red" size="4"><strong>Important Note for Cygwin Users:</strong></font> 
+ 
+While the script supports Cygwin, an Oracle sqlldr limitation requires the use 
+of <i>very large</i> temporary files in a Cygwin environment.  It is strongly recommended that 
+you execute the upload scripts from a true Unix environment with stronger pipeline support, 
+such as Solaris or Linux.</blockquote>
+
+<p>Use of the provided script is simple, but database administration is up to you. 
+Depending on what you hope to do with your data, you will likely want to customize 
+the ETL process to suit your needs. Therefore familiarity with sqlldr and basic 
+Oracle database administration is assumed here. You should examine the provided 
+scripts and make sure you understand what they do before using the.</p>
+
+<h3>Export to XML</h3>
+You can easily export a binary log to a simple XML format legible to humans or other XML
+processing utilities:
+<blockquote><pre>&gt; zcat path/to/log.bxml.gz | java -jar bt-utils.jar -tool xml &gt; result.xml</pre></blockquote>
+Be careful, though; the default compressed-binary format has a compression ratio
+of around 20:1 compared to its plain-text counterpart, so you can use a lot of disk this way.&nbsp; If you plan to apply an XSL transform to the output document, consider the XSLT mode of the export tool asoutlined below.<br><h3>Export to CSV</h3>
+Similarly, you can export to a CSV file for use in a spreadsheet or older EDI tools:
+<blockquote><pre>&gt; zcat path/to/log.bxml.gz | java -jar bt-utils.jar -tool csv &gt; result.csv</pre></blockquote>
+<p>Again, assume that your CSV data will be quite a bit larger than the compressed-binary data.</p>
+<h3>Export with custom XSL</h3>
+<p>You can certainly use the XML export and stream the result to an XSL transformer.
+However, executing XSL transforms on large XML documents can be extremely resource-intensive
+without specialized tools.  Included with the log analysis package is an analyzer
+that splits a large input document into fragments based on an XPath query, and then
+applies an XSL transform to each fragment.  For transforms that are stateless or only need
+to examine a small part of a document, this is vastly more efficient than loading an entire document to invoke the transform.</p>
+<p>The following example splits the input document into one fragment per 'event' element,
+applying the given XSL transform file to each fragment and streaming the result to standard
+out:</p>
+
+<blockquote><pre>&gt; zcat path/to/log.bxml.gz | java -jar bt-utils.jar -tool xslt -split event-log/event -xsl etl/insert_events.xsl &gt; result.csv</pre></blockquote> 
+ 
+The included file <code>etl/insert_events.xsl</code> provides an example transform document, including some custom XSL functions available to transforms invoked in this way. 
+ 
+</body>
+</html>

@@ -1,0 +1,112 @@
+<html>
+<head>
+	<title>MTGI BehaviorTracking 1.x Reference</title>
+	<style lang="text/css">
+		
+		body { margin: 1em; font-size: 12pt;}
+		h1 { margin: 0; padding: 0;}
+		h2 { font-size: 16pt; }
+		h3 { font-size: 14pt; }
+		h4 { font-size: 12pt; }
+		p, table { margin-top: 1em; }
+		td { vertical-align: top; padding: 1ex;}
+		blockquote pre { background-color:#efefef; margin:0;padding:4ex;border:1px solid #999999; font-size: 8pt;}
+		
+	</style>
+</head>
+<body>
+
+<h1>MTGI BehaviorTracking 1.x Reference</h1>
+
+<p>You are reading reference documentation for the MTGI BehaviorTracking library.  
+BehaviorTracking records application metrics as a user (or programmatic agent) interacts with
+a <a href="http://www.springframework.org">Spring-based</a> application.</p>
+
+<p>No source-level modification is required in the instrumented application; measurement is enabled completely at runtime.    
+Metrics are tied to a specific user and session, and can be  
+collected for servlet requests, Java method calls, and/or SQL statements.  Metrics  
+can be stored in various file formats or directly in a relational database.  The API is  
+extensible to support other persistence mechanisms and metrics gathering at other   
+layers of an application.</p>
+<p><a href="justification.html">Here</a> is a detailed discussion of where BehaviorTracking
+belongs in the broader picture of production monitoring.</p>
+
+<h2>Quick Start Installation</h2> 
+The BehaviorTracking.jar library and dependencies should be included in the target  
+application's library directory, e.g. WEB-INF/lib for web applications.&nbsp;  
+BehaviorTracking is then enabled separately for tracking&nbsp;HTTP&nbsp;requests, Java  
+method calls, and/or SQL queries.&nbsp; Behavior can be fine-tuned in many ways, but 
+the steps for a basic installation at all layers of an existing Spring application are: 
+ 
+<ol>
+<li>Add&nbsp;the library and its dependencies to the application.</li>
+<li>Add behavior tracking markup to your Spring applicationContext.xml file
+(modify values in <strong>bold </strong>to suit your application): 
+<blockquote><pre>&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+          xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+          xmlns:aop=&quot;http://www.springframework.org/schema/aop&quot;
+          xmlns:bt=&quot;http://www.mantis-tgi.com/schema/bt&quot;
+          xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+                              http://www.mantis-tgi.com/schema/bt classpath:com/mtgi/analytics/aop/mtgi-bt-1.0.xsd
+                              http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd&quot;&gt;
+
+   &lt;!-- add support for behavior tracking.  track-method-expression is an AOP expression identifying which methods we want to
+        profile in the behavior tracking logs; leave it out to skip Java method call metris.
+        the optional xml-persister element identifies a custom log location relative 
+        to Tomcat home. --&gt;
+   &lt;bt:config&gt;
+      <b>&lt;bt:manager application=&quot;myapp&quot;
+                  track-method-expression=&quot;execution(* com.mtgi.analytics.aop.config..*Tracked(..))&quot;&gt;
+         &lt;bt:xml-persister file=&quot;${catalina.home}/logs/caspr-perf.bxml&quot;/&gt;
+      &lt;/bt:manager&gt;</b>
+   &lt;/bt:config&gt;</pre></blockquote></li>
+<li><strong>(optional)</strong> To enable tracking for <strong>http requests</strong>, add the behavior 
+tracking servlet filter to web.xml: 
+<blockquote><pre>&lt;!-- enable behavior tracking for servlet requests --&gt;
+&lt;filter&gt;
+   &lt;filter-name&gt;trackingFilter&lt;/filter-name&gt;
+   &lt;filter-class&gt;com.mtgi.analytics.servlet.BehaviorTrackingFilter&lt;/filter-class&gt;
+   &lt;init-param&gt;
+      &lt;!-- request parameters are not logged by default.  to log specific 
+              parameters, list them here --&gt;
+      &lt;param-name&gt;com.mtgi.analytics.parameters.include&lt;/param-name&gt;
+      &lt;param-value&gt;dispatch&lt;/param-value&gt;
+   &lt;/init-param&gt;
+&lt;/filter&gt;
+&lt;filter-mapping&gt;
+   &lt;filter-name&gt;trackingFilter&lt;/filter-name&gt;
+   &lt;servlet-name&gt;action&lt;/servlet-name&gt;
+   &lt;dispatcher&gt;REQUEST&lt;/dispatcher&gt;
+&lt;/filter-mapping&gt;</pre></blockquote></li>
+<li><strong>(optional)</strong> To enable behavior tracking at the <strong>SQL</strong> level, add a custom attribute to the data  
+source declaration&nbsp;in your spring configuration:  
+<blockquote><pre>&lt;bean id=&quot;myDataSource&quot; class=&quot;...&quot; 
+      <strong>bt:tracking-manager=&quot;defaultTrackingManager&quot;</strong>&gt; 
+ 
+   ... normal datasource configuration ... 
+ 
+&lt;/bean&gt;</pre></blockquote></li></ol>
+
+<h2>Log Analysis</h2>
+<p>Once you've installed the library and are generating performance logs, 
+there are a variety of tools available for getting at that data.  Get started on
+the <a href="analysis.html">Log Analysis</a> page.</p>
+<h2>API Documentation</h2> 
+You only need to refer to the API documentation if you plan to write new persisters, application-specific modules, or log analysis utilities. 
+For most applications the provided tools should be adequate. 
+<table border="2">
+	<tr>
+		<td><a target="bt_api" href="api/index.html"><b>Core</b></a>
+		<td>BehaviorTracking core interfaces and utility classes.  
+		This library is packaged as <code>BehaviorTracking-[version].jar</code>.  This package contains interfaces
+		you must implement for custom persistence mechanisms and user identity providers.</td>
+	</tr>
+	<tr>
+		<td><a target="bt_api" href="../utils/docs/api/index.html"><b>Log Analysis Utilities</b></a></td>
+		<td>is a library useful for manipulating common behavior tracking log formats.  These
+		tools are primarily intended for command line use, but can be programmatically extended
+		to support custom data loaders.</td>
+	</tr>
+</table>
+</body>
+</html>
