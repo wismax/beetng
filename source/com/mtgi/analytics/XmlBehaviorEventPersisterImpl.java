@@ -198,6 +198,9 @@ public class XmlBehaviorEventPersisterImpl
 			//flush current writer and close streams.
 			closeWriter();
 			
+			//update output file name based on current settings.
+			file = getLogFile(file);
+			
 			//archive existing contents
 			if (file.exists()) {
 				File archive = getArchiveFile();
@@ -208,9 +211,6 @@ public class XmlBehaviorEventPersisterImpl
 				msg.append("No existing log data.");
 			}
 
-			//update output file name based on current settings.
-			file = getLogFile(file);
-			
 			//open a new stream, optionally compressed.
 			if (compress)
 				stream = new GZIPOutputStream(new FileOutputStream(file));
