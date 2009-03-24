@@ -1,0 +1,26 @@
+<chapter>
+	<title>Programmer Reference</title>
+	<para>You only need to refer to the API documentation if you plan to write new persisters, application-specific modules, or log analysis utilities. 
+	For most applications the provided tools should be adequate.</para>
+	<table>
+		<title>API Modules</title>
+		<tgroup cols="2">
+			<tbody>
+				<row>
+					<entry><ulink url="../../api/index.html">Core</ulink></entry>
+					<entry>BehaviorTracking core interfaces and utility classes.  
+					This library is packaged as <literal>BehaviorTracking-[version].jar</literal>.
+					This package contains interfaces you must implement for custom persistence 
+					mechanisms and user identity providers.</entry>
+				</row>
+				<row>
+					<entry><ulink url="../../../utils/docs/api/index.html">Log Analysis Utilities</ulink></entry>
+					<entry>is a library useful for manipulating common behavior tracking log formats.  These
+					tools are primarily intended for command line use, but can be programmatically extended
+					to support custom data loaders.</entry>
+				</row>
+			</tbody>
+		</tgroup>
+	</table>
+	
+</chapter>

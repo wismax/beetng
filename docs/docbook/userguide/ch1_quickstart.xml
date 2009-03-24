@@ -1,0 +1,214 @@
+<chapter id="chapter_getting_started">
+	<title>Quick Start</title>
+	<section>
+		<title>Overview</title>
+		<para>You are reading reference documentation for the MTGI BehaviorTracking library.  
+		BehaviorTracking records application metrics as a user (or programmatic agent) interacts with
+		a <ulink url="http://www.springframework.org">Spring-based</ulink> 
+		application.</para>
+		
+		<para>No source-level modification is required in the instrumented application; measurement 
+		is enabled completely at runtime. Metrics are tied to a specific user and session, and can be  
+		collected for servlet requests, Java method calls, and/or SQL statements.  Metrics  
+		can be stored in various file formats or directly in a relational database.  The API is  
+		extensible to support other persistence mechanisms and metrics gathering at other   
+		layers of an application.</para>
+		
+		<para><xref linkend="chapter_justification"/> contains a more detailed discussion of where 
+		BehaviorTracking belongs in the broader picture of production monitoring.</para>
+	</section>
+	<section>
+		<title>Simplified Installation</title> 
+		<para>The BehaviorTracking.jar library and dependencies should be included in the target  
+		application's library directory, e.g. <literal>WEB-INF/lib</literal> for web applications.  
+		BehaviorTracking is then enabled separately for tracking HTTP requests, Java  
+		method calls, and/or SQL queries. Behavior can be fine-tuned in many ways, but 
+		the steps for a basic installation at all layers of an existing Spring application are:
+
+		<orderedlist>
+			<listitem><para>Add the library and its dependencies to the application.</para></listitem>
+			<listitem>
+				<para>Add behavior tracking markup to your Spring applicationContext.xml file
+				(modify values to suit your application): 
+				<example>
+					<title>Adding method call tracking to applicationContext.xml</title>
+					<programlisting><![CDATA[<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:bt="http://www.mantis-tgi.com/schema/bt/1.1"
+       xsi:schemaLocation="
+          http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+          http://www.mantis-tgi.com/schema/bt         http://www.mantis-tgi.com/schema/bt/mtgi-bt-1.1.xsd
+          http://www.springframework.org/schema/aop   http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
+
+   <!-- 
+        enable behavior tracking.  track-method-expression is an AOP 
+        expression identifying which methods we want to profile in the behavior
+        tracking logs; leave it out to skip Java method call metrics.
+   -->
+   <bt:config>
+      <bt:manager application="myapp"]]><co id="appname"/><![CDATA[
+                  track-method-expression="execution(* com.mtgi.analytics..*Tracked(..))"/>]]><co id="pattern"/><![CDATA[
+   </bt:config>]]></programlisting>
+					<calloutlist>
+						<callout arearefs="appname"><para>The name of this application, as it will
+						appear in behavior tracking logs.</para></callout>
+						<callout arearefs="pattern"><para>An AspectJ pointcut expression identifying which
+						methods you want to track in your application.  This example identifies "all methods
+						in the com.mtgi.analytics package with names ending in "Tracked".  For a detailed 
+						description of this grammar, see the 
+						<ulink url="http://www.eclipse.org/aspectj/doc/released/progguide/semantics-pointcuts.html">AspectJ programming guide</ulink>.</para>
+						</callout>
+					</calloutlist>
+				</example>
+				</para>
+			</listitem>
+			<listitem>
+				<para><emphasis role="bold">(optional)</emphasis> To enable tracking for <emphasis role="bold">http requests</emphasis>, 
+				add the behavior tracking servlet filter to web.xml: 
+				<example>
+					<title>Adding request tracking to web.xml</title>
+					<programlisting><![CDATA[<!-- enable behavior tracking for servlet requests -->
+<filter>
+   <filter-name>trackingFilter</filter-name>
+   <filter-class>com.mtgi.analytics.servlet.BehaviorTrackingFilter</filter-class>
+   <init-param>
+   <!-- request parameters are not logged by default.  to log specific 
+        parameters, list them here -->
+      <param-name>com.mtgi.analytics.parameters.include</param-name>
+      <param-value>dispatch</param-value>
+   </init-param>
+</filter>
+<filter-mapping>
+   <filter-name>trackingFilter</filter-name>
+   <servlet-name>action</servlet-name>
+   <dispatcher>REQUEST</dispatcher>
+</filter-mapping>]]></programlisting></example>
+				</para>
+			</listitem>
+			<listitem><para><emphasis role="bold">(optional)</emphasis> To enable behavior tracking at the 
+				<emphasis role="bold">SQL</emphasis> level, add a custom attribute to the data  
+				source declaration in your spring configuration:  
+				<example>
+					<title>Adding SQL tracking to applicationContext.xml</title>
+					<programlisting><![CDATA[<bean id="myDataSource" class="..." 
+      ]]><emphasis role="bold"><![CDATA[bt:tracking-manager="defaultTrackingManager">]]></emphasis><co id="managerid"/><![CDATA[
+
+   ... normal datasource configuration ... 
+
+</bean>]]></programlisting>
+					<calloutlist>
+						<callout arearefs="managerid"><para>This name points back to
+						an instance of the <literal>bt:manager</literal> element
+						as described above, which is used to configure application-wide
+						behavior tracking settings.  This name is the <literal>id</literal>
+						attribute of your <literal>bt:manager</literal> element, or <literal>defaultTrackingManager</literal>
+						if <literal>bt:manager</literal> does not have an id.</para></callout>
+					</calloutlist>
+				</example>
+			</para></listitem>
+		</orderedlist>
+		</para>
+	</section>
+
+	<section>
+		<title>Log Analysis</title>
+		<para>The BehaviorTracking build generates a command-line tool suite for 
+		analyzing BehaviorTracking logs. The tool suite can be used to convert binary 
+		logs to CSV or XML, apply custom XSL transforms, and perform efficient bulk 
+		loads of BehaviorTracking data to an Oracle database. The tools require the 
+		following:
+		<itemizedlist>
+			<listitem><simpara>Solaris, Linux, or Cygwin environment</simpara></listitem>
+			<listitem><simpara>Local Java 5 or Java 6 SDK installation</simpara></listitem>
+			<listitem><simpara>If you plan to use the Oracle ETL scripts, an Oracle 9i or 
+			higher client install</simpara></listitem>
+		</itemizedlist>
+		</para>
+
+		<para>There are two packages, for java 5 and java 6; you only need to install the 
+		version appropriate to your local SDK install.</para> 
+		 
+		<para>After you have unpacked the archive, you can run any of the following utilities 
+		from a command prompt within the created <literal>BehaviorTracking</literal> directory.  All of these 
+		instructions assume you are logging in the default format, GZIP-compressed FastInfoSet 
+		(i.e. binary XML).</para>
+
+		<section>
+			<title>Upload to an Oracle Database</title>
+			
+			<orderedlist>
+				<listitem><para><emphasis role="bold">(first time only)</emphasis> Run the provided etl/create_etl.sql script to create
+				the required data structures in your target Oracle database.</para></listitem>
+				<listitem>
+					<para>Run the import script:
+					<informalexample><screen>&gt; ./load-event.sh user/pass@sid path/to/log.bxml.gz</screen></informalexample>
+					</para>
+				</listitem>
+				<listitem><para>The time required for this process will vary with available system resources, 
+				the size of the log, the speed of your connection to the database, and so on.  Examine 
+				the resulting log files <literal>load_event_csv.log</literal> and (if there were error records) 
+				<literal>BAD_EVENT_CSV.log</literal>. Typically errors will only occur if you have tried to insert values to large for the target 
+				schema.  If this is the case, you may want to update the schema to accommodate the larger values, 
+				or truncate the bad data (in <literal>BAD_EVENT_CSV.log</literal>) and attempt the load again. The provided 
+				structures are adequate to handle most needs, so errors should be rare.</para></listitem>
+			</orderedlist>
+			
+			<caution>
+				<title>Important Note for Cygwin Users:</title>
+				<para>While the script supports Cygwin, an Oracle sqlldr limitation requires the use 
+				of <emphasis>very large</emphasis> temporary files in a Cygwin environment.  It is strongly recommended that 
+				you execute the upload scripts from a true Unix environment with stronger pipeline support, 
+				such as Solaris or Linux.</para>
+			</caution>
+			
+			<para>Use of the provided script is simple, but database administration is up to you. 
+			Depending on what you hope to do with your data, you will likely want to customize 
+			the ETL process to suit your needs. Therefore familiarity with sqlldr and basic 
+			Oracle database administration is assumed here. You should examine the provided 
+			scripts and make sure you understand what they do before using them.</para>
+		</section>
+		
+		<section>
+			<title>Export to XML</title>
+			<para>
+				You can easily export a binary log to a simple XML format legible to humans or other XML
+				processing utilities:
+				<informalexample><screen>&gt; zcat path/to/log.bxml.gz | java -jar bt-utils.jar -tool xml &gt; result.xml</screen></informalexample>
+			</para>
+			<para>Be careful, though; the default compressed-binary format has a compression ratio
+			of around 20:1 compared to its plain-text counterpart, so you can use a lot of disk this way.
+			If you plan to apply an XSL transform to the output document, consider the XSLT mode of the
+			export tool asoutlined below.</para>
+		</section>
+		
+		<section>
+			<title>Export to CSV</title>
+			<para>
+				Similarly, you can export to a CSV file for use in a spreadsheet or older EDI tools:
+				<informalexample><screen>&gt; zcat path/to/log.bxml.gz | java -jar bt-utils.jar -tool csv &gt; result.csv</screen></informalexample>
+			</para>
+			<para>Again, assume that your CSV data will be quite a bit larger than the compressed-binary data.</para>
+		</section>
+		
+		<section>
+			<title>Export with custom XSL</title>
+			<para>You can certainly use the XML export and stream the result to an XSL transformer.
+			However, executing XSL transforms on large XML documents can be extremely resource-intensive
+			without specialized tools.  Included with the log analysis package is an analyzer
+			that splits a large input document into fragments based on an XPath query, and then
+			applies an XSL transform to each fragment.  For transforms that are stateless or only need
+			to examine a small part of a document, this is vastly more efficient than loading an entire document to invoke the transform.</para>
+			
+			<para>The following example splits the input document into one fragment per 'event' element,
+			applying the given XSL transform file to each fragment and streaming the result to standard
+			out:
+				<informalexample><screen>&gt; zcat path/to/log.bxml.gz | java -jar bt-utils.jar -tool xslt -split event-log/event -xsl etl/insert_events.xsl &gt; result.csv</screen></informalexample>
+			</para>
+			 
+			<para>The included file <varname>etl/insert_events.xsl</varname> provides an example transform document, including some custom XSL functions available to transforms 
+			invoked in this way.</para>
+		</section>
+	</section>
+	
+</chapter>
