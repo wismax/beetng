@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -264,6 +266,69 @@ public class XmlBehaviorEventPersisterTest {
 				assertTrue("log records time correctly", DATE_PATTERN.matcher(actual).find());
 				assertTrue("log records duration correctly", actual.contains("<duration-ms>" + evt.getDuration() + "</duration-ms>"));
 			}
+		}
+	}
+	
+	/** 
+	 * if the persister was not shut down cleanly, we might have an old log file without a timestamp laying around.
+	 * make sure log rotation doesn't clobber it.
+	 */
+	@Test
+	public void testOfflineConfigurationChange() throws Exception {
+		
+		//generate an old log file with some data, *not* the one currently referenced by our persister.
+		File staleFile = new File(persister.getFile() + ".gz");
+		staleFile.deleteOnExit();
+		assertFalse("sanity check: " + staleFile.getAbsolutePath() + " does not exist", staleFile.exists());
+		
+		byte[] data = { 0xC, 0xA, 0xF, 0xE, 0xB, 0xA, 0xB, 0xE };
+		FileOutputStream fos = new FileOutputStream(staleFile);
+		try {
+			fos.write(data);
+			fos.flush();
+			fos.getFD().sync();
+		} finally {
+			IOUtils.closeQuietly(fos);
+		}
+		assertEquals("sanity check: stale log file has content", 8, staleFile.length());
+		assertFalse("sanity check: persister currently points to different location", staleFile.equals(new File(persister.getFile())));
+
+		//change logging config, such that the next log rotation would cause us to clobber the
+		//pre-existing file 'staleFile'.  staleFile should be preserved in a new location with a timestamp
+		//suffix.
+		persister.setCompress(true);
+		persister.rotateLog();
+		File newPath = new File(persister.getFile());
+		assertEquals("persister now points to stale log file location after rotate", staleFile, newPath);
+
+		//we should be able to locate a backup file in the parent dir somewhere.
+		final String backupPrefix = staleFile.getName();
+		class BackupLocator implements FilenameFilter {
+			File backup = null;
+			int matchCount = 0;
+
+			public boolean accept(File dir, String name) {
+				if (name.length() > backupPrefix.length() && name.startsWith(backupPrefix)) {
+					++matchCount;
+					backup = new File(dir, name);
+				}
+				return false;
+			}
+		};
+		BackupLocator locator = new BackupLocator();
+		File dir = staleFile.getParentFile();
+		dir.listFiles(locator);
+		
+		assertEquals("exactly one backup log file found", 1, locator.matchCount);
+		//verify backup contents
+		FileInputStream fis = new FileInputStream(locator.backup);
+		try {
+			for (int i = 0; i < data.length; ++i)
+				assertEquals("@" + i + " matches", data[i], (byte)fis.read());
+			assertEquals("no data remains", -1, fis.read());
+		} finally {
+			IOUtils.closeQuietly(fis);
+			locator.backup.delete();
 		}
 	}
 	

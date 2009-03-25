@@ -197,19 +197,20 @@ public class XmlBehaviorEventPersisterImpl
 		synchronized (this) {
 			//flush current writer and close streams.
 			closeWriter();
-			
-			//update output file name based on current settings.
+			 
+			//rotate old log data to timestamped archive file.
+			File archived = moveToArchive();
+			if (archived == null)
+				msg.append("No existing log data.");
+			else
+				msg.append(archived.getAbsolutePath());
+				
+			//update output file name, in case binary/compress settings changed since last rotate.
 			file = getLogFile(file);
 			
-			//archive existing contents
-			if (file.exists()) {
-				File archive = getArchiveFile();
-				if (!file.renameTo(archive))
-					throw new IOException("Unable to rename log to " + archive.getAbsolutePath());
-				msg.append(archive.getAbsolutePath());
-			} else {
-				msg.append("No existing log data.");
-			}
+			//perform archive again, in case our file name changed and has pointed us at a preexisting file;
+			//this can happen if the system wasn't shut down cleanly the last time.
+			moveToArchive();
 
 			//open a new stream, optionally compressed.
 			if (compress)
@@ -229,6 +230,21 @@ public class XmlBehaviorEventPersisterImpl
 			}
 		}
 		return msg.toString();
+	}
+	
+	/** 
+	 * if the current target log location exists, move it to archive location, returning the newly created archive file 
+	 * @return the archive file; or null if the current target location does not yet exist
+	 * @throws IOException if an archive file was needed, but could not by created
+	 */
+	private File moveToArchive() throws IOException {
+		if (file.exists()) {
+			File archive = getArchiveFile();
+			if (!file.renameTo(archive))
+				throw new IOException("Unable to rename log to " + archive.getAbsolutePath() + "; is " + file.getPath() + " open by another process?");
+			return archive;
+		}
+		return null;
 	}
 	
 	private void closeWriter() {
