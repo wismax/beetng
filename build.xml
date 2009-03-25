@@ -5,7 +5,7 @@
 
 	<import file="scripts/build-master.xml"/>
 	
-	<target name="all-dist" depends="all,package-utils"/>
+	<target name="all-dist" depends="all,package-utils,doc"/>
 	
 	<target name="package-utils" description="package command line utilities">
 	
