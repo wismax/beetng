@@ -3,6 +3,7 @@ package com.mtgi.analytics.aop.config;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.FactoryBeanNotInitializedException;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 
 /**
@@ -21,11 +22,13 @@ public class TemplateBeanDefinitionFactory implements FactoryBean, DisposableBea
 	private String beanName;
 	
 	public Object getObject() throws Exception {
+		if (beanFactory == null || beanName == null)
+			throw new FactoryBeanNotInitializedException();
 		return beanFactory.getBean(beanName);
 	}
 
 	public Class<?> getObjectType() {
-		return beanFactory.getType(beanName);
+		return beanFactory == null ? null : beanFactory.getType(beanName);
 	}
 
 	public boolean isSingleton() {
