@@ -178,12 +178,12 @@ public class BehaviorTrackingManagerImpl implements BehaviorTrackingManager, Ini
 	@ManagedOperation(description="Immediately flush all completed events to the behavior tracking database.  Returns the number of events written to the database (not counting the flush event that is also logged)")
 	public int flush() {
 		
-		LinkedList<BehaviorEvent> oldList = null, 
-								newList = new LinkedList<BehaviorEvent>();
+		LinkedList<BehaviorEvent> oldList = null;
 		//rotate the buffer.
 		synchronized(bufferSync) {
 			oldList = writeBuffer;
-			writeBuffer = newList;
+			pendingFlush -= oldList.size();
+			writeBuffer = new LinkedList<BehaviorEvent>();
 			flushRequested = false;
 		}
 		
@@ -211,13 +211,7 @@ public class BehaviorTrackingManagerImpl implements BehaviorTrackingManager, Ini
 		try {
 			
 			count = persister.persist(oldList);
-			pendingFlush -= count;
 			if (log.isDebugEnabled()) log.debug("Flushed " + count + " events with " + pendingFlush + " remaining");
-			if (pendingFlush < 0) {
-				//should not be possible.
-				log.error("Bookkeeping error!  More events persisted than completed [" + pendingFlush + "]");
-				pendingFlush = 0;
-			}
 			
 			return count;
 			
@@ -313,10 +307,11 @@ public class BehaviorTrackingManagerImpl implements BehaviorTrackingManager, Ini
 	 * forcing a flush to the persister.  Default is 100 if unspecified.
 	 * 
 	 * Note that this value is treated as advice and not strictly obeyed.
-	 * For example, nested events can never be persisted before their parents,
-	 * and a single parent event may contain more than the threshold number of
-	 * nested events.  In this case, a flush will occur as soon as the top-level
-	 * event is completed.
+	 * For example, additional events may accumulate during the time it takes to
+	 * rotate the event buffer after the flush threshold is first observed crossed.
+	 * 
+	 * In other words, persister implementations must not assume that the flush
+	 * threshold is a hard upper limit on the batch size of persistence operations.
 	 */
 	public void setFlushThreshold(int flushThreshold) {
 		this.flushThreshold = flushThreshold;
