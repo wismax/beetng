@@ -60,71 +60,69 @@
       <title id="elt_manager_title">&lt;bt:manager&gt;</title>
       <para>Defines a behavior tracking manager bean (an implementation of com.mtgi.analytics.BehaviorTrackingManager). This is the fundamental top-level element required to enable behavior tracking in an application; method call tracking, HTTP request tracking, and JDBC tracking all require this element to appear in Spring configuration. Typically applications will not need to call methods on the BehaviorTrackingManager directly.</para>
       <para>If no "id" is specified, the implicit name "defaultTrackingManager" is assumed. If there is more than one &lt;bt:manager&gt; defined, you must define a unique ID for each.</para>
-      <table>
-         <title>&lt;bt:manager&gt; Attributes</title>
-         <tgroup cols="3">
-            <tbody>
-               <row>
-                  <entry>application</entry>
-                  <entry>
-                     <emphasis role="bold">required</emphasis>
-                  </entry>
-                  <entry>
-                     <para>Arbitrary text string recorded as the "application" attribute of each event recorded by this manager.</para>
-                  </entry>
-               </row>
-               <row>
-                  <entry>flush-threshold</entry>
-                  <entry>optional</entry>
-                  <entry>
-                     <para>Maximum number of events recorded before data is automatically flushed to the persister. Default is 100 if unspecified.</para>
-                  </entry>
-               </row>
-               <row>
-                  <entry>task-executor</entry>
-                  <entry>optional</entry>
-                  <entry>
-                     <para>Reference to a task executor for performing event logging operations. If unspecified, a private thread pool if maintained for this purpose. The default behavior is strongly recommended, as unbounded memory growth is possible if events cannot be logged in a timely fashion as they are recorded.</para>
-                  </entry>
-               </row>
-               <row>
-                  <entry>track-method-expression</entry>
-                  <entry>optional</entry>
-                  <entry>
-                     <para>Specify an AOP pointcut expression identifying methods that should generate behavior tracking events. This is a shortcut alternative to using bt:advice in combination with standard Spring AOP configuration.</para>
-                  </entry>
-               </row>
-               <row>
-                  <entry>flush-schedule</entry>
-                  <entry>optional</entry>
-                  <entry>
-                     <para>Quartz scheduler expression describing how often events should be flushed to the persister. Default is every 5 minutes if unspecified.</para>
-                  </entry>
-               </row>
-               <row>
-                  <entry>scheduler</entry>
-                  <entry>optional</entry>
-                  <entry>
-                     <para>ID of a Quartz scheduler bean to use for timed flush operations. If unspecified, a private instance will be created. The default behavior is strongly recommended.</para>
-                  </entry>
-               </row>
-               <row>
-                  <entry>persister</entry>
-                  <entry>optional</entry>
-                  <entry>
-                     <para>ID of a BehaviorEventPersister implementation defined in the applicaton context. Use in place of a nested bt:*-persister element.</para>
-                  </entry>
-               </row>
-               <row>
-                  <entry>session-context</entry>
-                  <entry>optional</entry>
-                  <entry>
-                     <para>ID of a SessionContext implementation defined in the applicaton context. Use in place of a nested bt:session-context element.</para>
-                  </entry>
-               </row>
-            </tbody>
-         </tgroup>
-      </table>
+      <segmentedlist><?dbhtml list-presentation="table"?><title>&lt;bt:manager&gt; Attributes</title>
+         <segtitle>Attribute</segtitle>
+         <segtitle>Use</segtitle>
+         <segtitle>Description</segtitle>
+         <seglistitem>
+            <seg>application</seg>
+            <seg>
+               <emphasis role="bold">required</emphasis>
+            </seg>
+            <seg>
+               <para>Arbitrary text string recorded as the "application" attribute of each event recorded by this manager.</para>
+            </seg>
+         </seglistitem>
+         <seglistitem>
+            <seg>flush-threshold</seg>
+            <seg>optional</seg>
+            <seg>
+               <para>Maximum number of events recorded before data is automatically flushed to the persister. Default is 100 if unspecified.</para>
+            </seg>
+         </seglistitem>
+         <seglistitem>
+            <seg>task-executor</seg>
+            <seg>optional</seg>
+            <seg>
+               <para>Reference to a task executor for performing event logging operations. If unspecified, a private thread pool if maintained for this purpose. The default behavior is strongly recommended, as unbounded memory growth is possible if events cannot be logged in a timely fashion as they are recorded.</para>
+            </seg>
+         </seglistitem>
+         <seglistitem>
+            <seg>track-method-expression</seg>
+            <seg>optional</seg>
+            <seg>
+               <para>Specify an AOP pointcut expression identifying methods that should generate behavior tracking events. This is a shortcut alternative to using bt:advice in combination with standard Spring AOP configuration.</para>
+            </seg>
+         </seglistitem>
+         <seglistitem>
+            <seg>flush-schedule</seg>
+            <seg>optional</seg>
+            <seg>
+               <para>Quartz scheduler expression describing how often events should be flushed to the persister. Default is every 5 minutes if unspecified.</para>
+            </seg>
+         </seglistitem>
+         <seglistitem>
+            <seg>scheduler</seg>
+            <seg>optional</seg>
+            <seg>
+               <para>ID of a Quartz scheduler bean to use for timed flush operations. If unspecified, a private instance will be created. The default behavior is strongly recommended.</para>
+            </seg>
+         </seglistitem>
+         <seglistitem>
+            <seg>persister</seg>
+            <seg>optional</seg>
+            <seg>
+               <para>ID of a BehaviorEventPersister implementation defined in the applicaton context. Use in place of a nested bt:*-persister element.</para>
+            </seg>
+         </seglistitem>
+         <seglistitem>
+            <seg>session-context</seg>
+            <seg>optional</seg>
+            <seg>
+               <para>ID of a SessionContext implementation defined in the applicaton context. Use in place of a nested bt:session-context element.</para>
+            </seg>
+         </seglistitem>
+      </segmentedlist>
       <variablelist>
          <title>&lt;bt:manager&gt; Nested Elements</title>
          <varlistentry>
@@ -173,34 +171,32 @@
          <title id="elt_http_requests_title">&lt;bt:http-requests&gt;</title>
          <para>Activate logging of http requests using this manager. All parameters are logged unless the "parameters" attribute is specified. Similarly, all requests are logged, unless one or more "uri-patterns" are specified.</para>
          <para>This element cannot be used in a web application that already has BehaviorTrackingFilters configured in web.xml. BehaviorTrackingFilters are a more complex, but more powerful alternative to configuration using this element. However, the relatively more concise &lt;bt:http-requests&gt; tag in spring configuration may suffice in simple applications, with the added benefit of centralizing all behavior tracking configuration in your Spring bean definitions file.</para>
-         <table>
-            <title>&lt;bt:http-requests&gt; Attributes</title>
-            <tgroup cols="3">
-               <tbody>
-                  <row>
-                     <entry>parameters</entry>
-                     <entry>optional</entry>
-                     <entry>
-                        <para>If specified, a comma-separated list of request parameters that should be logged with behavior events. If unspecified, all parameters are logged.</para>
-                     </entry>
-                  </row>
-                  <row>
-                     <entry>uri-pattern</entry>
-                     <entry>optional</entry>
-                     <entry>
-                        <para>Equivalent to a single nested uri-pattern element, provided as an attribute for syntactic convenience.</para>
-                     </entry>
-                  </row>
-                  <row>
-                     <entry>event-type</entry>
-                     <entry>optional</entry>
-                     <entry>
-                        <para>The value to log for event type when recording http requests. Defaults to "http-request" if unspecified.</para>
-                     </entry>
-                  </row>
-               </tbody>
-            </tgroup>
-         </table>
+         <segmentedlist><?dbhtml list-presentation="table"?><title>&lt;bt:http-requests&gt; Attributes</title>
+            <segtitle>Attribute</segtitle>
+            <segtitle>Use</segtitle>
+            <segtitle>Description</segtitle>
+            <seglistitem>
+               <seg>parameters</seg>
+               <seg>optional</seg>
+               <seg>
+                  <para>If specified, a comma-separated list of request parameters that should be logged with behavior events. If unspecified, all parameters are logged.</para>
+               </seg>
+            </seglistitem>
+            <seglistitem>
+               <seg>uri-pattern</seg>
+               <seg>optional</seg>
+               <seg>
+                  <para>Equivalent to a single nested uri-pattern element, provided as an attribute for syntactic convenience.</para>
+               </seg>
+            </seglistitem>
+            <seglistitem>
+               <seg>event-type</seg>
+               <seg>optional</seg>
+               <seg>
+                  <para>The value to log for event type when recording http requests. Defaults to "http-request" if unspecified.</para>
+               </seg>
+            </seglistitem>
+         </segmentedlist>
          <variablelist>
             <title>&lt;bt:http-requests&gt; Nested Elements</title>
             <varlistentry>
@@ -221,78 +217,72 @@
    <section id="elt_advice">
       <title id="elt_advice_title">&lt;bt:advice&gt;</title>
       <para>Defines an AOP advisor that logs a behavior tracking event for each advised method call. Generally you can use the track-method-expression attribute of &lt;bt:manager&gt; to achieve the same result; &lt;bt:advice&gt; tags are not strictly necessary. &lt;bt:advice&gt; is provided for fine-grained integration of behavior tracking with other AOP advice; for example, if you want to control whether behavior tracking events occur inside or outside of transaction boundaries.</para>
-      <table>
-         <title>&lt;bt:advice&gt; Attributes</title>
-         <tgroup cols="3">
-            <tbody>
-               <row>
-                  <entry>tracking-manager</entry>
-                  <entry>optional</entry>
-                  <entry>
-                     <para>The bean name of the BehaviorTrackingManager instance that is to be used to register events.</para>
-                     <para>This attribute is usually optional, only required if there is more than one &lt;bt:manager&gt; defined by the application.</para>
-                  </entry>
-               </row>
-            </tbody>
-         </tgroup>
-      </table>
+      <segmentedlist><?dbhtml list-presentation="table"?><title>&lt;bt:advice&gt; Attributes</title>
+         <segtitle>Attribute</segtitle>
+         <segtitle>Use</segtitle>
+         <segtitle>Description</segtitle>
+         <seglistitem>
+            <seg>tracking-manager</seg>
+            <seg>optional</seg>
+            <seg>
+               <para>The bean name of the BehaviorTrackingManager instance that is to be used to register events.</para>
+               <para>This attribute is usually optional, only required if there is more than one &lt;bt:manager&gt; defined by the application.</para>
+            </seg>
+         </seglistitem>
+      </segmentedlist>
    </section>
    <section id="elt_xml_persister">
       <title id="elt_xml_persister_title">&lt;bt:xml-persister&gt;</title>
       <para>Defines behavior tracking event persistence to a rotating XML log file. Support is provided for binary XML and GZIP compression. Generally this element will appear as a child of &lt;bt:manager&gt; without an "id", though it is possible to declare it as a top-level bean if you want to inject it into other application beans.</para>
-      <table>
-         <title>&lt;bt:xml-persister&gt; Attributes</title>
-         <tgroup cols="3">
-            <tbody>
-               <row>
-                  <entry>file</entry>
-                  <entry>optional</entry>
-                  <entry>
-                     <para>Path to XML log file. Defaults to behavior-tracking.xml in the process working directory.</para>
-                  </entry>
-               </row>
-               <row>
-                  <entry>rotate-schedule</entry>
-                  <entry>optional</entry>
-                  <entry>
-                     <para>Log file rotation schedule. Defaults to daily at midnight if unspecified.</para>
-                  </entry>
-               </row>
-               <row>
-                  <entry>binary</entry>
-                  <entry>optional</entry>
-                  <entry>
-                     <para>Enable binary (FastInfoset) XML logging. Defaults to true.</para>
-                  </entry>
-               </row>
-               <row>
-                  <entry>compress</entry>
-                  <entry>optional</entry>
-                  <entry>
-                     <para>Enable GZIP logfile compression. Defaults to true.</para>
-                  </entry>
-               </row>
-            </tbody>
-         </tgroup>
-      </table>
+      <segmentedlist><?dbhtml list-presentation="table"?><title>&lt;bt:xml-persister&gt; Attributes</title>
+         <segtitle>Attribute</segtitle>
+         <segtitle>Use</segtitle>
+         <segtitle>Description</segtitle>
+         <seglistitem>
+            <seg>file</seg>
+            <seg>optional</seg>
+            <seg>
+               <para>Path to XML log file. Defaults to behavior-tracking.xml in the process working directory.</para>
+            </seg>
+         </seglistitem>
+         <seglistitem>
+            <seg>rotate-schedule</seg>
+            <seg>optional</seg>
+            <seg>
+               <para>Log file rotation schedule. Defaults to daily at midnight if unspecified.</para>
+            </seg>
+         </seglistitem>
+         <seglistitem>
+            <seg>binary</seg>
+            <seg>optional</seg>
+            <seg>
+               <para>Enable binary (FastInfoset) XML logging. Defaults to true.</para>
+            </seg>
+         </seglistitem>
+         <seglistitem>
+            <seg>compress</seg>
+            <seg>optional</seg>
+            <seg>
+               <para>Enable GZIP logfile compression. Defaults to true.</para>
+            </seg>
+         </seglistitem>
+      </segmentedlist>
    </section>
    <section id="elt_jdbc_persister">
       <title id="elt_jdbc_persister_title">&lt;bt:jdbc-persister&gt;</title>
       <para>Defines behavior tracking event persistence to a JDBC DataSource. Optional support is provided for JDBC batch fetching. Generally this element will appear as a child of &lt;bt:manager&gt; without an "id", though it is possible to declare it as a top-level bean if you want to inject it into other application beans.</para>
-      <table>
-         <title>&lt;bt:jdbc-persister&gt; Attributes</title>
-         <tgroup cols="3">
-            <tbody>
-               <row>
-                  <entry>batch-size</entry>
-                  <entry>optional</entry>
-                  <entry>
-                     <para>Statement batch size for persistence operations, only used if underlying JDBC driver supports batching. Default is 25.</para>
-                  </entry>
-               </row>
-            </tbody>
-         </tgroup>
-      </table>
+      <segmentedlist><?dbhtml list-presentation="table"?><title>&lt;bt:jdbc-persister&gt; Attributes</title>
+         <segtitle>Attribute</segtitle>
+         <segtitle>Use</segtitle>
+         <segtitle>Description</segtitle>
+         <seglistitem>
+            <seg>batch-size</seg>
+            <seg>optional</seg>
+            <seg>
+               <para>Statement batch size for persistence operations, only used if underlying JDBC driver supports batching. Default is 25.</para>
+            </seg>
+         </seglistitem>
+      </segmentedlist>
       <variablelist>
          <title>&lt;bt:jdbc-persister&gt; Nested Elements</title>
          <varlistentry>
@@ -315,18 +305,16 @@
       <section id="elt_data_source">
          <title id="elt_data_source_title">&lt;bt:data-source&gt;</title>
          <para>Specifies the data source to which events are persisted.</para>
-         <table>
-            <title>&lt;bt:data-source&gt; Attributes</title>
-            <tgroup cols="3">
-               <tbody>
-                  <row>
-                     <entry>ref</entry>
-                     <entry>optional</entry>
-                     <entry/>
-                  </row>
-               </tbody>
-            </tgroup>
-         </table>
+         <segmentedlist><?dbhtml list-presentation="table"?><title>&lt;bt:data-source&gt; Attributes</title>
+            <segtitle>Attribute</segtitle>
+            <segtitle>Use</segtitle>
+            <segtitle>Description</segtitle>
+            <seglistitem>
+               <seg>ref</seg>
+               <seg>optional</seg>
+               <seg/>
+            </seglistitem>
+         </segmentedlist>
          <variablelist>
             <title>&lt;bt:data-source&gt; Nested Elements</title>
             <varlistentry>

@@ -11,3 +11,25 @@
   padding: 0 10pt; 
   background-color: lightyellow; 
 }
+
+.segmentedlist, .variablelist {
+  border: 1pt solid black;
+  margin: 5pt 20pt;
+  padding: 5pt;
+}
+
+.segmentedlist .title, 
+.variablelist .title { 
+  background-color: lightgrey;
+  margin: 0;
+  padding: 5pt;
+}
+
+.segmentedlist .seg {
+  padding: 5pt;
+  vertical-align: top;
+}
+
+.segmentedlist .seg:first-child {
+  white-space: nowrap;
+}
