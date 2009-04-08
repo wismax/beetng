@@ -10,8 +10,8 @@
    <para>Import this schema into your Spring beans definition file (namespace http://www.springframework.org/schema/beans) to configure behavior tracking.</para>
    <section id="elt_config">
       <title id="elt_config_title">&lt;bt:config&gt;</title>
-      <para>Top-level container for behavior tracking configuration in a Spring configuration file. The presence of a &lt;bt:config&gt; tag is "syntactic sugar" within a Spring bean configuration file and is entirely optional. All of its child elements are simple bean definitions.</para>
-      <para>Typically a &lt;bt:config&gt; element will contain one or more &lt;bt:manager&gt; elements; most applications will only need one &lt;bt:manager&gt; definition. Other elements like &lt;bt:xml-persister&gt; and &lt;bt:session-context&gt; will usually appear as children of a &lt;bt:manager&gt; element. It is useful to include them directly under &lt;bt:config&gt; when you want to make them public for injection into application beans that are not part of the behavior tracking framework.</para>
+      <para>Container for behavior tracking elements in a Spring configuration file. <xref linkend="elt_config" endterm="elt_config_title" /> is "syntactic sugar" within a Spring bean configuration file and is entirely optional; you can include any of its allowed child elements directly in the file instead.</para>
+      <para>Typically a <xref linkend="elt_config" endterm="elt_config_title" /> element will contain one or more <xref linkend="elt_manager" endterm="elt_manager_title" /> elements. Most applications will only need one <xref linkend="elt_manager" endterm="elt_manager_title" /> definition. Other elements like <xref linkend="elt_xml_persister" endterm="elt_xml_persister_title" /> and <xref linkend="elt_session_context" endterm="elt_session_context_title" /> will usually appear as children of a <xref linkend="elt_manager" endterm="elt_manager_title" /> element. It is useful to include them directly under <xref linkend="elt_config" endterm="elt_config_title" /> when you want to make them public for injection into application beans that are not part of the behavior tracking framework, or if you have multiple <xref linkend="elt_manager" endterm="elt_manager_title" /> tags that share a persister, and so on.</para>
       <variablelist>
          <title>&lt;bt:config&gt; Nested Elements</title>
          <varlistentry>
@@ -58,8 +58,8 @@
    </section>
    <section id="elt_manager">
       <title id="elt_manager_title">&lt;bt:manager&gt;</title>
-      <para>Defines a behavior tracking manager bean (an implementation of com.mtgi.analytics.BehaviorTrackingManager). This is the fundamental top-level element required to enable behavior tracking in an application; method call tracking, HTTP request tracking, and JDBC tracking all require this element to appear in Spring configuration. Typically applications will not need to call methods on the BehaviorTrackingManager directly.</para>
-      <para>If no "id" is specified, the implicit name "defaultTrackingManager" is assumed. If there is more than one &lt;bt:manager&gt; defined, you must define a unique ID for each.</para>
+      <para>Defines a behavior tracking manager bean (an implementation of com.mtgi.analytics.BehaviorTrackingManager). This is the fundamental element required to enable behavior tracking in an application: method call tracking, HTTP request tracking, and JDBC tracking all require this element to appear in Spring configuration.</para>
+      <para>If no "id" attribute is specified, the implicit name "defaultTrackingManager" is assumed. If there is more than one <xref linkend="elt_manager" endterm="elt_manager_title" /> defined, you must define a unique "id" value for each.</para>
       <segmentedlist><?dbhtml list-presentation="table"?><title>&lt;bt:manager&gt; Attributes</title>
          <segtitle>Attribute</segtitle>
          <segtitle>Use</segtitle>
@@ -70,7 +70,7 @@
                <emphasis role="bold">required</emphasis>
             </seg>
             <seg>
-               <para>Arbitrary text string recorded as the "application" attribute of each event recorded by this manager.</para>
+               <para>Arbitrary text string recorded as the "application" attribute of each logged event.</para>
             </seg>
          </seglistitem>
          <seglistitem>
@@ -84,42 +84,42 @@
             <seg>task-executor</seg>
             <seg>optional</seg>
             <seg>
-               <para>Reference to a task executor for performing event logging operations. If unspecified, a private thread pool if maintained for this purpose. The default behavior is strongly recommended, as unbounded memory growth is possible if events cannot be logged in a timely fashion as they are recorded.</para>
+               <para>Bean name of a task executor for performing event logging operations. If unspecified, a private thread pool if maintained for this purpose. The default behavior is strongly recommended, as unbounded memory growth is possible if events cannot be logged in a timely fashion as they are recorded.</para>
             </seg>
          </seglistitem>
          <seglistitem>
             <seg>track-method-expression</seg>
             <seg>optional</seg>
             <seg>
-               <para>Specify an AOP pointcut expression identifying methods that should generate behavior tracking events. This is a shortcut alternative to using bt:advice in combination with standard Spring AOP configuration.</para>
+               <para>An AspectJ AOP pointcut expression identifying methods that should generate behavior tracking events. This is a simplified alternative to using <xref linkend="elt_advice" endterm="elt_advice_title" /> in combination with standard Spring AOP configuration.</para>
             </seg>
          </seglistitem>
          <seglistitem>
             <seg>flush-schedule</seg>
             <seg>optional</seg>
             <seg>
-               <para>Quartz scheduler expression describing how often events should be flushed to the persister. Default is every 5 minutes if unspecified.</para>
+               <para>Quartz Cron expression describing how often events should be flushed to the persister. Default is every 5 minutes if unspecified.</para>
             </seg>
          </seglistitem>
          <seglistitem>
             <seg>scheduler</seg>
             <seg>optional</seg>
             <seg>
-               <para>ID of a Quartz scheduler bean to use for timed flush operations. If unspecified, a private instance will be created. The default behavior is strongly recommended.</para>
+               <para>Bean name of a Quartz scheduler bean to use for timed flush operations. If unspecified, a private instance will be created. The default behavior is strongly recommended.</para>
             </seg>
          </seglistitem>
          <seglistitem>
             <seg>persister</seg>
             <seg>optional</seg>
             <seg>
-               <para>ID of a BehaviorEventPersister implementation defined in the applicaton context. Use in place of a nested bt:*-persister element.</para>
+               <para>Bean name of a BehaviorEventPersister implementation defined in the applicaton context. Use in place of a nested persister element (e.g. <xref linkend="elt_xml_persister" endterm="elt_xml_persister_title" />, <xref linkend="elt_jdbc_persister" endterm="elt_jdbc_persister_title" />).</para>
             </seg>
          </seglistitem>
          <seglistitem>
             <seg>session-context</seg>
             <seg>optional</seg>
             <seg>
-               <para>ID of a SessionContext implementation defined in the applicaton context. Use in place of a nested bt:session-context element.</para>
+               <para>Bean name of a SessionContext implementation defined in the applicaton context. Use in place of a nested <xref linkend="elt_session_context" endterm="elt_session_context_title" /> element.</para>
             </seg>
          </seglistitem>
       </segmentedlist>
@@ -130,7 +130,7 @@
                <xref linkend="elt_xml_persister" endterm="elt_xml_persister_title"/>
             </term>
             <listitem>
-               <para/>
+               <para>Configure XML logging for this manager. This is the default logging type if none is specified, so this is only necessary if you want to change any of the defaults, e.g. specify log file location or change the log rotation schedule.</para>
             </listitem>
          </varlistentry>
          <varlistentry>
@@ -138,7 +138,7 @@
                <xref linkend="elt_jdbc_persister" endterm="elt_jdbc_persister_title"/>
             </term>
             <listitem>
-               <para/>
+               <para>Configure JDBC logging for this manager.</para>
             </listitem>
          </varlistentry>
          <varlistentry>
@@ -146,7 +146,7 @@
                <xref linkend="elt_custom_persister" endterm="elt_custom_persister_title"/>
             </term>
             <listitem>
-               <para/>
+               <para>Configure a custom BehaviorEventPersister implementation for this manager.</para>
             </listitem>
          </varlistentry>
          <varlistentry>
@@ -154,7 +154,7 @@
                <xref linkend="elt_session_context" endterm="elt_session_context_title"/>
             </term>
             <listitem>
-               <para>Specify a SessionContext implementation to use with this BehaviorTrackingManager. Defaults to JAASSessionContext if unspecified.</para>
+               <para>Specify the bean name of a SessionContext implementation to use with this BehaviorTrackingManager. An alternative to a nested <xref linkend="elt_session_context" endterm="elt_session_context_title" /> element.</para>
             </listitem>
          </varlistentry>
          <varlistentry>
@@ -163,14 +163,16 @@
             </term>
             <listitem>
                <para>Activate logging of http requests using this manager. All parameters are logged unless the "parameters" attribute is specified. Similarly, all requests are logged, unless one or more "uri-patterns" are specified.</para>
-               <para>This element cannot be used in a web application that already has BehaviorTrackingFilters configured in web.xml. BehaviorTrackingFilters are a more complex, but more powerful alternative to configuration using this element. However, the relatively more concise &lt;bt:http-requests&gt; tag in spring configuration may suffice in simple applications, with the added benefit of centralizing all behavior tracking configuration in your Spring bean definitions file.</para>
+               <para>This element cannot be used in a web application that already has BehaviorTrackingFilter instance(s) configured in web.xml. BehaviorTrackingFilters are a more complex, but more powerful alternative to configuration using this element. For example, BehaviorTrackingFilters add HTTP response code and error diagnostic information to the behavior tracking event. HTTP response codes are not logged if you use <xref linkend="elt_http_requests" endterm="elt_http_requests_title" /> in your Spring configuration.</para>
+               <para>However, the relatively more concise <xref linkend="elt_http_requests" endterm="elt_http_requests_title" /> tag in spring configuration may suffice in simple applications, with the added benefit of centralizing all behavior tracking configuration in your Spring bean definitions file.</para>
             </listitem>
          </varlistentry>
       </variablelist>
       <section id="elt_http_requests">
          <title id="elt_http_requests_title">&lt;bt:http-requests&gt;</title>
          <para>Activate logging of http requests using this manager. All parameters are logged unless the "parameters" attribute is specified. Similarly, all requests are logged, unless one or more "uri-patterns" are specified.</para>
-         <para>This element cannot be used in a web application that already has BehaviorTrackingFilters configured in web.xml. BehaviorTrackingFilters are a more complex, but more powerful alternative to configuration using this element. However, the relatively more concise &lt;bt:http-requests&gt; tag in spring configuration may suffice in simple applications, with the added benefit of centralizing all behavior tracking configuration in your Spring bean definitions file.</para>
+         <para>This element cannot be used in a web application that already has BehaviorTrackingFilter instance(s) configured in web.xml. BehaviorTrackingFilters are a more complex, but more powerful alternative to configuration using this element. For example, BehaviorTrackingFilters add HTTP response code and error diagnostic information to the behavior tracking event. HTTP response codes are not logged if you use <xref linkend="elt_http_requests" endterm="elt_http_requests_title" /> in your Spring configuration.</para>
+         <para>However, the relatively more concise <xref linkend="elt_http_requests" endterm="elt_http_requests_title" /> tag in spring configuration may suffice in simple applications, with the added benefit of centralizing all behavior tracking configuration in your Spring bean definitions file.</para>
          <segmentedlist><?dbhtml list-presentation="table"?><title>&lt;bt:http-requests&gt; Attributes</title>
             <segtitle>Attribute</segtitle>
             <segtitle>Use</segtitle>
@@ -204,19 +206,21 @@
                   <xref linkend="elt_uri_pattern" endterm="elt_uri_pattern_title"/>
                </term>
                <listitem>
-                  <para>A regular expression identifying URIs that should be logged to the behavior event persister. The value of HttpServletRequest.getServletURI() will be matched against this expression. This attribute has equivalent behavior to the uri-pattern attribute. Multiple patterns can be specified using additional uri-pattern elements.</para>
+                  <para>A regular expression identifying URIs that should be logged to the behavior event persister. The value of HttpServletRequest.getServletURI() will be matched against this expression.</para>
+                  <para>This element has equivalent behavior to the uri-pattern attribute, but can appear multiple time.</para>
                </listitem>
             </varlistentry>
          </variablelist>
          <section id="elt_uri_pattern">
             <title id="elt_uri_pattern_title">&lt;bt:uri-pattern&gt;</title>
-            <para>A regular expression identifying URIs that should be logged to the behavior event persister. The value of HttpServletRequest.getServletURI() will be matched against this expression. This attribute has equivalent behavior to the uri-pattern attribute. Multiple patterns can be specified using additional uri-pattern elements.</para>
+            <para>A regular expression identifying URIs that should be logged to the behavior event persister. The value of HttpServletRequest.getServletURI() will be matched against this expression.</para>
+            <para>This element has equivalent behavior to the uri-pattern attribute, but can appear multiple time.</para>
          </section>
       </section>
    </section>
    <section id="elt_advice">
       <title id="elt_advice_title">&lt;bt:advice&gt;</title>
-      <para>Defines an AOP advisor that logs a behavior tracking event for each advised method call. Generally you can use the track-method-expression attribute of &lt;bt:manager&gt; to achieve the same result; &lt;bt:advice&gt; tags are not strictly necessary. &lt;bt:advice&gt; is provided for fine-grained integration of behavior tracking with other AOP advice; for example, if you want to control whether behavior tracking events occur inside or outside of transaction boundaries.</para>
+      <para>Defines an AOP advisor that logs a behavior tracking event for each advised method call. Generally you can use the track-method-expression attribute of <xref linkend="elt_manager" endterm="elt_manager_title" /> to achieve the same result; <xref linkend="elt_advice" endterm="elt_advice_title" /> tags are not strictly necessary. <xref linkend="elt_advice" endterm="elt_advice_title" /> is provided for fine-grained integration of behavior tracking with other AOP advice. For example, you can control whether behavior tracking events occur inside or outside of transaction boundaries.</para>
       <segmentedlist><?dbhtml list-presentation="table"?><title>&lt;bt:advice&gt; Attributes</title>
          <segtitle>Attribute</segtitle>
          <segtitle>Use</segtitle>
@@ -226,14 +230,14 @@
             <seg>optional</seg>
             <seg>
                <para>The bean name of the BehaviorTrackingManager instance that is to be used to register events.</para>
-               <para>This attribute is usually optional, only required if there is more than one &lt;bt:manager&gt; defined by the application.</para>
+               <para>This attribute is usually optional, only required if there is more than one <xref linkend="elt_manager" endterm="elt_manager_title" /> defined by the application.</para>
             </seg>
          </seglistitem>
       </segmentedlist>
    </section>
    <section id="elt_xml_persister">
       <title id="elt_xml_persister_title">&lt;bt:xml-persister&gt;</title>
-      <para>Defines behavior tracking event persistence to a rotating XML log file. Support is provided for binary XML and GZIP compression. Generally this element will appear as a child of &lt;bt:manager&gt; without an "id", though it is possible to declare it as a top-level bean if you want to inject it into other application beans.</para>
+      <para>Defines behavior tracking event persistence to a rotating XML log file. Support is provided for binary XML and GZIP compression. Generally this element will appear as a child of <xref linkend="elt_manager" endterm="elt_manager_title" /> without an "id", though it is possible to declare it as a top-level bean if you want to inject it into other application beans.</para>
       <segmentedlist><?dbhtml list-presentation="table"?><title>&lt;bt:xml-persister&gt; Attributes</title>
          <segtitle>Attribute</segtitle>
          <segtitle>Use</segtitle>
@@ -249,7 +253,7 @@
             <seg>rotate-schedule</seg>
             <seg>optional</seg>
             <seg>
-               <para>Log file rotation schedule. Defaults to daily at midnight if unspecified.</para>
+               <para>Quartz Cron expression for the log file rotation schedule. Defaults to daily at midnight if unspecified.</para>
             </seg>
          </seglistitem>
          <seglistitem>
@@ -270,7 +274,7 @@
    </section>
    <section id="elt_jdbc_persister">
       <title id="elt_jdbc_persister_title">&lt;bt:jdbc-persister&gt;</title>
-      <para>Defines behavior tracking event persistence to a JDBC DataSource. Optional support is provided for JDBC batch fetching. Generally this element will appear as a child of &lt;bt:manager&gt; without an "id", though it is possible to declare it as a top-level bean if you want to inject it into other application beans.</para>
+      <para>Defines behavior tracking event persistence to a JDBC DataSource. Optional support is provided for JDBC batch fetching. Generally this element will appear as a child of <xref linkend="elt_manager" endterm="elt_manager_title" /> without an "id", though it is possible to declare it as a top-level bean if you want to inject it into other application beans.</para>
       <segmentedlist><?dbhtml list-presentation="table"?><title>&lt;bt:jdbc-persister&gt; Attributes</title>
          <segtitle>Attribute</segtitle>
          <segtitle>Use</segtitle>
@@ -338,10 +342,11 @@
    </section>
    <section id="elt_custom_persister">
       <title id="elt_custom_persister_title">&lt;bt:custom-persister&gt;</title>
-      <para>Defines a custom com.mtgi.analytics.BehaviorEventPersister implementation. Generally this element will appear as a child of &lt;bt:manager&gt; without an "id", though it is possible to declare it as a top-level bean if you want to inject it into other application beans.</para>
+      <para>Defines a custom com.mtgi.analytics.BehaviorEventPersister implementation. Generally this element will appear as a child of <xref linkend="elt_manager" endterm="elt_manager_title" /> without an "id", though it is possible to declare it as a top-level bean if you want to inject it into other application beans.</para>
    </section>
    <section id="elt_session_context">
       <title id="elt_session_context_title">&lt;bt:session-context&gt;</title>
-      <para>Specifies a custom SessionContext implementation.</para>
+      <para>Specifies a custom SessionContext implementation, which provides the user ID and session ID for logged events. If no session-context is specified, then com.mtgi.analytics.servlet.SpringSessionContext is used if we are determined to be in a Spring web application; otherwise com.mtgi.analytics.JAASSessionContext is used.</para>
+      <para>This element has the syntax of a standard Spring bean definition; e.g. specify "id" and "class" attributes, as well as nested &lt;property&gt; elements.</para>
    </section>
 </section>

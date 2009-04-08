@@ -22,8 +22,9 @@
 		<para>The BehaviorTracking.jar library and dependencies should be included in the target  
 		application's library directory, e.g. <literal>WEB-INF/lib</literal> for web applications.  
 		BehaviorTracking is then enabled separately for tracking HTTP requests, Java  
-		method calls, and/or SQL queries. Behavior can be fine-tuned in many ways, but 
-		the steps for a basic installation at all layers of an existing Spring application are:
+		method calls, and/or SQL queries. Behavior can be fine-tuned in many ways, see 
+		<xref linkend="chapter_configuration"/> for details.  The steps for a basic installation at all layers 
+		of an existing Spring application are:
 
 		<orderedlist>
 			<listitem><para>Add the library and its dependencies to the application.</para></listitem>

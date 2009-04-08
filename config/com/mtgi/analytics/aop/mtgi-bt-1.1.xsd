@@ -22,17 +22,18 @@
 	<xsd:element name="config">
 		<xsd:annotation>
 			<xsd:documentation><![CDATA[
-		Top-level container for behavior tracking configuration in a Spring configuration
-		file.  The presence of a <bt:config> tag is "syntactic sugar" within a Spring bean
-		configuration file and is entirely optional.  All of its child elements are simple 
-		bean definitions.
+		Container for behavior tracking elements in a Spring configuration
+		file.  <bt:config> is "syntactic sugar" within a Spring bean
+		configuration file and is entirely optional; you can include any of
+		its allowed child elements directly in the file instead.
 		
-		Typically a <bt:config> element will contain one or more <bt:manager> elements; most
+		Typically a <bt:config> element will contain one or more <bt:manager> elements.  Most
 		applications will only need one <bt:manager> definition.  Other elements like <bt:xml-persister>
 		and <bt:session-context> will usually appear as children of a <bt:manager> element.
 		It is useful to include them directly under <bt:config> when you want to make them
 		public for injection into application beans that are not part of the behavior
-		tracking framework.
+		tracking framework, or if you have multiple <bt:manager> tags that share a persister,
+		and so on.
 			]]></xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
@@ -52,13 +53,12 @@
 		<xsd:annotation>
 			<xsd:documentation source="java:com.mtgi.analytics.aop.BehaviorTrackingManager"><![CDATA[
 	Defines a behavior tracking manager bean (an implementation of com.mtgi.analytics.BehaviorTrackingManager).
-	This is the fundamental top-level element required to enable behavior tracking in an application; 
+	This is the fundamental element required to enable behavior tracking in an application:
 	method call tracking, HTTP request tracking, and JDBC tracking all require this element
-	to appear in Spring configuration.  Typically applications will not need to call methods on the BehaviorTrackingManager
-	directly.  
+	to appear in Spring configuration.
 	
-	If no "id" is specified, the implicit name "defaultTrackingManager" is assumed.  If there is
-	more than one <bt:manager> defined, you must define a unique ID for each.
+	If no "id" attribute is specified, the implicit name "defaultTrackingManager" is assumed.  If there is
+	more than one <bt:manager> defined, you must define a unique "id" value for each.
 			]]></xsd:documentation>
 			<xsd:appinfo>
 				<tool:annotation>
@@ -71,21 +71,35 @@
 				<xsd:extension base="beans:identifiedType">
 					<xsd:sequence>
 						<xsd:choice minOccurs="0">
-							<xsd:annotation>
-								<xsd:documentation><![CDATA[
-								Specify an event persister for this manager.  Defaults to a basic
-								file-based XML logging configuration if unspecified.
-								]]></xsd:documentation>
-							</xsd:annotation>
-							<xsd:element ref="bt:xml-persister"/>
-							<xsd:element ref="bt:jdbc-persister"/>
-							<xsd:element ref="bt:custom-persister"/>
+							<xsd:element ref="bt:xml-persister">
+								<xsd:annotation>
+									<xsd:documentation><![CDATA[
+									Configure XML logging for this manager.  This is the default logging type if none is
+									specified, so this is only necessary if you want to change any of the defaults, e.g.
+									specify log file location or change the log rotation schedule.
+									]]></xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+							<xsd:element ref="bt:jdbc-persister">
+								<xsd:annotation>
+									<xsd:documentation><![CDATA[
+									Configure JDBC logging for this manager.
+									]]></xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+							<xsd:element ref="bt:custom-persister">
+								<xsd:annotation>
+									<xsd:documentation><![CDATA[
+									Configure a custom BehaviorEventPersister implementation for this manager.
+									]]></xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
 						</xsd:choice>
 						<xsd:element ref="session-context" minOccurs="0">
 							<xsd:annotation>
 								<xsd:documentation><![CDATA[
-								Specify a SessionContext implementation to use with this BehaviorTrackingManager.
-								Defaults to JAASSessionContext if unspecified.
+								Specify the bean name of a SessionContext implementation to use with this BehaviorTrackingManager.
+								An alternative to a nested <bt:session-context> element.
 								]]></xsd:documentation>
 							</xsd:annotation>
 						</xsd:element>
@@ -96,9 +110,13 @@
 								unless the "parameters" attribute is specified.  Similarly, all requests are logged,
 								unless one or more "uri-patterns" are specified.
 								
-								This element cannot be used in a web application that already has BehaviorTrackingFilters
-								configured in web.xml.  BehaviorTrackingFilters are a more complex, but more powerful
-								alternative to configuration using this element.  However, the relatively more
+								This element cannot be used in a web application that already has BehaviorTrackingFilter
+								instance(s) configured in web.xml.  BehaviorTrackingFilters are a more complex, but more powerful
+								alternative to configuration using this element.  For example, BehaviorTrackingFilters
+								add HTTP response code and error diagnostic information to the behavior tracking event.  HTTP
+								response codes are not logged if you use <bt:http-requests> in your Spring configuration.
+								
+								However, the relatively more
 								concise <bt:http-requests> tag in spring configuration may suffice in simple
 								applications, with the added benefit of centralizing all behavior tracking configuration
 								in your Spring bean definitions file.
@@ -111,8 +129,9 @@
 											<xsd:documentation><![CDATA[A regular expression identifying URIs that should be
 											logged to the behavior event persister.  The value of HttpServletRequest.getServletURI()
 											will be matched against this expression.
-											This attribute has equivalent behavior to the uri-pattern attribute.  Multiple
-											patterns can be specified using additional uri-pattern elements.
+											
+											This element has equivalent behavior to the uri-pattern attribute, but
+											can appear multiple time.
 											]]></xsd:documentation>
 										</xsd:annotation>
 									</xsd:element>
@@ -141,7 +160,7 @@
 					<xsd:attribute name="application" type="xsd:string" use="required">
 						<xsd:annotation>
 							<xsd:documentation><![CDATA[
-							Arbitrary text string recorded as the "application" attribute of each event recorded by this manager.
+							Arbitrary text string recorded as the "application" attribute of each logged event.
 							]]></xsd:documentation>
 						</xsd:annotation>
 					</xsd:attribute>
@@ -155,7 +174,7 @@
 					<xsd:attribute name="task-executor" type="xsd:string">
 						<xsd:annotation>
 							<xsd:documentation><![CDATA[
-							Reference to a task executor for performing event logging operations.  If unspecified, a
+							Bean name of a task executor for performing event logging operations.  If unspecified, a
 							private thread pool if maintained for this purpose.  The default behavior is strongly recommended,
 							as unbounded memory growth is possible if events cannot be logged in a timely fashion as they
 							are recorded.
@@ -170,21 +189,21 @@
 					<xsd:attribute name="track-method-expression" type="xsd:string" use="optional">
 						<xsd:annotation>
 							<xsd:documentation><![CDATA[
-							Specify an AOP pointcut expression identifying methods that should generate behavior tracking
-							events.  This is a shortcut alternative to using bt:advice in combination with standard
+							An AspectJ AOP pointcut expression identifying methods that should generate behavior tracking
+							events.  This is a simplified alternative to using <bt:advice> in combination with standard
 							Spring AOP configuration.
 							]]></xsd:documentation>
 						</xsd:annotation>
 					</xsd:attribute>
 					<xsd:attribute name="flush-schedule" default="0 0/5 * * * ?">
 						<xsd:annotation>
-							<xsd:documentation>Quartz scheduler expression describing how often events should be flushed to the persister.
+							<xsd:documentation>Quartz Cron expression describing how often events should be flushed to the persister.
 							Default is every 5 minutes if unspecified.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:attribute>
 					<xsd:attribute name="scheduler" type="xsd:string">
 						<xsd:annotation>
-							<xsd:documentation>ID of a Quartz scheduler bean to use for timed flush operations.
+							<xsd:documentation>Bean name of a Quartz scheduler bean to use for timed flush operations.
 							If unspecified, a private instance will be created.  The default behavior
 							is strongly recommended.</xsd:documentation>
 							<xsd:appinfo>
@@ -196,8 +215,9 @@
 					</xsd:attribute>
 					<xsd:attribute name="persister" type="xsd:string">
 						<xsd:annotation>
-							<xsd:documentation>ID of a BehaviorEventPersister implementation defined
-							in the applicaton context.  Use in place of a nested bt:*-persister element.</xsd:documentation>
+							<xsd:documentation><![CDATA[Bean name of a BehaviorEventPersister implementation defined
+							in the applicaton context.  Use in place of a nested persister element (e.g. 
+							<bt:xml-persister>, <bt:jdbc-persister>).]]></xsd:documentation>
 							<xsd:appinfo>
 								<tool:annotation kind="ref">
 									<tool:expected-type type="com.mtgi.analytics.BehaviorEventPersister"/>
@@ -207,8 +227,8 @@
 					</xsd:attribute>
 					<xsd:attribute name="session-context" type="xsd:string">
 						<xsd:annotation>
-							<xsd:documentation>ID of a SessionContext implementation defined
-							in the applicaton context.  Use in place of a nested bt:session-context element.</xsd:documentation>
+							<xsd:documentation><![CDATA[Bean name of a SessionContext implementation defined
+							in the applicaton context.  Use in place of a nested <bt:session-context> element.]]></xsd:documentation>
 							<xsd:appinfo>
 								<tool:annotation kind="ref">
 									<tool:expected-type type="com.mtgi.analytics.SessionContext"/>
@@ -228,8 +248,8 @@
 	Defines an AOP advisor that logs a behavior tracking event for each advised method call.
 	Generally you can use the track-method-expression attribute of <bt:manager> to achieve
 	the same result; <bt:advice> tags are not strictly necessary.  <bt:advice> is provided for 
-	fine-grained  integration of behavior tracking with other AOP advice; for example, if you 
-	want to control whether behavior tracking events occur inside or outside of transaction boundaries.
+	fine-grained  integration of behavior tracking with other AOP advice.  For example, you 
+	can control whether behavior tracking events occur inside or outside of transaction boundaries.
 				]]></xsd:documentation>
 				<xsd:appinfo>
 					<tool:annotation>
@@ -286,7 +306,7 @@
 					</xsd:attribute>
 					<xsd:attribute name="rotate-schedule" default="0 0 0 * * ?" type="xsd:string">
 						<xsd:annotation>
-							<xsd:documentation>Log file rotation schedule.  Defaults to daily at midnight if unspecified.</xsd:documentation>
+							<xsd:documentation>Quartz Cron expression for the log file rotation schedule.  Defaults to daily at midnight if unspecified.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:attribute>
 					<xsd:attribute name="binary" default="true" type="xsd:boolean">
@@ -372,7 +392,14 @@
 	
 	<xsd:element name="session-context" type="beanType">
 		<xsd:annotation>
-			<xsd:documentation>Specifies a custom SessionContext implementation.</xsd:documentation>
+			<xsd:documentation  source="java:com.mtgi.analytics.SessionContext"><![CDATA[
+			Specifies a custom SessionContext implementation, which provides the
+			user ID and session ID for logged events.  If no session-context is specified, then
+			com.mtgi.analytics.servlet.SpringSessionContext is used if we are determined to be in a
+			Spring web application; otherwise com.mtgi.analytics.JAASSessionContext is used.
+			
+			This element has the syntax of a standard Spring bean definition; e.g. specify "id" and "class"
+			attributes, as well as nested <property> elements.]]></xsd:documentation>
 			<xsd:appinfo>
 				<tool:annotation>
 					<tool:exports type="com.mtgi.analytics.SessionContext"/>
@@ -383,9 +410,10 @@
 	
 	<xsd:attribute name="tracking-manager" type="xsd:string">
 		<xsd:annotation>
-			<xsd:documentation>Identifies a tracking manager used to monitor activity
-			on the annotated bean definition.
-			Currently this attribute is only supported for DataSource beans.</xsd:documentation>
+			<xsd:documentation><![CDATA[Annotates a Spring bean definition for behavior tracking.
+			The value of this attribute should be the ID of the <bt:manager> instance to use,
+			or simply "defaultTrackingManager".  Currently this attribute is only supported for 
+			DataSource beans.]]></xsd:documentation>
 		</xsd:annotation>
 	</xsd:attribute>
 
