@@ -14,15 +14,25 @@
 
 	<xsd:annotation>
 		<xsd:documentation><![CDATA[
-	Defines the elements used in the mantis-tgi behavior tracking management infrastructure.
+		Import this schema into your Spring beans definition file (namespace http://www.springframework.org/schema/beans)
+		to configure behavior tracking.
 		]]></xsd:documentation>
 	</xsd:annotation>
 
 	<xsd:element name="config">
 		<xsd:annotation>
 			<xsd:documentation><![CDATA[
-		Defines one or more BehaviorTrackingManager instances to record the behavior of
-		the application.
+		Top-level container for behavior tracking configuration in a Spring configuration
+		file.  The presence of a <bt:config> tag is "syntactic sugar" within a Spring bean
+		configuration file and is entirely optional.  All of its child elements are simple 
+		bean definitions.
+		
+		Typically a <bt:config> element will contain one or more <bt:manager> elements; most
+		applications will only need one <bt:manager> definition.  Other elements like <bt:xml-persister>
+		and <bt:session-context> will usually appear as children of a <bt:manager> element.
+		It is useful to include them directly under <bt:config> when you want to make them
+		public for injection into application beans that are not part of the behavior
+		tracking framework.
 			]]></xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
@@ -41,8 +51,14 @@
 	<xsd:element name="manager">
 		<xsd:annotation>
 			<xsd:documentation source="java:com.mtgi.analytics.aop.BehaviorTrackingManager"><![CDATA[
-	Defines a behavior tracking manager and optionally configures what application behaviors are
-	monitored.
+	Defines a behavior tracking manager bean (an implementation of com.mtgi.analytics.BehaviorTrackingManager).
+	This is the fundamental top-level element required to enable behavior tracking in an application; 
+	method call tracking, HTTP request tracking, and JDBC tracking all require this element
+	to appear in Spring configuration.  Typically applications will not need to call methods on the BehaviorTrackingManager
+	directly.  
+	
+	If no "id" is specified, the implicit name "defaultTrackingManager" is assumed.  If there is
+	more than one <bt:manager> defined, you must define a unique ID for each.
 			]]></xsd:documentation>
 			<xsd:appinfo>
 				<tool:annotation>
@@ -83,8 +99,9 @@
 								This element cannot be used in a web application that already has BehaviorTrackingFilters
 								configured in web.xml.  BehaviorTrackingFilters are a more complex, but more powerful
 								alternative to configuration using this element.  However, the relatively more
-								concise bt:http-requests tag in spring configuration may suffice in simple
-								applications.
+								concise <bt:http-requests> tag in spring configuration may suffice in simple
+								applications, with the added benefit of centralizing all behavior tracking configuration
+								in your Spring bean definitions file.
 								]]></xsd:documentation>
 							</xsd:annotation>
 							<xsd:complexType>
@@ -208,8 +225,11 @@
 		<xsd:complexType>
 			<xsd:annotation>
 				<xsd:documentation source="java:com.mtgi.analytics.aop.BehaviorTrackingAdvice"><![CDATA[
-	Defines the tracking semantics of the AOP advice that is to be
-	executed.
+	Defines an AOP advisor that logs a behavior tracking event for each advised method call.
+	Generally you can use the track-method-expression attribute of <bt:manager> to achieve
+	the same result; <bt:advice> tags are not strictly necessary.  <bt:advice> is provided for 
+	fine-grained  integration of behavior tracking with other AOP advice; for example, if you 
+	want to control whether behavior tracking events occur inside or outside of transaction boundaries.
 				]]></xsd:documentation>
 				<xsd:appinfo>
 					<tool:annotation>
@@ -223,11 +243,10 @@
 					<xsd:attribute name="tracking-manager" type="xsd:string" use="optional">
 						<xsd:annotation>
 							<xsd:documentation source="java:com.mtgi.analytics.BehaviorTrackingManager"><![CDATA[
-	The bean name of the BehaviorTrackingManager that is to be used
-	to drive trackings.
+	The bean name of the BehaviorTrackingManager instance that is to be used
+	to register events.
 	
-	This attribute is not required, and only needs to be specified
-	explicitly if there is more than one BehaviorTrackingManager defined
+	This attribute is usually optional, only required if there is more than one <bt:manager> defined
 	by the application.
 							]]></xsd:documentation>
 							<xsd:appinfo>
@@ -246,6 +265,12 @@
 	<xsd:element name="xml-persister">
 		<xsd:complexType>
 			<xsd:annotation>
+				<xsd:documentation source="java:com.mtgi.analytics.XmlBehaviorEventPersisterImpl"><![CDATA[
+		Defines behavior tracking event persistence to a rotating XML log file.  Support
+		is provided for binary XML and GZIP compression.  Generally this element will appear
+		as a child of <bt:manager> without an "id", though it is possible to declare it as a top-level
+		bean if you want to inject it into other application beans.
+				]]></xsd:documentation>
 				<xsd:appinfo>
 					<tool:annotation>
 						<tool:exports type="com.mtgi.analytics.XmlBehaviorEventPersisterImpl"/>
@@ -282,6 +307,12 @@
 	<xsd:element name="jdbc-persister">
 		<xsd:complexType>
 			<xsd:annotation>
+				<xsd:documentation source="java:com.mtgi.analytics.JdbcBehaviorEventPersisterImpl"><![CDATA[
+		Defines behavior tracking event persistence to a JDBC DataSource.  Optional support
+		is provided for JDBC batch fetching.  Generally this element will appear
+		as a child of <bt:manager> without an "id", though it is possible to declare it as a top-level
+		bean if you want to inject it into other application beans.
+				]]></xsd:documentation>
 				<xsd:appinfo>
 					<tool:annotation>
 						<tool:exports type="com.mtgi.analytics.JdbcBehaviorEventPersisterImpl"/>
@@ -326,7 +357,11 @@
 
 	<xsd:element name="custom-persister" type="beanType">
 		<xsd:annotation>
-			<xsd:documentation>Specifies a custom BehaviorEventPersister implementation.</xsd:documentation>
+			<xsd:documentation source="java:com.mtgi.analytics.BehaviorEventPersister"><![CDATA[
+	Defines a custom com.mtgi.analytics.BehaviorEventPersister implementation.
+	Generally this element will appear as a child of <bt:manager> without an "id", though it is possible to declare it as a top-level
+	bean if you want to inject it into other application beans.
+			]]></xsd:documentation>
 			<xsd:appinfo>
 				<tool:annotation>
 					<tool:exports type="com.mtgi.analytics.BehaviorEventPersister"/>
@@ -349,7 +384,7 @@
 	<xsd:attribute name="tracking-manager" type="xsd:string">
 		<xsd:annotation>
 			<xsd:documentation>Identifies a tracking manager used to monitor activity
-			on the annotated bean definition.  
+			on the annotated bean definition.
 			Currently this attribute is only supported for DataSource beans.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:attribute>

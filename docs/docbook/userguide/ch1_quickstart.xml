@@ -17,7 +17,7 @@
 		<para><xref linkend="chapter_justification"/> contains a more detailed discussion of where 
 		BehaviorTracking belongs in the broader picture of production monitoring.</para>
 	</section>
-	<section>
+	<section id="section_simple_installation">
 		<title>Simplified Installation</title> 
 		<para>The BehaviorTracking.jar library and dependencies should be included in the target  
 		application's library directory, e.g. <literal>WEB-INF/lib</literal> for web applications.  

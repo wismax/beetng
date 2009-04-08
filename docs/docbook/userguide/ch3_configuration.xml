@@ -1,0 +1,8 @@
+<chapter>
+   <title>Spring Bean Configuration Reference</title>
+   <para>Most configuration is accomplished by importing the custom config namespace into
+   your Spring bean definition file, and then using it to define the appropriate elements.</para>
+  
+   &chap3_schema; 
+   
+</chapter>
