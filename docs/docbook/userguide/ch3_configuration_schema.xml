@@ -58,7 +58,9 @@
    </section>
    <section id="elt_manager">
       <title id="elt_manager_title">&lt;bt:manager&gt;</title>
-      <para>Defines a behavior tracking manager bean (an implementation of com.mtgi.analytics.BehaviorTrackingManager). This is the fundamental element required to enable behavior tracking in an application: method call tracking, HTTP request tracking, and JDBC tracking all require this element to appear in Spring configuration.</para>
+      <emphasis role="bold">Java Bean Type:</emphasis>
+      <ulink url="../../api/com/mtgi/analytics/BehaviorTrackingManager.html">com.mtgi.analytics.BehaviorTrackingManager</ulink>
+      <para>This is the fundamental element required to enable behavior tracking in an application: method call tracking, HTTP request tracking, and JDBC tracking all require this element to appear in Spring configuration.</para>
       <para>If no "id" attribute is specified, the implicit name "defaultTrackingManager" is assumed. If there is more than one <xref linkend="elt_manager" endterm="elt_manager_title" /> defined, you must define a unique "id" value for each.</para>
       <segmentedlist><?dbhtml list-presentation="table"?><title>&lt;bt:manager&gt; Attributes</title>
          <segtitle>Attribute</segtitle>
@@ -220,6 +222,8 @@
    </section>
    <section id="elt_advice">
       <title id="elt_advice_title">&lt;bt:advice&gt;</title>
+      <emphasis role="bold">Java Bean Type:</emphasis>
+      <ulink url="../../api/com/mtgi/analytics/aop/BehaviorTrackingAdvice.html">com.mtgi.analytics.aop.BehaviorTrackingAdvice</ulink>
       <para>Defines an AOP advisor that logs a behavior tracking event for each advised method call. Generally you can use the track-method-expression attribute of <xref linkend="elt_manager" endterm="elt_manager_title" /> to achieve the same result; <xref linkend="elt_advice" endterm="elt_advice_title" /> tags are not strictly necessary. <xref linkend="elt_advice" endterm="elt_advice_title" /> is provided for fine-grained integration of behavior tracking with other AOP advice. For example, you can control whether behavior tracking events occur inside or outside of transaction boundaries.</para>
       <segmentedlist><?dbhtml list-presentation="table"?><title>&lt;bt:advice&gt; Attributes</title>
          <segtitle>Attribute</segtitle>
@@ -229,6 +233,8 @@
             <seg>tracking-manager</seg>
             <seg>optional</seg>
             <seg>
+               <emphasis role="bold">Java Bean Type:</emphasis>
+               <ulink url="../../api/com/mtgi/analytics/BehaviorTrackingManager.html">com.mtgi.analytics.BehaviorTrackingManager</ulink>
                <para>The bean name of the BehaviorTrackingManager instance that is to be used to register events.</para>
                <para>This attribute is usually optional, only required if there is more than one <xref linkend="elt_manager" endterm="elt_manager_title" /> defined by the application.</para>
             </seg>
@@ -237,6 +243,8 @@
    </section>
    <section id="elt_xml_persister">
       <title id="elt_xml_persister_title">&lt;bt:xml-persister&gt;</title>
+      <emphasis role="bold">Java Bean Type:</emphasis>
+      <ulink url="../../api/com/mtgi/analytics/XmlBehaviorEventPersisterImpl.html">com.mtgi.analytics.XmlBehaviorEventPersisterImpl</ulink>
       <para>Defines behavior tracking event persistence to a rotating XML log file. Support is provided for binary XML and GZIP compression. Generally this element will appear as a child of <xref linkend="elt_manager" endterm="elt_manager_title" /> without an "id", though it is possible to declare it as a top-level bean if you want to inject it into other application beans.</para>
       <segmentedlist><?dbhtml list-presentation="table"?><title>&lt;bt:xml-persister&gt; Attributes</title>
          <segtitle>Attribute</segtitle>
@@ -274,6 +282,8 @@
    </section>
    <section id="elt_jdbc_persister">
       <title id="elt_jdbc_persister_title">&lt;bt:jdbc-persister&gt;</title>
+      <emphasis role="bold">Java Bean Type:</emphasis>
+      <ulink url="../../api/com/mtgi/analytics/JdbcBehaviorEventPersisterImpl.html">com.mtgi.analytics.JdbcBehaviorEventPersisterImpl</ulink>
       <para>Defines behavior tracking event persistence to a JDBC DataSource. Optional support is provided for JDBC batch fetching. Generally this element will appear as a child of <xref linkend="elt_manager" endterm="elt_manager_title" /> without an "id", though it is possible to declare it as a top-level bean if you want to inject it into other application beans.</para>
       <segmentedlist><?dbhtml list-presentation="table"?><title>&lt;bt:jdbc-persister&gt; Attributes</title>
          <segtitle>Attribute</segtitle>
@@ -342,11 +352,21 @@
    </section>
    <section id="elt_custom_persister">
       <title id="elt_custom_persister_title">&lt;bt:custom-persister&gt;</title>
+      <emphasis role="bold">Java Bean Type:</emphasis>
+      <ulink url="../../api/com/mtgi/analytics/BehaviorEventPersister.html">com.mtgi.analytics.BehaviorEventPersister</ulink>
       <para>Defines a custom com.mtgi.analytics.BehaviorEventPersister implementation. Generally this element will appear as a child of <xref linkend="elt_manager" endterm="elt_manager_title" /> without an "id", though it is possible to declare it as a top-level bean if you want to inject it into other application beans.</para>
    </section>
    <section id="elt_session_context">
       <title id="elt_session_context_title">&lt;bt:session-context&gt;</title>
+      <emphasis role="bold">Java Bean Type:</emphasis>
+      <ulink url="../../api/com/mtgi/analytics/SessionContext.html">com.mtgi.analytics.SessionContext</ulink>
       <para>Specifies a custom SessionContext implementation, which provides the user ID and session ID for logged events. If no session-context is specified, then com.mtgi.analytics.servlet.SpringSessionContext is used if we are determined to be in a Spring web application; otherwise com.mtgi.analytics.JAASSessionContext is used.</para>
       <para>This element has the syntax of a standard Spring bean definition; e.g. specify "id" and "class" attributes, as well as nested &lt;property&gt; elements.</para>
+   </section>
+   <section id="elt_tracking_manager">
+      <title id="elt_tracking_manager_title">Attribute bt:tracking-manager</title>
+      <emphasis role="bold">Java Bean Type:</emphasis>
+      <ulink url="../../api/com/mtgi/analytics/sql/BehaviorTrackingDataSource.html">com.mtgi.analytics.sql.BehaviorTrackingDataSource</ulink>
+      <para>Annotates a Spring bean definition for behavior tracking. The value of this attribute should be the ID of the <xref linkend="elt_manager" endterm="elt_manager_title" /> instance to use, or simply "defaultTrackingManager". Currently this attribute is only supported for DataSource bean definitions.</para>
    </section>
 </section>

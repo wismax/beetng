@@ -51,8 +51,7 @@
 	 
 	<xsd:element name="manager">
 		<xsd:annotation>
-			<xsd:documentation source="java:com.mtgi.analytics.aop.BehaviorTrackingManager"><![CDATA[
-	Defines a behavior tracking manager bean (an implementation of com.mtgi.analytics.BehaviorTrackingManager).
+			<xsd:documentation source="java:com.mtgi.analytics.BehaviorTrackingManager"><![CDATA[
 	This is the fundamental element required to enable behavior tracking in an application:
 	method call tracking, HTTP request tracking, and JDBC tracking all require this element
 	to appear in Spring configuration.
@@ -392,7 +391,7 @@
 	
 	<xsd:element name="session-context" type="beanType">
 		<xsd:annotation>
-			<xsd:documentation  source="java:com.mtgi.analytics.SessionContext"><![CDATA[
+			<xsd:documentation source="java:com.mtgi.analytics.SessionContext"><![CDATA[
 			Specifies a custom SessionContext implementation, which provides the
 			user ID and session ID for logged events.  If no session-context is specified, then
 			com.mtgi.analytics.servlet.SpringSessionContext is used if we are determined to be in a
@@ -410,10 +409,10 @@
 	
 	<xsd:attribute name="tracking-manager" type="xsd:string">
 		<xsd:annotation>
-			<xsd:documentation><![CDATA[Annotates a Spring bean definition for behavior tracking.
+			<xsd:documentation source="java:com.mtgi.analytics.sql.BehaviorTrackingDataSource"><![CDATA[Annotates a Spring bean definition for behavior tracking.
 			The value of this attribute should be the ID of the <bt:manager> instance to use,
 			or simply "defaultTrackingManager".  Currently this attribute is only supported for 
-			DataSource beans.]]></xsd:documentation>
+			DataSource bean definitions.]]></xsd:documentation>
 		</xsd:annotation>
 	</xsd:attribute>
 
