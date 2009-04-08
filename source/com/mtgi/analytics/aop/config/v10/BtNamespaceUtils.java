@@ -1,9 +1,6 @@
 package com.mtgi.analytics.aop.config.v10;
 
 import org.springframework.core.Conventions;
-import org.springframework.core.JdkVersion;
-
-import org.springframework.util.ClassUtils;
 
 public class BtNamespaceUtils {
 	public static final String TRACKING_MANAGER_ATTRIBUTE = "tracking-manager";

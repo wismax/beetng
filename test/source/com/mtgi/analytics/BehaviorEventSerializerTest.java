@@ -128,8 +128,11 @@ public class BehaviorEventSerializerTest {
 	
 	private static class FixedEvent extends BehaviorEvent {
 		
+		private static final long serialVersionUID = -2851079725765893506L;
+
 		private Date date;
 		private Long duration;
+		
 		public FixedEvent(BehaviorEvent parent, String type, String name, String application, String userId, String sessionId, Date start, Long duration) {
 			super(parent, type, name, application, userId, sessionId);
 			this.date = start;
