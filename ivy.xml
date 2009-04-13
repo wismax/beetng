@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <ivy-module version="1.0">
-    <info organisation="mtgi" module="beet" status="release" revision="1.4.0">
+    <info organisation="mtgi" module="beet" status="release" revision="1.4.0_b1">
     	<description>
     	The beet library adds aspect-oriented user behavior tracking and 
     	performance monitoring capabilities to a Java application.  It is 
@@ -26,7 +26,7 @@
 	
 	<dependencies defaultconfmapping="1.5->1.5(default);1.6->1.6(default);default,compile,test->default">
 
-		<dependency org="springframework" name="spring" rev="2.0.5" conf="default,compile->default;test->mock"/>
+		<dependency org="springframework" name="spring" rev="2.0.5" conf="compile->default;test->mock"/>
 		<dependency org="apache" name="commons-logging" rev="1.1"/>
 		<dependency org="aspectj" name="aspectj" rev="1.5.3"/>
 		<dependency org="cglib" name="cglib" rev="2.1.3"/>

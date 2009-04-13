@@ -1,40 +1,93 @@
 <?xml version="1.0"?>
 
-<project name="BehaviorTracking" default="all-dist"
+<project name="BehaviorTracking" default="all"
 		 xmlns:ivy="antlib:org.apache.ivy.ant">
 
 	<import file="scripts/build-master.xml"/>
+
+	<target name="all-dist" description="deprecated target, just use all instead" depends="all"/>
 	
-	<target name="all-dist" depends="all,package-utils,doc"/>
-	
+	<!-- replace standard package target with custom routines -->
+	<target name="package" depends="doc,package-release,package-utils,package-reports"/>
+
 	<target name="package-utils" description="package command line utilities">
-	
-	    <ivy:resolve file="utils/ivy.xml"/>
-		<property name="utils.dist" value="${target.dir}/utils"/>
-		
+
+		<ivy:resolve file="utils/ivy.xml" resolveId="mtgi-beet-utils" />
+
 		<!-- create separate distributions for java 5 and 6 -->
 		<for list="5,6" param="current.version">
 			<sequential>
 				<var name="utils.dist" value="${target.dir}/java@{current.version}/utils"/>
-			    <mkdir dir="${utils.dist}"/>
-				
-			    <ivy:retrieve useOrigin="true"
+				<mkdir dir="${utils.dist}"/>
+
+				<ivy:retrieve useOrigin="true"
 			                  pattern="${utils.dist}/lib/[artifact]-[revision].[ext]"
 							  conf="1.@{current.version}"/>
-			
+
 				<copy todir="${utils.dist}">
 					<fileset dir="db" includes="etl/**"/>
-		            <fileset dir="${build.root}/utils/dist/jars"
+					<fileset dir="${build.root}/utils/dist/jars"
 		                     includes="**/*.jar" excludes="**/*test*"/>
 					<fileset dir="utils/bin" includes="**/**"/>
 				</copy>
-				
-				<zip file="${target.dir}/bt-utils-java@{current.version}.zip">
-					<zipfileset prefix="BehaviorTracking" dir="${utils.dist}" includes="**/*"/>
+
+				<zip file="${target.dir}/beet-utils-java@{current.version}-${ivy.revision.mtgi-beet-utils}.zip">
+					<zipfileset prefix="beet-utils-${ivy.revision.mtgi-beet-utils}" dir="${utils.dist}" includes="**/*"/>
 				</zip>
 			</sequential>
 		</for>
-	
+
 	</target>
-	
+
+	<target name="package-release" description="package a new public release for upload to SF">
+		<ivy:resolve file="ivy.xml" resolveId="mtgi-beet"/>
+
+		<!-- create separate distributions for java 5 and 6 -->
+		<for list="5,6" param="current.version">
+			<sequential>
+				<var name="release.dir" value="${target.dir}/java@{current.version}/release"/>
+				<mkdir dir="${release.dir}"/>
+
+				<ivy:retrieve useOrigin="true"
+			                  pattern="${release.dir}/lib/[artifact]-[revision].[ext]"
+							  conf="1.@{current.version}"/>
+
+				<copy todir="${release.dir}/lib">
+					<fileset dir="${build.root}/dist/jars"
+		                     includes="**/*.jar" excludes="**/*test*"/>
+				</copy>
+
+				<copy todir="${release.dir}/docs">
+					<fileset dir="${build.root}/docs" includes="api/**/*,userguide/**/*"/>
+				</copy>
+
+				<zip file="${target.dir}/beet-java@{current.version}-${ivy.revision.mtgi-beet}.zip">
+					<zipfileset prefix="beet-${ivy.revision.mtgi-beet}" dir="${release.dir}" includes="**/*"/>
+				</zip>
+
+			</sequential>
+		</for>
+	</target>
+
+	<target name="package-reports" description="package build reports and documentation for a project web site update">
+
+		<var name="release.dir" value="${target.dir}/site"/>
+		<mkdir dir="${release.dir}"/>
+
+		<copy todir="${release.dir}/build">
+			<fileset dir="${build.root}">
+				<include name="docs/api/**/*"/>
+				<include name="docs/userguide/**/*"/>
+				<include name="reports/**"/>
+				<include name="utils/docs/**"/>
+				<include name="utils/reports/**"/>
+			</fileset>
+		</copy>
+
+		<zip file="${target.dir}/site.zip">
+			<zipfileset dir="${release.dir}" includes="**/*"/>
+		</zip>
+		
+	</target>
+
 </project>
