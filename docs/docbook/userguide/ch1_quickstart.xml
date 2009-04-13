@@ -2,8 +2,9 @@
 	<title>Quick Start</title>
 	<section>
 		<title>Overview</title>
-		<para>You are reading reference documentation for the MTGI BehaviorTracking library.  
-		BehaviorTracking records application metrics as a user (or programmatic agent) interacts with
+		<para>You are reading reference documentation for the MTGI beet library.  
+		Beet (from B.T., short for Behavior Tracking) records application metrics 
+		as a user (or programmatic agent) interacts with
 		a <ulink url="http://www.springframework.org">Spring-based</ulink> 
 		application.</para>
 		
@@ -15,13 +16,13 @@
 		layers of an application.</para>
 		
 		<para><xref linkend="chapter_justification"/> contains a more detailed discussion of where 
-		BehaviorTracking belongs in the broader picture of production monitoring.</para>
+		beet belongs in the broader picture of production monitoring.</para>
 	</section>
 	<section id="section_simple_installation">
 		<title>Simplified Installation</title> 
-		<para>The BehaviorTracking.jar library and dependencies should be included in the target  
+		<para>The beet.jar library and dependencies should be included in the target  
 		application's library directory, e.g. <literal>WEB-INF/lib</literal> for web applications.  
-		BehaviorTracking is then enabled separately for tracking HTTP requests, Java  
+		beet is then enabled separately for tracking HTTP requests, Java  
 		method calls, and/or SQL queries. Behavior can be fine-tuned in many ways, see 
 		<xref linkend="chapter_configuration"/> for details.  The steps for a basic installation at all layers 
 		of an existing Spring application are:
@@ -114,10 +115,10 @@
 
 	<section>
 		<title>Log Analysis</title>
-		<para>The BehaviorTracking build generates a command-line tool suite for 
-		analyzing BehaviorTracking logs. The tool suite can be used to convert binary 
+		<para>The beet build generates a command-line tool suite for 
+		analyzing beet logs. The tool suite can be used to convert binary 
 		logs to CSV or XML, apply custom XSL transforms, and perform efficient bulk 
-		loads of BehaviorTracking data to an Oracle database. The tools require the 
+		loads of beet data to an Oracle database. The tools require the 
 		following:
 		<itemizedlist>
 			<listitem><simpara>Solaris, Linux, or Cygwin environment</simpara></listitem>
@@ -131,7 +132,7 @@
 		version appropriate to your local SDK install.</para> 
 		 
 		<para>After you have unpacked the archive, you can run any of the following utilities 
-		from a command prompt within the created <literal>BehaviorTracking</literal> directory.  All of these 
+		from a command prompt within the created <literal>beet</literal> directory.  All of these 
 		instructions assume you are logging in the default format, GZIP-compressed FastInfoSet 
 		(i.e. binary XML).</para>
 

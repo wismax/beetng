@@ -8,8 +8,8 @@
 			<tbody>
 				<row>
 					<entry><ulink url="../../api/index.html">Core</ulink></entry>
-					<entry>BehaviorTracking core interfaces and utility classes.  
-					This library is packaged as <literal>BehaviorTracking-[version].jar</literal>.
+					<entry>beet core interfaces and utility classes.  
+					This library is packaged as <literal>beet-[version].jar</literal>.
 					This package contains interfaces you must implement for custom persistence 
 					mechanisms and user identity providers.</entry>
 				</row>

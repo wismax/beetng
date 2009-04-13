@@ -10,7 +10,7 @@
 	
 	<section>
 		<title>Existing Tools and Methods</title> 
-		<para>There are many powerful tools available to monitor any modern Java application.  BehaviorTracking 
+		<para>There are many powerful tools available to monitor any modern Java application.  beet 
 		is designed to augment, not replace, the information that these tools provide.  A successful 
 		system will have a place for <emphasis>every one of these tools</emphasis>, almost without exception. What's most important is that you 
 		<emphasis>actually measure</emphasis> your system to understand where the problems lie.  The temptation 
@@ -130,7 +130,7 @@
 	</section>
 	
 	<section>
-		<title>Where BehaviorTracking Fits</title>
+		<title>Where beet Fits</title>
 		<para>From the above discussion, there are some obvious needs not <emphasis>easily</emphasis> met by existing tools:
 		<orderedlist>
 		<listitem><para>Easy addition of instrumentation at runtime, not compile-time</para></listitem>
@@ -140,20 +140,20 @@
 		a system, so that you know which request triggered that expensive SQL statement without needing to infer it.</para></listitem>
 		</orderedlist>
 		</para>
-		<para>BehaviorTracking aims to balance these needs against each other, so that you can react with more  
+		<para>beet aims to balance these needs against each other, so that you can react with more  
 		focus to production problems, and so that you can proactively understand how users behave as you  
-		consider ways to grow your system. The ideal use of BehaviorTracking combines it with judicious toolkit 
+		consider ways to grow your system. The ideal use of beet combines it with judicious toolkit 
 		logging, system resource monitoring, and JMX console access to provide you with a profoundly detailed portrait 
 		of your live production system.</para>
 		
 		<section>
 			<title>Why Spring?</title>
-			<para>The first release of BehaviorTracking targets <ulink url="http://www.springframework.org">Spring</ulink> 
+			<para>The first release of beet targets <ulink url="http://www.springframework.org">Spring</ulink> 
 			applications exclusively.  This is mostly because of Spring's 
-			excellent runtime AOP support, which is critical to BehaviorTracking's aim of zero code modification.
+			excellent runtime AOP support, which is critical to beet's aim of zero code modification.
 			Spring is also unusual in being of generally high quality, completely free, and wildly popular.  Finally,
 			many other important frameworks make Spring compatibility a priority.</para>
-			<para>Still, the core components of BehaviorTracking are not tightly coupled to Spring and support for other
+			<para>Still, the core components of beet are not tightly coupled to Spring and support for other
 			deployment scenarios is conceivable.  Deployment in a pure EJB3 container is a likely target for a 
 			future release.</para>
 		</section>
@@ -166,9 +166,9 @@
 			analysis tools; with our library, you mostly get the data, and what you do with it is your business. 
 			Many portal application servers (Sun Glassfish and BEA WebLogic come to mind) have some behavior 
 			tracking features; make sure you consider the capabilities of your target platform. Even if you have 
-			some tools available, BehaviorTracking may offer you something in simplicity, flexibility, and performance.</para>
+			some tools available, beet may offer you something in simplicity, flexibility, and performance.</para>
 			<para>There are also a few excellent open source projects out there geared toward gathering performance
-			metrics in a production system.  Among these, we believe BehaviorTracking to be fairly unique in its layered
+			metrics in a production system.  Among these, we believe beet to be fairly unique in its layered
 			approach to monitoring.</para>
 		</section>
 	</section>
