@@ -1,11 +1,191 @@
 <chapter id="chapter_configuration">
    <title>Spring Bean Configuration Reference</title>
+
    <para>Most configuration is accomplished by importing the custom config namespace into
-   your Spring bean definition file, and then using it to define the appropriate elements.</para>
+   your Spring bean definition file, and then using it to define the appropriate elements.
+   You can find probably find an example in <xref linkend="config_examples"/> and then customize
+   it to suit your needs using the schema reference in <xref linkend="config_schema"/>.</para>
    
-   <para>Unless otherwise specified, all elements support the "id" attribute for injection into
+   <para>Unless otherwise specified, all schema elements support the "id" attribute for injection into
    other Spring beans, in addition to those listed here.</para>
+   
+   <section id="config_examples">
+      <title>Configuration Examples</title>
+      <para>The simplest example in <xref linkend="chapter_getting_started"/> should suit most applications.
+      Here are some common (and less common) customizations:</para>
+		<example>
+			<title>Store performance logs in the Tomcat logs directory</title>
+			<programlisting><![CDATA[<beans xmlns="http://www.springframework.org/schema/beans"
+		    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		    xmlns:bt="http://www.mantis-tgi.com/schema/bt/1.1"
+		    xsi:schemaLocation="
+		       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+		       http://www.mantis-tgi.com/schema/bt         http://www.mantis-tgi.com/schema/bt/mtgi-bt-1.1.xsd">
+		
+		<bt:manager application="myapp">
+		  <bt:xml-persister file="${catalina.home}/logs/myapp-beet.xml"/>]]><co id="log-location"/><![CDATA[
+		</bt:manager>]]></programlisting>
+			<calloutlist>
+				<callout arearefs="log-location"><para>Tomcat defines the catalina.home system property, which
+				is useful for specifying server-relative paths in the configuration.
+				The file extension listed here will be replaced at runtime with one appropriate
+				to the log settings; for example, ".gz" is appended if log compression is enabled 
+				(which is the default).</para></callout>
+			</calloutlist>
+		</example>
+		
+		<example>
+			<title>Use a custom SessionContext implementation to specify user IDs</title>
+			<programlisting><![CDATA[<beans xmlns="http://www.springframework.org/schema/beans"
+		    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		    xmlns:bt="http://www.mantis-tgi.com/schema/bt/1.1"
+		    xsi:schemaLocation="
+		       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+		       http://www.mantis-tgi.com/schema/bt         http://www.mantis-tgi.com/schema/bt/mtgi-bt-1.1.xsd">
+		
+		<bt:manager application="myapp">
+		   <bt:session-context class="com.me.MySessionContextImpl]]><co id="custom-sc"/><![CDATA["/>
+		</bt:manager>]]></programlisting>
+			<calloutlist>
+				<callout arearefs="custom-sc"><para>This class must implement 
+				<ulink url="../../api/com/mtgi/analytics/SessionContext.html">com.mtgi.analytics.SessionContext</ulink>.
+				The <xref linkend="elt_session_context" endterm="elt_session_context_title"/> element is otherwise
+				a normal Spring bean definition, and may include nested property elements and so on.</para></callout>
+			</calloutlist>
+		</example>
+		
+		<example>
+			<title>Send tracking data for different packages to different log files</title>
+			<programlisting><![CDATA[<beans xmlns="http://www.springframework.org/schema/beans"
+		    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		    xmlns:bt="http://www.mantis-tgi.com/schema/bt/1.1"
+		    xsi:schemaLocation="
+		       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+		       http://www.mantis-tgi.com/schema/bt         http://www.mantis-tgi.com/schema/bt/mtgi-bt-1.1.xsd">
+		
+		<bt:config>
+		   <bt:manager id="loggerA]]><co id="multiple-managers"/><![CDATA[" application="myapp"
+		               track-method-expression="execution(* com.mtgi.package_a..*Tracked(..))>
+		      <bt:xml-persister file="log-a.xml"/>
+		   </bt:manager>
+		   <bt:manager id="loggerB" application="myapp"
+		               track-method-expression="execution(* com.mtgi.package_b..*Tracked(..))>
+		      <bt:xml-persister file="log-b.xml"/>]]><co id="multiple-executors"/><![CDATA[
+		   </bt:manager>
+		</bt:config>]]></programlisting>
+			<calloutlist>
+				<callout arearefs="multiple-managers"><para>When specifying multiple &lt;bt:manager&gt; instances
+				in a single application, you must provide unique IDs for each.</para></callout>
+				<callout arearefs="multiple-executors"><para>An important consequence of having multiple
+				managers in a single application is that each will define a private thread pool for persistence
+				operations.  If you want to have them all share a thread pool (which is not a bad idea), 
+				use the <xref linkend="elt_manager" endterm="elt_manager_title"/> attribute "task-executor".</para></callout>
+			</calloutlist>
+		</example>
+
+		<example>
+			<title>Register MBeans on a JVM with multiple Beet applications</title>
+			<programlisting><![CDATA[<beans xmlns="http://www.springframework.org/schema/beans"
+		    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		    xmlns:bt="http://www.mantis-tgi.com/schema/bt/1.1"
+		    xsi:schemaLocation="
+		       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+		       http://www.mantis-tgi.com/schema/bt         http://www.mantis-tgi.com/schema/bt/mtgi-bt-1.1.xsd">
+		
+		<bt:manager application="myapp"/>
+		
+        <!-- 
+             setup automatic export of annotated MBeans to the platform mbean server.  
+             Except where called out, most of this is boilerplate Spring/JMX configuration.
+        -->
+        <bean id="jmxAttributeSource" class="org.springframework.jmx.export.annotation.AnnotationJmxAttributeSource"/>
+        <bean id="jmxExporter" class="org.springframework.jmx.export.MBeanExporter">
+           <property name="assembler">
+              <bean class="org.springframework.jmx.export.assembler.MetadataMBeanInfoAssembler">
+                 <property name="attributeSource" ref="jmxAttributeSource"/>
+              </bean>
+           </property>
+           <property name="namingStrategy">
+              <bean class="com.mtgi.jmx.export.naming.ApplicationNamingStrategy">]]><co id="jmx-naming"/><![CDATA[
+                 <property name="application" value="myapp"/>
+                 <property name="delegate">
+                    <bean class="org.springframework.jmx.export.naming.MetadataNamingStrategy">
+                       <property name="attributeSource" ref="jmxAttributeSource"/>
+                    </bean>
+                 </property>
+              </bean>
+           </property>
+           <property name="autodetect" value="true"/>
+        </bean>]]></programlisting>
+			<calloutlist>
+				<callout arearefs="jmx-naming"><para>Here we add a naming strategy which puts all detected MBeans
+				in a group called "myapp", see the 
+				<ulink url="../../api/com/mtgi/jmx/export/naming/ApplicationNamingStrategy.html">ApplicationNamingStrategy JavaDoc</ulink>.  
+				The "delegate" property can be any other valid naming strategy
+				supported by Spring, which defines how the rest of the MBean names are constructed.
+				You can choose different names for each application to keep them
+				in separate branches of the JVM's platform MBean tree.</para></callout>
+			</calloutlist>
+		</example>
+   </section>
   
+   <section id="config_web">
+      <title>The Behavior Tracking Servlet Filter</title>
+      <para>As mentioned in <xref linkend="chapter_getting_started"/>, HTTP request tracking can be enabled either
+      in spring configuration via inclusion of <xref linkend="elt_http_requests" endterm="elt_http_requests_title"/>
+      or as a servlet filter.  The primary difference is that the serlvet filter can record response codes and error
+      messages in the event log.
+		<example>
+			<title>Defining BehaviorTrackingFilter in web.xml</title>
+			<programlisting><![CDATA[<?xml version="1.0"?>
+			
+        <web-app xmlns="http://java.sun.com/xml/ns/j2ee"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
+                 version="2.4">
+                 
+           ...
+           <!-- normal web.xml configuration up to this point -->
+           
+           <!-- enable behavior tracking for servlet requests -->
+           <filter>
+              <filter-name>trackingFilter</filter-name>
+              <filter-class>com.mtgi.analytics.servlet.BehaviorTrackingFilter</filter-class>
+              <init-param>
+                 <param-name>com.mtgi.analytics.parameters.include</param-name>]]><co id="filter-params"/><![CDATA[
+                 <param-value>dispatch</param-value>
+              </init-param>
+              <init-param>
+                 <param-name>com.mtgi.analytics.servlet.event</param-name>]]><co id="filter-type"/><![CDATA[
+                 <param-value>http-request</param-value>
+              </init-param>
+              <init-param>
+                 <param-name>com.mtgi.analytics.manager</param-name>]]><co id="filter-manager"/><![CDATA[
+                 <param-value>defaultTrackingManager</param-value>
+              </init-param>
+           </filter>
+
+           <filter-mapping>
+              <filter-name>trackingFilter</filter-name>
+              <servlet-name>action</servlet-name>
+              <dispatcher>REQUEST</dispatcher>
+           </filter-mapping>
+                     
+        </web-app>]]></programlisting>
+			<calloutlist>
+				<callout arearefs="filter-params"><para>An optional comma-separated list of parameters to include
+				in the event data logs.  If unspecified, all parameters are logged.</para></callout>
+				<callout arearefs="filter-type"><para>The value to specify for "event-type" in the event data
+				logs.  Primarily useful if you want to define several different filters and be able to identify
+				which generated each event.  Defaults to "http-request" if unspecified.</para></callout>
+				<callout arearefs="filter-manager"><para>The Spring bean name of the BehaviorTrackingManager used
+				to log events.  Defaults to "defaultTrackingManager" if unspecified (if you only have one &lt;bt:manager&gt;
+				tag in your Spring configuration, you should not need this parameter).</para></callout>
+			</calloutlist>
+		</example>
+      </para>
+   </section>
+   
    &chap3_schema; 
    
 </chapter>

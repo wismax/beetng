@@ -1,4 +1,4 @@
-<chapter>
+<chapter id="chapter_api_reference">
 	<title>Programmer Reference</title>
 	<para>You only need to refer to the API documentation if you plan to write new persisters, application-specific modules, or log analysis utilities. 
 	For most applications the provided tools should be adequate.</para>

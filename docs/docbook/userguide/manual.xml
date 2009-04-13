@@ -6,7 +6,8 @@
 	<!ENTITY chap2 SYSTEM "ch2_justification.xml">
 	<!ENTITY chap3 SYSTEM "ch3_configuration.xml">
 	<!ENTITY chap3_schema SYSTEM "ch3_configuration_schema.xml">
-	<!ENTITY chap4 SYSTEM "ch4_programmer_reference.xml">
+	<!ENTITY chap4 SYSTEM "ch4_jmx_administration.xml">
+	<!ENTITY chap5 SYSTEM "ch5_programmer_reference.xml">
 ]>
 
 <book>
@@ -32,5 +33,6 @@
 	&chap2;
 	&chap3;
 	&chap4;
+	&chap5;
 
 </book>

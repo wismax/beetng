@@ -33,3 +33,32 @@
 .segmentedlist .seg:first-child {
   white-space: nowrap;
 }
+
+
+h2.title {
+  background-color: grey;
+  color: #fafafa;
+  padding: 10pt;
+  border: 5px solid #333;
+}
+
+.section h2.title {
+  padding: 5pt;
+  border-width: 3px;
+}
+
+.section h3.title {
+  background-color: lightgrey;
+  padding: 5pt;
+  border: 1px solid black;
+  margin-top: 2em;
+}
+
+.caution h3.title {
+  border: none;
+  background-color: transparent;
+  color: black;
+  padding: 0;
+  margin-top: 15pt;
+}
+

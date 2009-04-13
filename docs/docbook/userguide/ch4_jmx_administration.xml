@@ -1,0 +1,4 @@
+<chapter id="chapter_jmx_administration">
+	<title>JMX Administration</title>
+	<para>Several Beet classes include Spring JMX Annotations for automatic registration with an MBean server.  Doc TBD.</para>
+</chapter>

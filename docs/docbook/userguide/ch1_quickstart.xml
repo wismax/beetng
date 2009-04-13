@@ -2,11 +2,9 @@
 	<title>Quick Start</title>
 	<section>
 		<title>Overview</title>
-		<para>You are reading reference documentation for the MTGI beet library.  
-		Beet (from B.T., short for Behavior Tracking) records application metrics 
-		as a user (or programmatic agent) interacts with
-		a <ulink url="http://www.springframework.org">Spring-based</ulink> 
-		application.</para>
+		<para>Beet (from B.T., short for Behavior Tracking) records application metrics 
+		as a user (or programmatic agent) interacts with a <ulink url="http://www.springframework.org">Spring-based</ulink> 
+		Java application.</para>
 		
 		<para>No source-level modification is required in the instrumented application; measurement 
 		is enabled completely at runtime. Metrics are tied to a specific user and session, and can be  
@@ -33,7 +31,7 @@
 				<para>Add behavior tracking markup to your Spring applicationContext.xml file
 				(modify values to suit your application): 
 				<example>
-					<title>Adding method call tracking to applicationContext.xml</title>
+					<title>Adding method and http tracking to applicationContext.xml</title>
 					<programlisting><![CDATA[<beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:aop="http://www.springframework.org/schema/aop"
@@ -43,49 +41,25 @@
           http://www.mantis-tgi.com/schema/bt         http://www.mantis-tgi.com/schema/bt/mtgi-bt-1.1.xsd
           http://www.springframework.org/schema/aop   http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
 
-   <!-- 
-        enable behavior tracking.  track-method-expression is an AOP 
-        expression identifying which methods we want to profile in the behavior
-        tracking logs; leave it out to skip Java method call metrics.
-   -->
-   <bt:config>
       <bt:manager application="myapp"]]><co id="appname"/><![CDATA[
-                  track-method-expression="execution(* com.mtgi.analytics..*Tracked(..))"/>]]><co id="pattern"/><![CDATA[
-   </bt:config>]]></programlisting>
+                  track-method-expression="execution(* com.mtgi.analytics..*Tracked(..))]]><co id="pattern"/><![CDATA[">
+         <bt:http-requests parameters="dispatch"/>]]><co id="http-requests"/><![CDATA[
+      </bt:manager>]]></programlisting>
 					<calloutlist>
 						<callout arearefs="appname"><para>The name of this application, as it will
 						appear in behavior tracking logs.</para></callout>
-						<callout arearefs="pattern"><para>An AspectJ pointcut expression identifying which
+						<callout arearefs="pattern"><para>(optional) An AspectJ pointcut expression identifying which
 						methods you want to track in your application.  This example identifies "all methods
 						in the com.mtgi.analytics package with names ending in "Tracked".  For a detailed 
 						description of this grammar, see the 
 						<ulink url="http://www.eclipse.org/aspectj/doc/released/progguide/semantics-pointcuts.html">AspectJ programming guide</ulink>.</para>
 						</callout>
+						<callout arearefs="http-requests"><para>(optional) Enable limited HTTP request tracking.  
+						HTTP request tracking can also be enabled as a servlet filter with more fine-grained
+						control.  The "parameters" attribute is a comma-separated list of request parameters logged with each event.</para>
+						</callout>
 					</calloutlist>
 				</example>
-				</para>
-			</listitem>
-			<listitem>
-				<para><emphasis role="bold">(optional)</emphasis> To enable tracking for <emphasis role="bold">http requests</emphasis>, 
-				add the behavior tracking servlet filter to web.xml: 
-				<example>
-					<title>Adding request tracking to web.xml</title>
-					<programlisting><![CDATA[<!-- enable behavior tracking for servlet requests -->
-<filter>
-   <filter-name>trackingFilter</filter-name>
-   <filter-class>com.mtgi.analytics.servlet.BehaviorTrackingFilter</filter-class>
-   <init-param>
-   <!-- request parameters are not logged by default.  to log specific 
-        parameters, list them here -->
-      <param-name>com.mtgi.analytics.parameters.include</param-name>
-      <param-value>dispatch</param-value>
-   </init-param>
-</filter>
-<filter-mapping>
-   <filter-name>trackingFilter</filter-name>
-   <servlet-name>action</servlet-name>
-   <dispatcher>REQUEST</dispatcher>
-</filter-mapping>]]></programlisting></example>
 				</para>
 			</listitem>
 			<listitem><para><emphasis role="bold">(optional)</emphasis> To enable behavior tracking at the 

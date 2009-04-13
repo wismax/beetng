@@ -3,9 +3,10 @@
 	
 		namespacePrefix = bt:
 		rootElement     = section
+		rootElementId   = config_schema
 		sectionPrefix   = elt_
 -->
-<section>
+<section id="config_schema">
    <title>XML Schema Documentation for http://www.mantis-tgi.com/schema/bt/1.1</title>
    <para>Import this schema into your Spring beans definition file (namespace http://www.springframework.org/schema/beans) to configure behavior tracking.</para>
    <section id="elt_config">
@@ -86,7 +87,7 @@
             <seg>task-executor</seg>
             <seg>optional</seg>
             <seg>
-               <para>Bean name of a task executor for performing event logging operations. If unspecified, a private thread pool if maintained for this purpose. The default behavior is strongly recommended, as unbounded memory growth is possible if events cannot be logged in a timely fashion as they are recorded.</para>
+               <para>Bean name of a task executor for performing event logging operations. If unspecified, a private thread pool is maintained for this purpose. The default behavior is strongly recommended, as unbounded memory growth is possible if events cannot be logged in a timely fashion as they are recorded.</para>
             </seg>
          </seglistitem>
          <seglistitem>
@@ -164,16 +165,18 @@
                <xref linkend="elt_http_requests" endterm="elt_http_requests_title"/>
             </term>
             <listitem>
-               <para>Activate logging of http requests using this manager. All parameters are logged unless the "parameters" attribute is specified. Similarly, all requests are logged, unless one or more "uri-patterns" are specified.</para>
-               <para>This element cannot be used in a web application that already has BehaviorTrackingFilter instance(s) configured in web.xml. BehaviorTrackingFilters are a more complex, but more powerful alternative to configuration using this element. For example, BehaviorTrackingFilters add HTTP response code and error diagnostic information to the behavior tracking event. HTTP response codes are not logged if you use <xref linkend="elt_http_requests" endterm="elt_http_requests_title" /> in your Spring configuration.</para>
+               <para>Activate logging of http requests using this manager. Use of this element requires a servlet container supporting JSP 2.0 and higher. Older containers MUST use the servlet filter instead.</para>
+               <para>All parameters are logged unless the "parameters" attribute is specified. Similarly, all requests are logged, unless one or more "uri-patterns" are specified.</para>
+               <para>This element cannot be used in a web application that already has BehaviorTrackingFilter instance(s) configured in web.xml. BehaviorTrackingFilters are a more complex, but slightly more powerful alternative to configuration using this element. For example, BehaviorTrackingFilters add HTTP response code and error diagnostic information to the behavior tracking event. HTTP response codes are not logged if you use <xref linkend="elt_http_requests" endterm="elt_http_requests_title" /> in your Spring configuration.</para>
                <para>However, the relatively more concise <xref linkend="elt_http_requests" endterm="elt_http_requests_title" /> tag in spring configuration may suffice in simple applications, with the added benefit of centralizing all behavior tracking configuration in your Spring bean definitions file.</para>
             </listitem>
          </varlistentry>
       </variablelist>
       <section id="elt_http_requests">
          <title id="elt_http_requests_title">&lt;bt:http-requests&gt;</title>
-         <para>Activate logging of http requests using this manager. All parameters are logged unless the "parameters" attribute is specified. Similarly, all requests are logged, unless one or more "uri-patterns" are specified.</para>
-         <para>This element cannot be used in a web application that already has BehaviorTrackingFilter instance(s) configured in web.xml. BehaviorTrackingFilters are a more complex, but more powerful alternative to configuration using this element. For example, BehaviorTrackingFilters add HTTP response code and error diagnostic information to the behavior tracking event. HTTP response codes are not logged if you use <xref linkend="elt_http_requests" endterm="elt_http_requests_title" /> in your Spring configuration.</para>
+         <para>Activate logging of http requests using this manager. Use of this element requires a servlet container supporting JSP 2.0 and higher. Older containers MUST use the servlet filter instead.</para>
+         <para>All parameters are logged unless the "parameters" attribute is specified. Similarly, all requests are logged, unless one or more "uri-patterns" are specified.</para>
+         <para>This element cannot be used in a web application that already has BehaviorTrackingFilter instance(s) configured in web.xml. BehaviorTrackingFilters are a more complex, but slightly more powerful alternative to configuration using this element. For example, BehaviorTrackingFilters add HTTP response code and error diagnostic information to the behavior tracking event. HTTP response codes are not logged if you use <xref linkend="elt_http_requests" endterm="elt_http_requests_title" /> in your Spring configuration.</para>
          <para>However, the relatively more concise <xref linkend="elt_http_requests" endterm="elt_http_requests_title" /> tag in spring configuration may suffice in simple applications, with the added benefit of centralizing all behavior tracking configuration in your Spring bean definitions file.</para>
          <segmentedlist><?dbhtml list-presentation="table"?><title>&lt;bt:http-requests&gt; Attributes</title>
             <segtitle>Attribute</segtitle>
