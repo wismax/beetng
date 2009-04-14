@@ -62,10 +62,14 @@
 							  conf="1.@{current.version}"/>
 
 				<copy todir="${utils.dist}">
-					<fileset dir="utils/db" includes="etl/**"/>
 					<fileset dir="${build.root}/utils/dist/jars"
 		                     includes="**/*.jar" excludes="**/*test*"/>
-					<fileset dir="utils/bin" includes="**/**"/>
+				</copy>
+				<copy todir="${utils.dist}/bin">
+					<fileset dir="utils/src/main/sh" includes="**/**"/>
+				</copy>
+				<copy todir="${utils.dist}/db">
+					<fileset dir="utils/src/main/sql" includes="**/**"/>
 				</copy>
 
 				<bundle basename="${target.dir}/beet-utils-java@{current.version}-${ivy.revision.mtgi-beet-utils}"
@@ -89,10 +93,12 @@
 			                  pattern="${release.dir}/lib/[artifact]-[revision].[ext]"
 							  conf="1.@{current.version}"/>
 
-				<copy todir="${release.dir}/lib">
+				<copy todir="${release.dir}">
 					<fileset dir="${build.root}/core/dist/jars"
 		                     includes="**/*.jar" excludes="**/*test*"/>
 				</copy>
+				
+				<copy todir="${release.dir}" file="LICENSE.txt"/>
 
 				<copy todir="${release.dir}/docs">
 					<fileset dir="${build.root}/core/docs" includes="api/**/*,userguide/**/*"/>

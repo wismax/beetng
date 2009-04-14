@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="core/test/source"/>
-	<classpathentry kind="src" path="core/source"/>
-	<classpathentry kind="src" path="utils/source"/>
-	<classpathentry kind="src" path="utils/test/source"/>
+	<classpathentry kind="src" path="utils/src/test/java"/>
+	<classpathentry kind="src" path="core/src/test/java"/>
+	<classpathentry kind="src" path="core/src/main/java"/>
+	<classpathentry kind="src" path="utils/src/main/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jre1.6.0_04"/>
 	<classpathentry kind="con" path="org.apache.ivyde.eclipse.cpcontainer.IVYDE_CONTAINER/utils/ivy.xml/*"/>
-	<classpathentry kind="lib" path="core/config"/>
-	<classpathentry kind="lib" path="core/test/config"/>
-	<classpathentry kind="lib" path="utils/db"/>
 	<classpathentry kind="con" path="org.apache.ivyde.eclipse.cpcontainer.IVYDE_CONTAINER/core/ivy.xml/*"/>
+	<classpathentry kind="lib" path="core/src/main/resources"/>
+	<classpathentry kind="lib" path="core/src/test/resources"/>
+	<classpathentry kind="lib" path="utils/src/main/sql"/>
 	<classpathentry kind="output" path="ide"/>
 </classpath>
