@@ -62,7 +62,7 @@
 							  conf="1.@{current.version}"/>
 
 				<copy todir="${utils.dist}">
-					<fileset dir="db" includes="etl/**"/>
+					<fileset dir="utils/db" includes="etl/**"/>
 					<fileset dir="${build.root}/utils/dist/jars"
 		                     includes="**/*.jar" excludes="**/*test*"/>
 					<fileset dir="utils/bin" includes="**/**"/>
@@ -77,7 +77,7 @@
 	</target>
 
 	<target name="package-release" description="package a new public release for upload to SF">
-		<ivy:resolve file="ivy.xml" resolveId="mtgi-beet"/>
+		<ivy:resolve file="core/ivy.xml" resolveId="mtgi-beet"/>
 
 		<!-- create separate distributions for java 5 and 6 -->
 		<for list="5,6" param="current.version">
@@ -90,12 +90,12 @@
 							  conf="1.@{current.version}"/>
 
 				<copy todir="${release.dir}/lib">
-					<fileset dir="${build.root}/dist/jars"
+					<fileset dir="${build.root}/core/dist/jars"
 		                     includes="**/*.jar" excludes="**/*test*"/>
 				</copy>
 
 				<copy todir="${release.dir}/docs">
-					<fileset dir="${build.root}/docs" includes="api/**/*,userguide/**/*"/>
+					<fileset dir="${build.root}/core/docs" includes="api/**/*,userguide/**/*"/>
 				</copy>
 
 				<bundle basename="${target.dir}/beet-java@{current.version}-${ivy.revision.mtgi-beet}"
@@ -111,18 +111,14 @@
 		<var name="release.dir" value="${target.dir}/site"/>
 		<mkdir dir="${release.dir}"/>
 
-		<copy todir="${release.dir}/build">
-			<fileset dir="${build.root}">
-				<include name="docs/api/**/*"/>
-				<include name="docs/userguide/**/*"/>
-				<include name="reports/**"/>
+		<zip file="${target.dir}/site.zip">
+			<zipfileset prefix="build" dir="${build.root}">
+				<include name="core/docs/api/**/*"/>
+				<include name="core/docs/userguide/**/*"/>
+				<include name="core/reports/**"/>
 				<include name="utils/docs/**"/>
 				<include name="utils/reports/**"/>
-			</fileset>
-		</copy>
-
-		<zip file="${target.dir}/site.zip">
-			<zipfileset dir="${release.dir}" includes="**/*"/>
+			</zipfileset>
 		</zip>
 		
 	</target>
