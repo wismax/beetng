@@ -1,3 +1,16 @@
+/* 
+ * Copyright 2008-2009 the original author or authors.
+ * The contents of this file are subject to the Mozilla Public License
+ * Version 1.1 (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of the License at
+ * http://www.mozilla.org/MPL/
+ *
+ * Software distributed under the License is distributed on an "AS IS"
+ * basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+ * License for the specific language governing rights and limitations
+ * under the License.
+ */
+ 
 package com.mtgi.analytics;
 
 import java.io.Serializable;
@@ -229,7 +242,7 @@ public class BehaviorEvent implements Serializable {
 	/** 
 	 * a singleton empty data element, for events that do not need to define any data.
 	 * Replaces itself with a new, standard EventDataElement instance on the first call
-	 * to {@link #dereference(BehaviorEvent)}.  This somewhat arcane construction is an optimization
+	 * to {@link #initialize(BehaviorEvent)}.  This somewhat arcane construction is an optimization
 	 * for calls to {@link #addData}, so that they do not require a null check.
 	 */
 	private static class DeferredDataElement extends ImmutableEventDataElement {
