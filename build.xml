@@ -1,10 +1,47 @@
 <?xml version="1.0"?>
 
-<project name="BehaviorTracking" default="all"
+<project name="beet" default="all"
 		 xmlns:ivy="antlib:org.apache.ivy.ant">
 
 	<import file="scripts/build-master.xml"/>
 
+	<macrodef name="bundle" 
+			  description="Generate tar.gz, tar.bz2, zip, and corresponding MD5 hash files for a release directory">
+
+		<attribute name="basename" description="Base name for the generated archives, without extensions"/>
+		<attribute name="prefix" description="Root directory name of contents placed in the archive"/>
+		<attribute name="dir" description="Base directory for files to include" />
+		<attribute name="includes" description="Include patterns relative to 'dir'" default=""/>
+		<attribute name="excludes" description="Exclude patterns relative to 'dir'" default=""/>
+		<element name="contents" description="nested include, exclude, or pattern directives" implicit="true" optional="true"/>
+
+		<sequential>
+
+			<zip file="@{basename}.zip">
+				<zipfileset prefix="@{prefix}" dir="@{dir}" includes="@{includes}" excludes="@{excludes}">
+					<contents/>
+				</zipfileset>
+			</zip>
+			<checksum file="@{basename}.zip"/>
+			
+			<tar destfile="@{basename}.tar.gz" compression="gzip">
+				<tarfileset prefix="@{prefix}" dir="@{dir}" includes="@{includes}" excludes="@{excludes}">
+					<contents/>
+				</tarfileset>
+			</tar>
+			<checksum file="@{basename}.tar.gz"/>
+
+			<tar destfile="@{basename}.tar.bz2" compression="bzip2">
+				<tarfileset prefix="@{prefix}" dir="@{dir}" includes="@{includes}" excludes="@{excludes}">
+					<contents/>
+				</tarfileset>
+			</tar>
+			<checksum file="@{basename}.tar.bz2"/>
+			
+		</sequential>
+		
+	</macrodef>
+	
 	<target name="all-dist" description="deprecated target, just use all instead" depends="all"/>
 	
 	<!-- replace standard package target with custom routines -->
@@ -31,9 +68,9 @@
 					<fileset dir="utils/bin" includes="**/**"/>
 				</copy>
 
-				<zip file="${target.dir}/beet-utils-java@{current.version}-${ivy.revision.mtgi-beet-utils}.zip">
-					<zipfileset prefix="beet-utils-${ivy.revision.mtgi-beet-utils}" dir="${utils.dist}" includes="**/*"/>
-				</zip>
+				<bundle basename="${target.dir}/beet-utils-java@{current.version}-${ivy.revision.mtgi-beet-utils}"
+						prefix="beet-utils-${ivy.revision.mtgi-beet-utils}"
+						dir="${utils.dist}" includes="**/*"/>
 			</sequential>
 		</for>
 
@@ -61,9 +98,9 @@
 					<fileset dir="${build.root}/docs" includes="api/**/*,userguide/**/*"/>
 				</copy>
 
-				<zip file="${target.dir}/beet-java@{current.version}-${ivy.revision.mtgi-beet}.zip">
-					<zipfileset prefix="beet-${ivy.revision.mtgi-beet}" dir="${release.dir}" includes="**/*"/>
-				</zip>
+				<bundle basename="${target.dir}/beet-java@{current.version}-${ivy.revision.mtgi-beet}"
+						prefix="beet-${ivy.revision.mtgi-beet}"
+						dir="${release.dir}" includes="**/*"/>
 
 			</sequential>
 		</for>

@@ -1,2 +1,5 @@
 build/
 ide/
+
+/local.properties
+/scripts/
