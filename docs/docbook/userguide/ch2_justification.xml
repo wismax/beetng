@@ -1,6 +1,7 @@
 <chapter id="chapter_justification">
 	<title>Justification</title>
-	<para>It is hard to predict how users will engage your application before it hits production.  You can invest much or little in your attempts to 
+	<para>It is hard to predict how users will engage your application before it hits production.  
+	You can invest much or little in your attempts to 
 	predict demand, but in either case your best educated guess cannot dictate  
 	the future.  If you can avoid performance problems on first release, monitoring  
 	is paramount to ensure that things stay under control  as users find new ways to  
@@ -10,12 +11,12 @@
 	
 	<section>
 		<title>Existing Tools and Methods</title> 
-		<para>There are many powerful tools available to monitor any modern Java application.  beet 
-		is designed to augment, not replace, the information that these tools provide.  A successful 
-		system will have a place for <emphasis>every one of these tools</emphasis>, almost without exception. What's most important is that you 
+		<para>There are many powerful tools available to monitor any modern Java application.  Beet 
+		is designed to augment, not replace, the information that these tools provide.  What's most important is that you 
 		<emphasis>actually measure</emphasis> your system to understand where the problems lie.  The temptation 
 		to arbitrarily pick your least favorite part of the application and rewrite while your users suffer is a 
-		strong one and a good way to lose credibility.  The same goes for measuring arbitrary behaviors in a controlled test environment without a clear analogy to production user behavior. If your suspicion feels like certainty, it 
+		strong one and a good way to lose credibility.  The same goes for measuring arbitrary behaviors in a controlled 
+		test environment without a clear analogy to production user behavior. If your suspicion feels like certainty, it 
 		should be easy to find hard evidence to back it up, but don't forgo the exercise.</para>
 		
 		<section>

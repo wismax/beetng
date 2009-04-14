@@ -1,5 +1,5 @@
 <chapter id="chapter_configuration">
-   <title>Spring Bean Configuration Reference</title>
+   <title>Configuration Reference</title>
 
    <para>Most configuration is accomplished by importing the custom config namespace into
    your Spring bean definition file, and then using it to define the appropriate elements.
@@ -16,15 +16,15 @@
 		<example>
 			<title>Store performance logs in the Tomcat logs directory</title>
 			<programlisting><![CDATA[<beans xmlns="http://www.springframework.org/schema/beans"
-		    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		    xmlns:bt="http://www.mantis-tgi.com/schema/bt/1.1"
-		    xsi:schemaLocation="
-		       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
-		       http://www.mantis-tgi.com/schema/bt         http://www.mantis-tgi.com/schema/bt/mtgi-bt-1.1.xsd">
-		
-		<bt:manager application="myapp">
-		  <bt:xml-persister file="${catalina.home}/logs/myapp-beet.xml"/>]]><co id="log-location"/><![CDATA[
-		</bt:manager>]]></programlisting>
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:bt="http://www.mantis-tgi.com/schema/bt/1.1"
+       xsi:schemaLocation="
+          http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+          http://www.mantis-tgi.com/schema/bt         http://www.mantis-tgi.com/schema/bt/mtgi-bt-1.1.xsd">
+
+   <bt:manager application="myapp">
+      <bt:xml-persister file="${catalina.home}/logs/myapp-beet.xml"/>]]><co id="log-location"/><![CDATA[
+   </bt:manager>]]></programlisting>
 			<calloutlist>
 				<callout arearefs="log-location"><para>Tomcat defines the catalina.home system property, which
 				is useful for specifying server-relative paths in the configuration.
@@ -37,15 +37,15 @@
 		<example>
 			<title>Use a custom SessionContext implementation to specify user IDs</title>
 			<programlisting><![CDATA[<beans xmlns="http://www.springframework.org/schema/beans"
-		    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		    xmlns:bt="http://www.mantis-tgi.com/schema/bt/1.1"
-		    xsi:schemaLocation="
-		       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
-		       http://www.mantis-tgi.com/schema/bt         http://www.mantis-tgi.com/schema/bt/mtgi-bt-1.1.xsd">
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:bt="http://www.mantis-tgi.com/schema/bt/1.1"
+       xsi:schemaLocation="
+          http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+          http://www.mantis-tgi.com/schema/bt         http://www.mantis-tgi.com/schema/bt/mtgi-bt-1.1.xsd">
 		
-		<bt:manager application="myapp">
-		   <bt:session-context class="com.me.MySessionContextImpl]]><co id="custom-sc"/><![CDATA["/>
-		</bt:manager>]]></programlisting>
+   <bt:manager application="myapp">
+      <bt:session-context class="com.me.MySessionContextImpl]]><co id="custom-sc"/><![CDATA["/>
+   </bt:manager>]]></programlisting>
 			<calloutlist>
 				<callout arearefs="custom-sc"><para>This class must implement 
 				<ulink url="../../api/com/mtgi/analytics/SessionContext.html">com.mtgi.analytics.SessionContext</ulink>.
@@ -57,22 +57,22 @@
 		<example>
 			<title>Send tracking data for different packages to different log files</title>
 			<programlisting><![CDATA[<beans xmlns="http://www.springframework.org/schema/beans"
-		    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		    xmlns:bt="http://www.mantis-tgi.com/schema/bt/1.1"
-		    xsi:schemaLocation="
-		       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
-		       http://www.mantis-tgi.com/schema/bt         http://www.mantis-tgi.com/schema/bt/mtgi-bt-1.1.xsd">
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:bt="http://www.mantis-tgi.com/schema/bt/1.1"
+       xsi:schemaLocation="
+          http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+          http://www.mantis-tgi.com/schema/bt         http://www.mantis-tgi.com/schema/bt/mtgi-bt-1.1.xsd">
 		
-		<bt:config>
-		   <bt:manager id="loggerA]]><co id="multiple-managers"/><![CDATA[" application="myapp"
-		               track-method-expression="execution(* com.mtgi.package_a..*Tracked(..))>
-		      <bt:xml-persister file="log-a.xml"/>
-		   </bt:manager>
-		   <bt:manager id="loggerB" application="myapp"
-		               track-method-expression="execution(* com.mtgi.package_b..*Tracked(..))>
-		      <bt:xml-persister file="log-b.xml"/>]]><co id="multiple-executors"/><![CDATA[
-		   </bt:manager>
-		</bt:config>]]></programlisting>
+   <bt:config>
+      <bt:manager id="loggerA]]><co id="multiple-managers"/><![CDATA[" application="myapp"
+                  track-method-expression="execution(* com.mtgi.package_a..*Tracked(..))">
+         <bt:xml-persister file="log-a.xml"/>
+      </bt:manager>
+      <bt:manager id="loggerB" application="myapp"
+                  track-method-expression="execution(* com.mtgi.package_b..*Tracked(..))">
+         <bt:xml-persister file="log-b.xml"/>]]><co id="multiple-executors"/><![CDATA[
+      </bt:manager>
+   </bt:config>]]></programlisting>
 			<calloutlist>
 				<callout arearefs="multiple-managers"><para>When specifying multiple &lt;bt:manager&gt; instances
 				in a single application, you must provide unique IDs for each.</para></callout>
@@ -84,39 +84,72 @@
 		</example>
 
 		<example>
+			<title>Integrate beet with other AOP advice</title>
+			<programlisting><![CDATA[<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:bt="http://www.mantis-tgi.com/schema/bt/1.1"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="
+          http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+          http://www.springframework.org/schema/tx    http://www.springframework.org/schema/tx/spring-tx-2.0.xsd
+          http://www.mantis-tgi.com/schema/bt         http://www.mantis-tgi.com/schema/bt/mtgi-bt-1.1.xsd
+          http://www.springframework.org/schema/aop   http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
+		
+   <bt:manager/>]]><co id="no-expression"/><![CDATA[
+        
+   <bt:advice id="btAdvice"/>]]><co id="advice-manager"/><![CDATA[
+   <tx:advice id="txAdvice"/>
+                
+   <aop:config>
+      <aop:pointcut id="trackedOperations" expression="execution(* com.mtgi..*Service(..))" />
+      <aop:advisor id="behaviorTrackingAdvisor" advice-ref="btAdvice" pointcut-ref="trackedOperations" order="1"/>
+      <aop:advisor id="transactionAdvisor" advice-ref="txAdvice" pointcut-ref="trackedOperations" order="2"/>]]><co id="advice-ordering"/><![CDATA[
+   </aop:config>]]></programlisting>
+			<calloutlist>
+				<callout arearefs="no-expression"><para>We have intentionally not specified a pointcut expression
+				here, since we're going to be including that with the rest of our AOP config below.</para></callout>
+				<callout arearefs="advice-manager"><para>If you want to associate behavior tracking advice
+				with a manager other than the default instance, you can use the "tracking-manager" attribute to do so.</para></callout>
+				<callout arearefs="advice-ordering"><para>By specifying a lower order for the behavior tracking advice, 
+				we've ensured that behavior tracking metrics include time spent on transaction synchronization.</para></callout>
+			</calloutlist>
+		</example>
+
+		<example>
 			<title>Register MBeans on a JVM with multiple Beet applications</title>
 			<programlisting><![CDATA[<beans xmlns="http://www.springframework.org/schema/beans"
-		    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		    xmlns:bt="http://www.mantis-tgi.com/schema/bt/1.1"
-		    xsi:schemaLocation="
-		       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
-		       http://www.mantis-tgi.com/schema/bt         http://www.mantis-tgi.com/schema/bt/mtgi-bt-1.1.xsd">
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:bt="http://www.mantis-tgi.com/schema/bt/1.1"
+       xsi:schemaLocation="
+          http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+          http://www.mantis-tgi.com/schema/bt         http://www.mantis-tgi.com/schema/bt/mtgi-bt-1.1.xsd">
 		
-		<bt:manager application="myapp"/>
+   <bt:manager application="myapp"/>
 		
-        <!-- 
-             setup automatic export of annotated MBeans to the platform mbean server.  
-             Except where called out, most of this is boilerplate Spring/JMX configuration.
-        -->
-        <bean id="jmxAttributeSource" class="org.springframework.jmx.export.annotation.AnnotationJmxAttributeSource"/>
-        <bean id="jmxExporter" class="org.springframework.jmx.export.MBeanExporter">
-           <property name="assembler">
-              <bean class="org.springframework.jmx.export.assembler.MetadataMBeanInfoAssembler">
-                 <property name="attributeSource" ref="jmxAttributeSource"/>
-              </bean>
-           </property>
-           <property name="namingStrategy">
-              <bean class="com.mtgi.jmx.export.naming.ApplicationNamingStrategy">]]><co id="jmx-naming"/><![CDATA[
-                 <property name="application" value="myapp"/>
-                 <property name="delegate">
-                    <bean class="org.springframework.jmx.export.naming.MetadataNamingStrategy">
-                       <property name="attributeSource" ref="jmxAttributeSource"/>
-                    </bean>
-                 </property>
-              </bean>
-           </property>
-           <property name="autodetect" value="true"/>
-        </bean>]]></programlisting>
+   <!-- 
+     setup automatic export of annotated MBeans to the platform mbean server.  
+     Except where called out, most of this is boilerplate Spring/JMX configuration.
+   -->
+   <bean id="jmxAttributeSource" class="org.springframework.jmx.export.annotation.AnnotationJmxAttributeSource"/>
+   <bean id="jmxExporter" class="org.springframework.jmx.export.MBeanExporter">
+      <property name="assembler">
+         <bean class="org.springframework.jmx.export.assembler.MetadataMBeanInfoAssembler">
+            <property name="attributeSource" ref="jmxAttributeSource"/>
+         </bean>
+      </property>
+      <property name="namingStrategy">
+         <bean class="com.mtgi.jmx.export.naming.ApplicationNamingStrategy">]]><co id="jmx-naming"/><![CDATA[
+            <property name="application" value="myapp"/>
+            <property name="delegate">
+               <bean class="org.springframework.jmx.export.naming.MetadataNamingStrategy">
+                  <property name="attributeSource" ref="jmxAttributeSource"/>
+               </bean>
+            </property>
+         </bean>
+      </property>
+      <property name="autodetect" value="true"/>
+   </bean>]]></programlisting>
 			<calloutlist>
 				<callout arearefs="jmx-naming"><para>Here we add a naming strategy which puts all detected MBeans
 				in a group called "myapp", see the 
@@ -139,39 +172,39 @@
 			<title>Defining BehaviorTrackingFilter in web.xml</title>
 			<programlisting><![CDATA[<?xml version="1.0"?>
 			
-        <web-app xmlns="http://java.sun.com/xml/ns/j2ee"
-                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                 xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
-                 version="2.4">
-                 
-           ...
-           <!-- normal web.xml configuration up to this point -->
-           
-           <!-- enable behavior tracking for servlet requests -->
-           <filter>
-              <filter-name>trackingFilter</filter-name>
-              <filter-class>com.mtgi.analytics.servlet.BehaviorTrackingFilter</filter-class>
-              <init-param>
-                 <param-name>com.mtgi.analytics.parameters.include</param-name>]]><co id="filter-params"/><![CDATA[
-                 <param-value>dispatch</param-value>
-              </init-param>
-              <init-param>
-                 <param-name>com.mtgi.analytics.servlet.event</param-name>]]><co id="filter-type"/><![CDATA[
-                 <param-value>http-request</param-value>
-              </init-param>
-              <init-param>
-                 <param-name>com.mtgi.analytics.manager</param-name>]]><co id="filter-manager"/><![CDATA[
-                 <param-value>defaultTrackingManager</param-value>
-              </init-param>
-           </filter>
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
+         version="2.4">
+         
+   ...
+   <!-- normal web.xml configuration up to this point -->
+   
+   <!-- enable behavior tracking for servlet requests -->
+   <filter>
+      <filter-name>trackingFilter</filter-name>
+      <filter-class>com.mtgi.analytics.servlet.BehaviorTrackingFilter</filter-class>
+      <init-param>
+         <param-name>com.mtgi.analytics.parameters.include</param-name>]]><co id="filter-params"/><![CDATA[
+         <param-value>dispatch</param-value>
+      </init-param>
+      <init-param>
+         <param-name>com.mtgi.analytics.servlet.event</param-name>]]><co id="filter-type"/><![CDATA[
+         <param-value>http-request</param-value>
+      </init-param>
+      <init-param>
+         <param-name>com.mtgi.analytics.manager</param-name>]]><co id="filter-manager"/><![CDATA[
+         <param-value>defaultTrackingManager</param-value>
+      </init-param>
+   </filter>
 
-           <filter-mapping>
-              <filter-name>trackingFilter</filter-name>
-              <servlet-name>action</servlet-name>
-              <dispatcher>REQUEST</dispatcher>
-           </filter-mapping>
-                     
-        </web-app>]]></programlisting>
+   <filter-mapping>
+      <filter-name>trackingFilter</filter-name>
+      <servlet-name>action</servlet-name>
+      <dispatcher>REQUEST</dispatcher>
+   </filter-mapping>
+             
+</web-app>]]></programlisting>
 			<calloutlist>
 				<callout arearefs="filter-params"><para>An optional comma-separated list of parameters to include
 				in the event data logs.  If unspecified, all parameters are logged.</para></callout>
