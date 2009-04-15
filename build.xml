@@ -100,7 +100,7 @@
 				
 				<copy todir="${release.dir}" file="LICENSE.txt"/>
 
-				<copy todir="${release.dir}/docs">
+				<copy todir="${release.dir}/docs" failonerror="false">
 					<fileset dir="${build.root}/core/docs" includes="api/**/*,userguide/**/*"/>
 				</copy>
 
