@@ -1,0 +1,25 @@
+<ivy-module version="1.0">
+
+	<info organisation="mtgi" module="ant-configuration" revision="1.0" status="milestone">
+        <description homepage="http://www.mantis-tgi.com/">
+        Ivy configuration used to extend ant with the following task libraries:
+	        * ant-contrib
+    	    * cobertura
+        	* junit
+        </description>
+	</info>
+
+	<configurations>
+		<conf name="build" description="loads common task libraries required for all java project builds"/>
+	</configurations>
+
+	<dependencies defaultconfmapping="build->default">
+
+		<dependency org="cobertura" name="cobertura" rev="1.9"/>
+		<dependency org="junit" name="junit" rev="4.1"/>
+		<dependency org="apache" name="ant-contrib" rev="1.0b3"/>
+		<dependency org="apache" name="log4j" rev="1.2.13"/>
+
+	</dependencies>
+
+</ivy-module>

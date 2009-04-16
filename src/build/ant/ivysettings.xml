@@ -1,0 +1,45 @@
+<ivysettings>
+
+	<!-- build.mode should be "online" or "offline" -->
+    <settings defaultResolver="${build.mode}" validate="false"/>
+
+    <caches checkUpToDate="false" useOrigin="true" lockStrategy="artifact-lock"
+    		default="default-cache" resolutionCacheDir="${integration.dir}/resolution">
+    	<cache name="default-cache"/>
+    	<cache name="temp-cache" basedir="${integration.dir}/cache"/>
+    </caches>
+
+    <resolvers>
+
+		<chain name="offline" returnFirst="true">
+	       	<!-- first we look into our local set of build products for unpublished versions of jars -->
+	       	<filesystem name="${working.repository}" alwaysCheckExactRevision="false"
+				 		cache="temp-cache" checkmodified="false">
+	            <ivy pattern="${integration.dir}/[module]/ivys/ivy-[revision].xml"/>
+	            <artifact pattern="${integration.dir}/[module]/[type]s/[revision]/[artifact].[ext]"/>
+	       	</filesystem>
+			<!-- use the cache directly as a repository for builds in offline mode -->    	
+	       	<filesystem name="cache" cache="temp-cache" alwaysCheckExactRevision="false" checkmodified="false">
+	            <ivy pattern="${ivy.default.ivy.user.dir}/cache/[organisation]/[module](/[branch])/ivy-[revision].xml"/>
+	            <artifact pattern="${ivy.default.ivy.user.dir}/cache/[organisation]/[module](/[branch])/[type]s/[artifact]-[revision](-[classifier])(.[ext])"/>
+	    	</filesystem>
+        </chain>
+		
+        <chain name="online" returnFirst="true">
+	       	<!-- first we look into our local set of build products for unpublished versions of jars -->
+	       	<filesystem name="${working.repository}" cache="temp-cache" alwaysCheckExactRevision="false"
+				 		changingPattern=".*-SNAPSHOT" checkmodified="true">
+	            <ivy pattern="${integration.dir}/[module]/ivys/ivy-[revision].xml"/>
+	            <artifact pattern="${integration.dir}/[module]/[type]s/[revision]/[artifact].[ext]"/>
+	       	</filesystem>
+	       	<!-- fall back to the enterprise repository for everything else -->
+			<url name="enterprise-repository" alwaysCheckExactRevision="false" 
+				 changingPattern=".*-SNAPSHOT" checkmodified="true">
+				<ivy pattern="http://mtgisvn/ivyrep/[organisation]/[module]/[revision]/ivys/ivy.xml"/>
+				<artifact pattern="http://mtgisvn/ivyrep/[organisation]/[module]/[revision]/[type]s/[artifact].[ext]"/>
+			</url>
+        </chain>
+        
+    </resolvers>
+    
+</ivysettings>

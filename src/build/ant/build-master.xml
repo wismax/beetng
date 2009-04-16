@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+
+<project name="Beet Master Build" basedir="." default="all"
+		 xmlns:ivy="antlib:org.apache.ivy.ant">
+
+	<description><![CDATA[
+Master build for a multi-module project.
+
+To build only a specific sub-module, the property build.modules
+can be overridden on the command line or in local.properties.  This property is a comma-
+delimited list of directories (note that this can include the root directory, expressed
+as a ".").
+		
+This script is not designed to be invoked directly.  Rather, it should
+be included from a script in the project root directory.
+	]]></description>
+	
+	<property name="scripts.dir" value="${basedir}/src/build/ant"/>
+	
+	<property name="local.properties" value="${basedir}/local.properties"/>
+	<property file="${local.properties}"/>
+	
+	<property name="build.properties" value="build.properties"/>
+	<property file="${build.properties}"/>
+
+	<!-- miscellaneous standard directories used by the master script -->
+	<property name="master.properties" value="${scripts.dir}/master.properties"/>
+	<property file="${master.properties}"/>
+	
+	<import file="${scripts.dir}/build-common.xml"/>
+	
+	<target name="all" depends="clean,init,modules,package"
+			description="cleans, compiles, tests, and packages the project"/>
+
+	<target name="-check-clean">
+		<condition property="-do-clean" value="true">
+			<available file="${build.dir}"/>
+		</condition>
+	</target>
+
+	<target name="clean" depends="-check-clean" if="-do-clean"
+			description="deletes prior build and test products">
+		<delete dir="${build.dir}"/>
+	</target>
+	
+	<target name="init">
+		<mkdir dir="${build.dir}"/>
+		<mkdir dir="${integration.dir}"/>
+	</target>
+	
+	<target name="modules">
+		<for list="${build.modules}" param="current.module">
+			<sequential>
+				<var name="last.module" value="@{current.module}"/>
+				<build-module dir="@{current.module}" target="${module.target}"/>
+				<var name="last.module" unset="true"/>
+			</sequential>
+		</for>
+	</target>
+	
+	<target name="doc" description="placeholder target to generate docs"/>
+	<target name="package" description="placeholder target to package release archives"/>
+
+	<macrodef name="build-module"
+			  description="fork a module build process">
+		<attribute name="dir" description="the root dir of the module"/>
+		<attribute name="target" description="target to invoke on subbuilds" default="all"/>
+		<sequential>
+			<ant dir="${basedir}" inheritall="false" inheritrefs="false" 
+				 antfile="${scripts.dir}/build-module.xml" target="@{target}">
+				<property name="module.dir" value="@{dir}"/>
+				<property name="module.build.number" value="${build.number}"/>
+				<property name="module.status" value="${module.status}"/>
+				<property name="local.properties" value="${local.properties}"/>
+				<property name="working.repository" value="${working.repository}"/>
+			</ant>
+		</sequential>
+	</macrodef>
+
+</project>

@@ -3,7 +3,11 @@
 <project name="beet" default="all"
 		 xmlns:ivy="antlib:org.apache.ivy.ant">
 
-	<import file="scripts/build-master.xml"/>
+	<property name="local.properties" value="local.properties"/>
+	<property file="${local.properties}"/>
+
+	<property name="master.ant" value="src/build/ant/build-master.xml"/>
+	<import file="${master.ant}"/>
 
 	<macrodef name="bundle" 
 			  description="Generate tar.gz, tar.bz2, zip, and corresponding MD5 hash files for a release directory">
