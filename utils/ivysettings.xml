@@ -1,6 +1,6 @@
 <ivysettings>
 
-	<include file="${basedir}/scripts/ivysettings.xml"/>
+	<include file="${scripts.dir}/ivysettings.xml"/>
 	
 	<!-- we add a class-path writer to the standard set of manifest attributes -->
 	<typedef name="manifest-classpath"
