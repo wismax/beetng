@@ -46,7 +46,7 @@
 		
 	</macrodef>
 	
-	<target name="all-dist" description="deprecated target, just use all instead" depends="all"/>
+	<target name="all-dist" depends="all,release"/>
 	
 	<!-- replace standard package target with custom routines -->
 	<target name="package" depends="doc,package-release,package-utils,package-reports"/>
