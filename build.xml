@@ -68,8 +68,6 @@
 				<copy todir="${utils.dist}">
 					<fileset dir="${build.root}/utils/dist/jars"
 		                     includes="**/*.jar" excludes="**/*test*"/>
-				</copy>
-				<copy todir="${utils.dist}/bin">
 					<fileset dir="utils/src/main/sh" includes="**/**"/>
 				</copy>
 				<copy todir="${utils.dist}/db">
