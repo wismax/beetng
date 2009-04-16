@@ -13,7 +13,7 @@
 
 		<chain name="offline" returnFirst="true">
 	       	<!-- first we look into our local set of build products for unpublished versions of jars -->
-	       	<filesystem name="${working.repository}" alwaysCheckExactRevision="false"
+	       	<filesystem name="build" alwaysCheckExactRevision="false"
 				 		cache="temp-cache" checkmodified="false">
 	            <ivy pattern="${integration.dir}/[module]/ivys/ivy-[revision].xml"/>
 	            <artifact pattern="${integration.dir}/[module]/[type]s/[revision]/[artifact].[ext]"/>
@@ -27,7 +27,7 @@
 		
         <chain name="online" returnFirst="true">
 	       	<!-- first we look into our local set of build products for unpublished versions of jars -->
-	       	<filesystem name="${working.repository}" cache="temp-cache" alwaysCheckExactRevision="false"
+	       	<filesystem name="build" cache="temp-cache" alwaysCheckExactRevision="false"
 				 		changingPattern=".*-SNAPSHOT" checkmodified="true">
 	            <ivy pattern="${integration.dir}/[module]/ivys/ivy-[revision].xml"/>
 	            <artifact pattern="${integration.dir}/[module]/[type]s/[revision]/[artifact].[ext]"/>

@@ -286,7 +286,7 @@ once for each module in the project.
 		
 		<!-- publish the generated archive into the temporary repository,
 			 where it can be found by other sub-module builds -->
-		<ivy:publish resolver="${working.repository}" overwrite="true"
+		<ivy:publish resolver="build" overwrite="true"
 					 pubrevision="${ivy-module.info.revision}">
 			<artifacts pattern="${build.dist}/[type]s/[artifact].[ext]" />
 		</ivy:publish>
