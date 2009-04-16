@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<project name="Beet Master Build" basedir="." default="all"
+<project name="build-master" basedir="." default="all"
 		 xmlns:ivy="antlib:org.apache.ivy.ant">
 
 	<description><![CDATA[
@@ -15,7 +15,7 @@ This script is not designed to be invoked directly.  Rather, it should
 be included from a script in the project root directory.
 	]]></description>
 	
-	<property name="scripts.dir" value="${basedir}/src/build/ant"/>
+	<dirname property="scripts.dir" file="${ant.file.build-master}"/>
 	
 	<property name="local.properties" value="${basedir}/local.properties"/>
 	<property file="${local.properties}"/>
@@ -27,7 +27,7 @@ be included from a script in the project root directory.
 	<property name="master.properties" value="${scripts.dir}/master.properties"/>
 	<property file="${master.properties}"/>
 	
-	<import file="${scripts.dir}/build-common.xml"/>
+	<import file="${scripts.dir}/build-common.xml" />
 	
 	<target name="all" depends="clean,init,modules,package"
 			description="cleans, compiles, tests, and packages the project"/>

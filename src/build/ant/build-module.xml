@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<project name="Project Module Build" default="all"
+<project name="build-module" default="all"
 		 xmlns:ivy="antlib:org.apache.ivy.ant">
 
 	<description><![CDATA[
@@ -14,7 +14,7 @@ once for each module in the project.
 	<property name="local.properties" value="${basedir}/local.properties"/>
 	<property file="${local.properties}"/>
 	
-	<property name="scripts.dir" value="${basedir}/src/build/ant"/>
+	<dirname property="scripts.dir" file="${ant.file.build-module}"/>
 	<property name="default.properties" value="${scripts.dir}/module-default.properties"/>
 
 	<!-- load ivy version information into our property namespace -->

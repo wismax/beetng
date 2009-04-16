@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 
-<project name="Build Common Utilities" basedir=".."
+<project name="build-common" basedir=".."
 		 xmlns:ivy="antlib:org.apache.ivy.ant">
 	
-	<property name="scripts.dir" value="${basedir}/src/build/ant"/>
+	<dirname property="scripts.dir" file="${ant.file.build-common}"/>
 	<property name="ivysettings.file" value="${scripts.dir}/ivysettings.xml"/>
 	
 	<tstamp>
@@ -11,9 +11,8 @@
 	</tstamp>
 	<path id="task.class.path"/>
 
-	
 	<!-- resolve task libraries via Ivy -->
-	<ivy:configure settingsId="ivy.instance" file="${ivysettings.file}" override="true"/>
+	<ivy:settings file="${ivysettings.file}"/>
 	<ivy:resolve file="${scripts.dir}/ivy-tasks.xml" conf="build"/>
 	<ivy:cachepath pathid="task.class.path" conf="build"/>
 	
