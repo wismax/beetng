@@ -119,7 +119,7 @@
 		<var name="release.dir" value="${target.dir}/site"/>
 		<mkdir dir="${release.dir}"/>
 
-		<tar destfile="${target.dir}/site.tar.bz2" compression="bzip2">
+		<tar destfile="${target.dir}/reports.tar.bz2" compression="bzip2">
 			<tarfileset prefix="build" dir="${build.root}">
 				<include name="core/docs/api/**/*"/>
 				<include name="core/docs/userguide/**/*"/>
@@ -141,6 +141,18 @@
 		<ivy:install from="online" to="local" transitive="true"
 					 organisation="mtgi" module="beet-utils" revision="latest.integration"
 					 overwrite="true"/>
+	</target>
+	
+	<target name="release">
+		<zip destfile="${target.dir}/release-packages-full.zip">
+			<zipfileset prefix="beet-release" dir="${target.dir}">
+				<include name="*.gz"/>
+				<include name="*.bz2"/>
+				<include name="*.zip"/>
+				<include name="*.MD5"/>
+				<exclude name="reports.tar.bz2"/>
+			</zipfileset>
+		</zip>
 	</target>
 
 </project>
