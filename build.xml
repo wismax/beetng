@@ -6,8 +6,8 @@
 	<property name="local.properties" value="local.properties"/>
 	<property file="${local.properties}"/>
 
-	<property name="master.ant" value="src/build/ant/build-master.xml"/>
-	<import file="${master.ant}"/>
+	<property name="scripts.dir" value="${basedir}/src/build/ant"/>
+	<import file="${scripts.dir}/build-master.xml"/>
 
 	<macrodef name="bundle" 
 			  description="Generate tar.gz, tar.bz2, zip, and corresponding MD5 hash files for a release directory">
@@ -121,16 +121,28 @@
 		<var name="release.dir" value="${target.dir}/site"/>
 		<mkdir dir="${release.dir}"/>
 
-		<zip file="${target.dir}/site.zip">
-			<zipfileset prefix="build" dir="${build.root}">
+		<tar destfile="${target.dir}/site.tar.bz2" compression="bzip2">
+			<tarfileset prefix="build" dir="${build.root}">
 				<include name="core/docs/api/**/*"/>
 				<include name="core/docs/userguide/**/*"/>
 				<include name="core/reports/**"/>
 				<include name="utils/docs/**"/>
 				<include name="utils/reports/**"/>
-			</zipfileset>
-		</zip>
+			</tarfileset>
+		</tar>
 		
+	</target>
+
+	<target name="repository" description="build a functioning local Ivy repository containing beet and all of its dependencies">
+		<ivy:resolve file="${scripts.dir}/ivy-tasks.xml"/>
+		<ivy:retrieve pattern="${basedir}/repository/[organisation]/[module]/[revision]/[type]s/[artifact].[ext]" 
+					  ivypattern="${basedir}/repository/[organisation]/[module]/[revision]/[type]s/[artifact].[ext]"/>
+		<ivy:install from="online" to="local" transitive="true"
+					 organisation="mtgi" module="beet" revision="latest.integration"
+					 overwrite="true"/>
+		<ivy:install from="online" to="local" transitive="true"
+					 organisation="mtgi" module="beet-utils" revision="latest.integration"
+					 overwrite="true"/>
 	</target>
 
 </project>

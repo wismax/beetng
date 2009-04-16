@@ -13,6 +13,8 @@
 		<conf name="build" description="loads common task libraries required for all java project builds"/>
 	</configurations>
 
+	<publications/>
+
 	<dependencies defaultconfmapping="build->default">
 
 		<dependency org="cobertura" name="cobertura" rev="1.9"/>
