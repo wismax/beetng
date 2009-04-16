@@ -26,8 +26,8 @@
 	
 	<dependencies defaultconfmapping="1.5->1.5(default);1.6->1.6(default);default,compile,test->default">
 
-		<dependency org="springframework" name="spring" rev="2.0.5" conf="compile->default;test->mock"/>
-		<dependency org="apache" name="commons-logging" rev="1.1"/>
+		<dependency org="springframework" name="spring" rev="2.0.+" conf="compile->default;test->mock"/>
+		<dependency org="apache" name="commons-logging" rev="1.1.1"/>
 		<dependency org="aspectj" name="aspectj" rev="1.5.3"/>
 		<dependency org="cglib" name="cglib" rev="2.1.3"/>
 		<dependency org="opensymphony" name="quartz" rev="1.6.0"/>
