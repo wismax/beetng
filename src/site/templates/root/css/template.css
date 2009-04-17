@@ -1,0 +1,80 @@
+@import url("fonts.css");
+
+.sky {
+	height: 110pt;
+	background: #bfbfff url('../images/grass.png') repeat-x scroll bottom;
+}
+
+.earth {
+	background-color: #b28257;
+	height: 390pt;
+	overflow: visible;
+	z-index: 10;
+	background: #785331 url('../images/dirt.png') repeat-x scroll top;
+}
+
+.rock {
+	background-color: #bfbfbf;
+	height: 125pt;
+	background: #bfbfbf url('../images/rock.png') repeat-x scroll top;
+}
+
+#rootContainer {
+  margin: 0 auto;
+  width: 70%;
+  max-width: 120ex;
+  background-color: #ffbf00;
+  z-index: 10;
+  position: relative;
+  top: -70pt;
+  /* border: 15pt solid #ffdf00; TODO: media stylesheets with gamma info */
+  border: 15pt solid #ffbf00;
+  border-radius: 25pt;
+  
+  -moz-border-radius: 25pt;
+  -webkit-border-radius: 25pt;
+}
+
+#rootHeader {
+  vertical-align: middle;
+  height: 50pt;
+  padding: 5pt 10px;
+  background-color: #cf3f5f;
+  border-top-right-radius: 10pt;
+  border-top-left-radius: 10pt;
+  
+  -moz-border-radius-topleft: 10pt;
+  -moz-border-radius-topright: 10pt;
+  -webkit-border-top-right-radius: 10pt;
+  -webkit-border-top-left-radius: 10pt;
+}
+
+#rootContent {
+  background-color: #fff;
+  height: 365pt;
+  border-color: #ffbf00;
+  border-width: 15pt 0;
+  border-style: solid;
+}
+
+#rootFooter {
+  background-color: #ffdf90;
+  height: 50pt;
+  border-bottom-right-radius: 10pt;
+  border-bottom-left-radius: 10pt;
+  
+  -moz-border-radius-bottomleft: 10pt;
+  -moz-border-radius-bottomright: 10pt;
+  -webkit-border-bottom-right-radius: 10pt;
+  -webkit-border-bottom-left-radius: 10pt;
+}
+
+#rootHeader h1 {
+  font-size: 50pt;
+  line-height: 50pt;
+  padding-left: 72px;
+  background: transparent url('../images/beet.png') no-repeat scroll center left;
+  margin: 0;
+  color: #fff5f5;
+  font-family: "alba", Arial;
+}

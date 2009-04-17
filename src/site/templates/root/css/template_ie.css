@@ -1,0 +1,7 @@
+@import url("fonts_ie.css");
+
+#rootHeader h1 {
+	margin-top: -15pt;
+	line-height: 75pt;
+	font-weight: normal;
+}

@@ -1,0 +1,22 @@
+
+.sky, .earth, .rock {
+	background-image: none;
+}
+
+.earth {
+	text-align: center;
+}
+
+.rock {
+	position: relative;
+	top: -100pt;
+}
+
+#rootHeader h1 {
+	margin-top: 0;
+}
+
+#rootContainer {
+	text-align: left;
+}
+

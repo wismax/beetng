@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<install version="1.5" type="template">
+	<name>Beet Root</name>
+	<version>1.0.0</version>
+	<creationDate>04/17/09</creationDate>
+	<author>Jason Trump</author>
+	<authorEmail>trump.jason@gmail.com</authorEmail>
+	<authorUrl>http://beet.sourceforge.net</authorUrl>
+	<copyright></copyright>
+	<license>Mozilla Public License v1.1</license>
+	<description>Joomla Template for the Beet project site</description>
+
+	<files>
+		<filename>index.php</filename>
+		<filename>templateDetails.xml</filename>
+		<filename>css/fonts/alba/ALBAM___.TTF</filename>
+		<filename>css/fonts/alba/ALBAS___.TTF</filename>
+		<filename>css/fonts/alba/ALBA____.TTF</filename>
+		<filename>css/fonts/alba/XtraStuf.mac/ALBAM___.TTF</filename>
+		<filename>css/fonts/alba/XtraStuf.mac/ALBAS___.TTF</filename>
+		<filename>css/fonts/alba/XtraStuf.mac/ALBA____.TTF</filename>
+		<filename>css/fonts/azrael/AZRAEL__.TTF</filename>
+		<filename>css/fonts/azrael/RAPHAEL_.TTF</filename>
+		<filename>css/fonts/bluestone/BlueStone.ttf</filename>
+		<filename>css/fonts/bottlerocket/BOTTRBB_.TTF</filename>
+		<filename>css/fonts/bottlerocket/BOTTRBRG.TTF</filename>
+		<filename>css/fonts/casualmarker/CASUMM__.TTF</filename>
+		<filename>css/fonts/copyrightviolations/Copyviol.ttf</filename>
+		<filename>css/fonts/copyrightviolations/CopyvlN.ttf</filename>
+		<filename>css/fonts/finchley/FINCHLEY.TTF</filename>
+		<filename>css/fonts/foo/FOO.ttf</filename>
+		<filename>css/fonts/lockedwindow/locke___.ttf</filename>
+		<filename>css/fonts/stentiga/stentiga.ttf</filename>
+	</files>
+
+	<images>
+		<filename>images/beet.png</filename>
+		<filename>images/dirt.png</filename>
+		<filename>images/grass.png</filename>
+		<filename>images/rock.png</filename>
+	</images>
+	
+	<css>
+		<filename>css/fonts.css</filename>
+		<filename>css/template.css</filename>
+		<filename>css/template_ie.css</filename>
+		<filename>css/template_ie_6.css</filename>
+	</css>
+
+	<languages>
+		<language tag="en-US">en-US.tpl_root.ini</language>
+	</languages>
+	
+	<administration>
+    	<languages>
+			<language tag="en-US">admin/en-US.tpl_root.ini</language>
+		</languages>
+    </administration>
+
+	<positions>
+		<position>hornav</position>
+		<position>breadcrumbs</position>
+		<position>banner</position>
+		<position>left</position>
+		<position>right</position>
+		<position>top</position>
+		<position>footer</position>
+		<position>syndicate</position>
+		<position>debug</position>
+	</positions>
+
+	<params>
+		<param type="spacer" default="Template Logo" />
+		<param name="logoType" type="list" default="image" label="Logo type" description="LOGO TYPE DESCRIPTION">
+			<option value="image">Image</option>
+			<option value="text">Text</option>
+		</param>
+		<param name="logoText" type="text" default="" size="50" label="Logo text" description="LOGO TEXT DESCRIPTION" />
+		<param name="sloganText" type="text" default="" size="50" label="Slogan" description="SLOGAN DESCRIPTION" />
+	</params>
+</install>
