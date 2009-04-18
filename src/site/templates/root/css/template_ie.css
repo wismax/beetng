@@ -1,7 +1,28 @@
 @import url("fonts_ie.css");
 
 #rootHeader h1 {
-	margin-top: -15pt;
-	line-height: 75pt;
 	font-weight: normal;
+}
+
+#rootHeader h1 a {
+	margin-top: -15pt;
+	padding-bottom: 15pt;
+	line-height: 75pt;
+}
+
+#rootLeft ul.menu {
+	margin: 0;
+}
+
+#rootLeft .minwidth, #sfLogo .minWidth {
+	width: 150px;
+}
+
+#rootLeft .moduletable {
+	margin-top: 10pt;
+}
+
+#rootFooter .copyright {
+	margin-left: 150px;
+	padding-left: 20pt;
 }

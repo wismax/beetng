@@ -42,6 +42,7 @@
 	
 	<css>
 		<filename>css/fonts.css</filename>
+		<filename>css/fonts_ie.css</filename>
 		<filename>css/template.css</filename>
 		<filename>css/template_ie.css</filename>
 		<filename>css/template_ie_6.css</filename>
@@ -58,14 +59,10 @@
     </administration>
 
 	<positions>
-		<position>hornav</position>
 		<position>breadcrumbs</position>
-		<position>banner</position>
 		<position>left</position>
 		<position>right</position>
-		<position>top</position>
 		<position>footer</position>
-		<position>syndicate</position>
 		<position>debug</position>
 	</positions>
 

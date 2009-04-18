@@ -1,5 +1,6 @@
 @import url("fonts.css");
 
+/* background images */
 .sky {
 	height: 110pt;
 	background: #bfbfff url('../images/grass.png') repeat-x scroll bottom;
@@ -19,7 +20,10 @@
 	background: #bfbfbf url('../images/rock.png') repeat-x scroll top;
 }
 
+/* positioning and styles for main content area */
+
 #rootContainer {
+  font-family: Arial, sans-serif;
   margin: 0 auto;
   width: 70%;
   max-width: 120ex;
@@ -49,7 +53,27 @@
   -webkit-border-top-left-radius: 10pt;
 }
 
-#rootContent {
+#rootHeader h1 {
+  font-size: 50pt;
+  margin: 0;
+  color: #fff5f5;
+  font-family: "alba", Arial;
+  font-weight: normal;
+  text-transform: lowercase;
+}
+
+#rootHeader h1 a, 
+#rootHeader h1 a:visited, 
+#rootHeader h1 a:hover {
+  padding-left: 72px;
+  background: transparent url('../images/beet.png') no-repeat scroll center left;
+  text-decoration: none;
+  color: #fff5f5;
+  line-height: 50pt;
+  display: block;
+}
+
+#rootCenter {
   background-color: #fff;
   height: 365pt;
   border-color: #ffbf00;
@@ -57,9 +81,29 @@
   border-style: solid;
 }
 
+#rootLeft {
+  float: left;
+  font-size: smaller;
+  padding: 0 10pt;
+  min-width: 150px;
+  width: 20ex;
+  background-color: #efefef;
+  height: 100%;
+}
+
+#rootContent {
+  height: 100%;
+  overflow: auto;
+  padding-left: 10pt;
+}
+
 #rootFooter {
+
+  padding: 10pt;
+  min-height: 40px;
+  vertical-align: middle;
+
   background-color: #ffdf90;
-  height: 50pt;
   border-bottom-right-radius: 10pt;
   border-bottom-left-radius: 10pt;
   
@@ -69,12 +113,31 @@
   -webkit-border-bottom-left-radius: 10pt;
 }
 
-#rootHeader h1 {
-  font-size: 50pt;
-  line-height: 50pt;
-  padding-left: 72px;
-  background: transparent url('../images/beet.png') no-repeat scroll center left;
-  margin: 0;
-  color: #fff5f5;
-  font-family: "alba", Arial;
+#sfLogo {
+  float: left;
+  width: 20ex;
+  min-width: 150px;
+}
+
+#sfLogo img {
+  border: none;
+}
+
+#rootFooter .copyright {
+  font-size: small;
+}
+
+/* overrides for general content */
+
+#rootLeft ul.menu {
+  list-style: none;
+  padding-left: 10pt;
+  white-space: nowrap;
+}
+
+.componentheading {
+  font-size: xx-large;
+  font-weight: bold;
+  margin-top: 1ex;
+  border-bottom: 2pt solid grey;
 }
