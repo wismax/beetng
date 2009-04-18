@@ -22,21 +22,30 @@
 
 /* positioning and styles for main content area */
 
+#rootOutline {
+  /* border: 15pt solid #ffdf00; TODO: media stylesheets with gamma info */
+  border: 15pt solid #ffbf00;
+  background-color: #ffbf00;
+  border-radius: 25pt;
+
+  -moz-border-radius: 25pt;
+  -webkit-border-radius: 25pt;
+}
+
 #rootContainer {
   font-family: Arial, sans-serif;
   margin: 0 auto;
   width: 70%;
   max-width: 120ex;
-  background-color: #ffbf00;
   z-index: 10;
   position: relative;
   top: -70pt;
-  /* border: 15pt solid #ffdf00; TODO: media stylesheets with gamma info */
-  border: 15pt solid #ffbf00;
-  border-radius: 25pt;
-  
-  -moz-border-radius: 25pt;
-  -webkit-border-radius: 25pt;
+
+  border: 2pt solid #df9f00;
+  border-radius: 27pt;
+
+  -moz-border-radius: 27pt;
+  -webkit-border-radius: 27pt;
 }
 
 #rootHeader {
@@ -71,6 +80,7 @@
   color: #fff5f5;
   line-height: 50pt;
   display: block;
+  float: left;
 }
 
 #rootCenter {
@@ -94,7 +104,7 @@
 #rootContent {
   height: 100%;
   overflow: auto;
-  padding-left: 10pt;
+  padding: 0 10pt;
 }
 
 #rootFooter {
@@ -124,7 +134,7 @@
 }
 
 #rootFooter .copyright {
-  font-size: small;
+  font-size: x-small;
 }
 
 /* overrides for general content */
@@ -141,3 +151,45 @@
   margin-top: 1ex;
   border-bottom: 2pt solid grey;
 }
+
+.contentheading, h1 {
+  font-weight: normal;
+  margin-bottom: 0;
+}
+
+.article-tools {
+  background: #faf0f0;
+  padding: 5pt;
+  font-size: smaller;
+  border: 1pt solid #faa;
+}
+
+.article-meta > span {
+  margin-right: 1em;
+}
+
+/* custom styles for articles */
+
+.leftfloat {
+  float: left;
+  margin-right: 10pt;
+  padding-right: 10pt;
+}
+
+.leftfloat > h2 {
+  margin-top: 0;
+}
+
+.article-content h1 {
+  margin: 0;
+}
+
+.dfContactTable {
+  border-collapse: collapse;
+}
+
+.dfContactTable td, .dfContactTable th {
+  padding: 0;
+  margin: 0;
+}
+ 

@@ -17,7 +17,9 @@
 	<body>
 		<div class="sky"></div>
 		<div class="earth">
+			
 			<div id="rootContainer">
+			<div id="rootOutline">
 
 				<!-- BEGIN HEADER -->
 				<div id="rootHeader"><?php
@@ -92,6 +94,8 @@
 				<!-- END FOOTER -->
 				
 			</div>
+			</div>
+			
 		</div>
 		<div class="rock"><jdoc:include type="modules" name="debug" /></div>
 	</body>
