@@ -185,7 +185,7 @@
 }
 
 /* nested menu properties */
-#rootTop .parent > ul {
+#rootTop .parent ul {
   display: none;
   margin: 0;
   padding: 10pt 10pt 5pt 10pt;

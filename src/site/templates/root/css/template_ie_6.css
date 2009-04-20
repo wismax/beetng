@@ -7,16 +7,43 @@
 	text-align: center;
 }
 
-.rock {
-	position: relative;
-	top: -100pt;
+#rootContainer {
+	text-align: left;
 }
 
 #rootHeader h1 {
 	margin-top: 0;
 }
 
-#rootContainer {
-	text-align: left;
+#rootTop .moduletable {
+  padding: 0;
+  margin: 0;
 }
 
+#rootTop .moduletable h3 {
+  display: none;
+}
+
+#rootTop .moduletable ul.menu {
+  list-style: none;
+  margin: 0;
+}
+
+#rootTop .moduletable ul.menu li {
+  display: inline;
+  position: relative;
+}
+
+#rootTop .moduletable ul.menu li a {
+  padding: 2pt 5pt;
+  display: block;
+  text-decoration: none;
+}
+
+#rootTop .parent:hover ul {
+  display: block;
+  position: absolute;
+  border-top: 2pt solid;
+  width: 16ex;
+  left: -5ex;
+}

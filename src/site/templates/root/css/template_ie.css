@@ -1,5 +1,9 @@
 @import url("fonts_ie.css");
 
+br {
+	display: none;
+}
+
 #rootHeader h1 {
 	font-weight: normal;
 }
