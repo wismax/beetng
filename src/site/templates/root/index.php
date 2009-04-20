@@ -36,9 +36,23 @@
 						$logoClass = 'logo-text';
 					endif;
 
-					?><h1 class="<?php echo $logoClass; ?>">
+					?><div id="rootHeaderLeft">
+						<h1 class="<?php echo $logoClass; ?>">
 						<a href="index.php" title="<?php echo $siteName; ?>"><?php echo $logoText; ?></a>
-					</h1>
+						<?php if(JRequest::getCmd( 'view' ) != 'frontpage') : ?>
+						<div id="rootBreadcrumbs">
+							<jdoc:include type="module" name="breadcrumbs" />
+						</div>
+						<?php endif ; ?>
+						</h1>
+					</div>
+					<?php if ($this->countModules('top')): ?>
+					<!-- BEGIN: TOP -->
+					<div id="rootTop">
+						<jdoc:include type="modules" name="top" style="xhtml" />
+					</div>
+					<!-- END: TOP -->
+					<?php endif; ?>
 				</div>
 				<!-- END HEADER -->
 				
@@ -66,12 +80,6 @@
 					<div id="rootContent">
 				
 						<jdoc:include type="message" />
-						<?php if(JRequest::getCmd( 'view' ) != 'frontpage') : ?>
-						<div id="rootBreadcrumbs">
-							<jdoc:include type="module" name="breadcrumbs" />
-						</div>
-						<?php endif ; ?>
-				
 						<jdoc:include type="component" />
 				
 					</div>

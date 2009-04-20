@@ -12,6 +12,10 @@
 
 	<files>
 		<filename>index.php</filename>
+		<filename>html/com_content/article/default.php</filename>
+		<filename>html/com_content/fontpage/default.php</filename>
+		<filename>html/com_content/fontpage/default_item.php</filename>
+		<filename>html/com_wrapper/wrapper/default.php</filename>
 		<filename>templateDetails.xml</filename>
 		<filename>css/fonts/alba/ALBAM___.TTF</filename>
 		<filename>css/fonts/alba/ALBAS___.TTF</filename>
@@ -31,13 +35,13 @@
 		<filename>css/fonts/foo/FOO.ttf</filename>
 		<filename>css/fonts/lockedwindow/locke___.ttf</filename>
 		<filename>css/fonts/stentiga/stentiga.ttf</filename>
-		<filename>html/com_content/article/default.php</filename>
 	</files>
 
 	<images>
 		<filename>images/beet.png</filename>
 		<filename>images/dirt.png</filename>
 		<filename>images/grass.png</filename>
+		<filename>images/rgrad.png</filename>
 		<filename>images/rock.png</filename>
 	</images>
 	

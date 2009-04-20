@@ -22,7 +22,26 @@
 	margin-top: 10pt;
 }
 
+#rootContent {
+  padding: 10pt;
+}
+
 #rootFooter .copyright {
 	margin-left: 150px;
 	padding-left: 20pt;
+}
+
+#rootTop > .moduletable {
+  position: relative;
+  top: 50%;
+  margin-top: -2ex;
+}
+
+#rootTop > .moduletable > ul.menu > li {
+  display: inline;
+  float: left;
+}
+
+.breadcrumbs {
+  display: none;
 }
