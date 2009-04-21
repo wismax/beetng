@@ -38,12 +38,12 @@
 
 					?><div id="rootHeaderLeft">
 						<h1 class="<?php echo $logoClass; ?>">
-						<a href="index.php" title="<?php echo $siteName; ?>"><?php echo $logoText; ?></a>
-						<?php if(JRequest::getCmd( 'view' ) != 'frontpage') : ?>
-						<div id="rootBreadcrumbs">
-							<jdoc:include type="module" name="breadcrumbs" />
-						</div>
-						<?php endif ; ?>
+							<a href="index.php" title="<?php echo $siteName; ?>"><?php echo $logoText; ?></a>
+							<?php if(JRequest::getCmd( 'view' ) != 'frontpage') : ?>
+							<div id="rootBreadcrumbs">
+								<jdoc:include type="module" name="breadcrumbs" />
+							</div>
+							<?php endif ; ?>
 						</h1>
 					</div>
 					<?php if ($this->countModules('top')): ?>
@@ -63,7 +63,10 @@
 					?><!-- BEGIN: LEFT COLUMN -->
 					<div id="rootLeft">
 						<jdoc:include type="modules" name="left" style="xhtml" />
-						<!-- [if IE><div class="minwidth"></div><![endif]-->
+						<!-- [if IE]>
+							<iframe src="<?php echo JURI::base(); ?>/ie.xhtml"></iframe>
+							<div class="minwidth"></div>
+						<![endif]-->
 					</div>
 					<!-- END: LEFT COLUMN -->
 					<?php endif; ?>
@@ -93,7 +96,7 @@
 					<a id="sfLogo" href="http://sourceforge.net/projects/beet">
 						<img src="http://sflogo.sourceforge.net/sflogo.php?group_id=258926&amp;type=14" 
 							 alt="Get beet at SourceForge.net. Fast, secure and Free Open Source software downloads" width="150" height="40"/>
-						<!-- [if IE><div class="minwidth"></div><![endif]-->
+						<!-- [if IE]><div class="minwidth"></div><![endif]-->
 					</a>
 					<div class="copyright">
 						<jdoc:include type="modules" name="footer" />
