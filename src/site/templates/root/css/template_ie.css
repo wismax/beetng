@@ -1,9 +1,5 @@
 @import url("fonts_ie.css");
 
-br {
-	display: none;
-}
-
 #rootHeaderLeft {
 	display: inline;
 	float: left;
