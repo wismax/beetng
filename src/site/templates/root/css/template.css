@@ -136,6 +136,7 @@
 #rootContent {
   padding: 0 10pt;
   border: 2pt solid #df9f00;
+  font-size: 80%;
 }
 
 #rootFooter {
@@ -314,3 +315,10 @@
   margin: 0;
 }
  
+.article_column {
+  padding-right: 5pt;
+}
+
+.column_separator {
+  padding-left: 5pt;
+}
