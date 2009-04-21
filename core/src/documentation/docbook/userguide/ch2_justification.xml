@@ -11,13 +11,14 @@
 	
 	<section>
 		<title>Existing Tools and Methods</title> 
+
 		<para>There are many powerful tools available to monitor any modern Java application.  Beet 
 		is designed to augment, not replace, the information that these tools provide.  What's most important is that you 
-		<emphasis>actually measure</emphasis> your system to understand where the problems lie.  The temptation 
-		to arbitrarily pick your least favorite part of the application and rewrite while your users suffer is a 
-		strong one and a good way to lose credibility.  The same goes for measuring arbitrary behaviors in a controlled 
-		test environment without a clear analogy to production user behavior. If your suspicion feels like certainty, it 
-		should be easy to find hard evidence to back it up, but don't forgo the exercise.</para>
+		actually measure your system to understand where the problems lie.  You can verify
+		whether a candidate fix improves the readings you get on these metrics.
+		It also enables you to devise tests that load the system in a way that
+		resembles the actual production load patterns, rather than having to
+		rely on expectations and guesses.</para>
 		
 		<section>
 			<title>System Resource Monitoring</title>
@@ -169,8 +170,15 @@
 			tracking features; make sure you consider the capabilities of your target platform. Even if you have 
 			some tools available, beet may offer you something in simplicity, flexibility, and performance.</para>
 			<para>There are also a few excellent open source projects out there geared toward gathering performance
-			metrics in a production system.  Among these, we believe beet to be fairly unique in its layered
-			approach to monitoring.</para>
+			metrics in a production system.  You may want to evaluate:
+			<itemizedlist>
+				<listitem><para><ulink url="https://helios.dev.java.net/">Helios</ulink></para></listitem>
+				<listitem><para><ulink url="http://www.springsource.com/products/ams">Spring AMS</ulink></para></listitem>
+				<listitem><para><ulink url="http://messadmin.sourceforge.net/">MessAdmin</ulink></para></listitem>
+				<listitem><para><ulink url="https://sourceforge.net/projects/jmeasurement2">jmeasurement</ulink></para></listitem>
+			</itemizedlist>
+			and there are many others.  The Helios product site in particular features a long list of related products.
+			</para>
 		</section>
 	</section>
 </chapter>
