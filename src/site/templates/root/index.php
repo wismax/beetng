@@ -63,10 +63,7 @@
 					?><!-- BEGIN: LEFT COLUMN -->
 					<div id="rootLeft">
 						<jdoc:include type="modules" name="left" style="xhtml" />
-						<!-- [if IE]>
-							<iframe src="<?php echo JURI::base(); ?>/ie.xhtml"></iframe>
-							<div class="minwidth"></div>
-						<![endif]-->
+						<!--[if IE]><div class="minwidth"></div><![endif]-->
 					</div>
 					<!-- END: LEFT COLUMN -->
 					<?php endif; ?>
@@ -81,10 +78,27 @@
 				
 					<!-- BEGIN: CONTENT -->
 					<div id="rootContent">
-				
+					
+						<?php if (strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE')):
+						?><!--[if IE]>
+							<div class="ieTaunt">
+							<h3>Greetings IE user!</h3>  The view is <b>much nicer</b> from one of these browsers:
+							<ul>
+								<li><a href="http://www.mozilla.com/firefox"><img border="0" alt="Firefox 3" title="Firefox 3" src="firefox.png"/> Firefox</a></li>
+								<li><a href="http://www.apple.com/safari"><img border="0" alt="Safari 4" title="Safari 4" src="safari.png"/> Safari</a></li>
+								<li><a href="http://www.google.com/chrome"><img border="0" alt="Google Chrome" title="Google Chrome" src="chrome.png"/> Chrome</a></li>
+							</ul>
+							</div>
+							<div class="ieContent">
+						<![endif]-->
+						<?php endif; ?>
+						
 						<jdoc:include type="message" />
 						<jdoc:include type="component" />
 				
+						<?php if (strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE')):
+						?><!--[if IE]></div><![endif]-->
+						<?php endif; ?>
 					</div>
 					<!-- END: CONTENT -->
 					
@@ -96,7 +110,7 @@
 					<a id="sfLogo" href="http://sourceforge.net/projects/beet">
 						<img src="http://sflogo.sourceforge.net/sflogo.php?group_id=258926&amp;type=14" 
 							 alt="Get beet at SourceForge.net. Fast, secure and Free Open Source software downloads" width="150" height="40"/>
-						<!-- [if IE]><div class="minwidth"></div><![endif]-->
+						<!--[if IE]><div class="minwidth"></div><![endif]-->
 					</a>
 					<div class="copyright">
 						<jdoc:include type="modules" name="footer" />

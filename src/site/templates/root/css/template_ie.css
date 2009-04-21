@@ -37,6 +37,7 @@ br {
 
 #rootContent {
   padding: 10pt;
+  overflow: auto;
 }
 
 #rootFooter .copyright {
@@ -55,6 +56,35 @@ br {
   float: left;
 }
 
-.breadcrumbs {
+#rootBreadcrumbs {
   display: none;
+}
+
+.ieTaunt {
+	position: relative;
+	z-index: 200;
+	font-size: smaller;
+	background-color: #efefef;
+	border: 2pt solid #666;
+	padding: 5pt;
+	display: block;
+	float: left;
+	overflow: auto;
+	width: 20ex;
+	margin-right: 10pt;
+}
+
+.ieTaunt ul {
+	list-style: none;
+	padding: 5pt 0;
+	margin: 0;
+}
+
+.ieTaunt li {
+	padding: 2pt 5pt;
+}
+
+.ieContent {
+	margin-left: 20ex;
+	padding-left: 5pt;
 }
