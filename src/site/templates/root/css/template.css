@@ -98,6 +98,18 @@
   display: inline-block;
 }
 
+/* image logo - hide text */
+#rootHeader h1.logo {
+	background: transparent url('../images/beet-logo.png') no-repeat scroll center left;
+	margin-left: 2pt;
+}
+
+#rootHeader h1.logo > a, 
+#rootHeader h1.logo > a:visited, 
+#rootHeader h1.logo > a:hover {
+	color: transparent;
+}
+
 #rootBreadcrumbs {
   font-size: 10pt;
   display: block;

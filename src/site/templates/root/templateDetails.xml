@@ -43,6 +43,10 @@
 		<filename>images/grass.png</filename>
 		<filename>images/rgrad.png</filename>
 		<filename>images/rock.png</filename>
+		<filename>images/beet-logo.png</filename>
+		<filename>images/chrome.png</filename>
+		<filename>images/safari.png</filename>
+		<filename>images/firefox.png</filename>
 	</images>
 	
 	<css>
@@ -64,6 +68,7 @@
     </administration>
 
 	<positions>
+		<position>top</position>
 		<position>breadcrumbs</position>
 		<position>left</position>
 		<position>right</position>
@@ -78,6 +83,5 @@
 			<option value="text">Text</option>
 		</param>
 		<param name="logoText" type="text" default="" size="50" label="Logo text" description="LOGO TEXT DESCRIPTION" />
-		<param name="sloganText" type="text" default="" size="50" label="Slogan" description="SLOGAN DESCRIPTION" />
 	</params>
 </install>

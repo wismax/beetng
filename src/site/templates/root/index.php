@@ -38,7 +38,7 @@
 
 					?><div id="rootHeaderLeft">
 						<h1 class="<?php echo $logoClass; ?>">
-							<a href="/" title="<?php echo $siteName; ?>"><?php echo $logoText; ?></a>
+							<a href="<?php echo JURI::base(); ?>" title="<?php echo $siteName; ?>"><?php echo $logoText; ?></a>
 						</h1>
 						<?php if(JRequest::getCmd( 'view' ) != 'frontpage') : ?>
 						<div id="rootBreadcrumbs">
@@ -84,9 +84,9 @@
 							<div class="ieTaunt">
 							<h3>Greetings IE user!</h3>  The view is <b>much nicer</b> from one of these browsers:
 							<ul>
-								<li><a href="http://www.mozilla.com/firefox"><img border="0" alt="Firefox 3" title="Firefox 3" src="firefox.png"/> Firefox</a></li>
-								<li><a href="http://www.apple.com/safari"><img border="0" alt="Safari 4" title="Safari 4" src="safari.png"/> Safari</a></li>
-								<li><a href="http://www.google.com/chrome"><img border="0" alt="Google Chrome" title="Google Chrome" src="chrome.png"/> Chrome</a></li>
+								<li><a href="http://www.mozilla.com/firefox"><img border="0" alt="Firefox 3" title="Firefox 3" src="<?php echo JURI::base(); ?>templates/root/images/firefox.png"/> Firefox</a></li>
+								<li><a href="http://www.apple.com/safari"><img border="0" alt="Safari 4" title="Safari 4" src="<?php echo JURI::base(); ?>templates/root/images/safari.png"/> Safari</a></li>
+								<li><a href="http://www.google.com/chrome"><img border="0" alt="Google Chrome" title="Google Chrome" src="<?php echo JURI::base(); ?>templates/root/images/chrome.png"/> Chrome</a></li>
 							</ul>
 							</div>
 							<div class="ieContent">
