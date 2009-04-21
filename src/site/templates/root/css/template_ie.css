@@ -88,3 +88,7 @@ br {
 	margin-left: 20ex;
 	padding-left: 5pt;
 }
+
+.blog .article_column .contentpaneopen {
+  margin-top: 10pt;
+}
