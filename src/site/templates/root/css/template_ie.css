@@ -4,14 +4,23 @@ br {
 	display: none;
 }
 
+#rootHeaderLeft {
+	display: inline;
+	float: left;
+	margin-right: 40pt;
+}
+
 #rootHeader h1 {
 	font-weight: normal;
 }
 
-#rootHeader h1 a {
-	margin-top: -15pt;
-	padding-bottom: 15pt;
-	line-height: 75pt;
+#rootHeader h1.logo-text a {
+	margin-top: -15pt ! important;
+	line-height: 75pt ! important;
+}
+
+#rootTop {
+	display: inline;
 }
 
 #rootLeft ul.menu {

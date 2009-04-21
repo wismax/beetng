@@ -70,38 +70,50 @@
 }
 
 #rootHeaderLeft {
-  float: left;
+  position: relative;
+  display: table-cell;
+  vertical-align: middle;
+  padding-left: 72px;
+  height: 52pt;
+  background: transparent url('../images/beet.png') no-repeat scroll center left;
+  text-transform: lowercase;
 }
 
 #rootHeader h1 {
-  height: 52pt;
-  display: table-cell;
-  vertical-align: middle;
   margin: 0;
+  padding: 0;
+  height: 38pt;
   font-family: "alba", Arial, sans-serif;
   font-weight: normal;
-  text-transform: lowercase;
 }
 
 #rootHeader h1 > a, 
 #rootHeader h1 > a:visited, 
 #rootHeader h1 > a:hover {
-  padding-left: 72px;
-  background: transparent url('../images/beet.png') no-repeat scroll center left;
+  margin: 0;
+  padding: 0;
   text-decoration: none;
-  height: 50pt;
   font-size: 50pt;
-  line-height: 50pt;
+  line-height: 38pt;
+  display: inline-block;
+}
+
+#rootBreadcrumbs {
+  font-size: 10pt;
   display: block;
-  float: left;
+  width: 100%;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  white-space: nowrap;
+  padding-left: 2pt;
 }
 
 #rootTop {
-  margin: auto;
+  width: 100%;
+  text-align: center;
   font-size: 90%;
   height: 52pt;
   display: table-cell;
-  padding-left: 40pt;
   vertical-align: middle;
 }
 
@@ -188,37 +200,42 @@
 #rootTop .parent ul {
   display: none;
   margin: 0;
-  padding: 10pt 10pt 5pt 10pt;
+  padding: 2pt;
   list-style: none;
-
-  color: #cf3f5f;
-  background: #fff5f5 url('../images/rgrad.png') repeat-x scroll top;
-
-  border-style: solid;
-  border-width: 0 2pt 2pt 2pt;
   white-space: nowrap;
 
-  border-bottom-right-radius: 10pt;
-  border-bottom-left-radius: 10pt;
-  
-  -moz-border-radius-bottomleft: 10pt;
-  -moz-border-radius-bottomright: 10pt;
-  -webkit-border-bottom-right-radius: 10pt;
-  -webkit-border-bottom-left-radius: 10pt;
+  color: #fff5f5;
+  background-color: #cf3f5f;
+
+  border-style: solid;
+  border-width: 2pt 0 0 0;
+
+  border-radius: 10pt;
+  -moz-border-radius: 10pt;
+  -webkit-border-radius: 8pt;
 }
 
 #rootTop .parent ul li {
-  padding-bottom: 5pt;
 }
 
 #rootTop .parent ul a {
-  color: #cf3f5f;
+  color: #fff5f5;
   text-decoration: none;
   display: block;
+  padding: 3pt 6pt;
 }
 
-#rootTop .parent a:hover {
-	font-style: italic;
+#rootTop .parent ul a:hover {
+  background-color: #fff5f5;
+  color: #cf3f5f;
+}
+
+#rootTop li:hover > a {
+  background-color: #fff5f5;
+  color: #cf3f5f;
+  border-radius: 10pt;
+  -moz-border-radius: 10pt;
+  -webkit-border-radius: 8pt;
 }
 
 #rootTop .parent:hover {
@@ -228,8 +245,8 @@
 #rootTop .parent:hover > ul {
   display: block;
   position: absolute;
-  border-top: 2pt solid;
-  width: 16ex;
+  z-index: 100;
+  width: 20ex;
   left: -5ex;
 }
 
@@ -247,21 +264,6 @@
 }
 
 /* overrides for general content */
-
-.breadcrumbs {
-  height: 12pt;
-  position: relative;
-  top: -12pt;
-  overflow: hidden;
-  clear: left;
-  float: left;
-  display: block;
-  width: 100%;
-  margin-left: 72px;
-  padding: 2pt;
-  font-size: small;
-  font-family: Arial, sans-serif;
-}
 
 .componentheading {
   font-size: xx-large;

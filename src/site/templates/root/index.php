@@ -39,12 +39,12 @@
 					?><div id="rootHeaderLeft">
 						<h1 class="<?php echo $logoClass; ?>">
 							<a href="index.php" title="<?php echo $siteName; ?>"><?php echo $logoText; ?></a>
-							<?php if(JRequest::getCmd( 'view' ) != 'frontpage') : ?>
-							<div id="rootBreadcrumbs">
-								<jdoc:include type="module" name="breadcrumbs" />
-							</div>
-							<?php endif ; ?>
 						</h1>
+						<?php if(JRequest::getCmd( 'view' ) != 'frontpage') : ?>
+						<div id="rootBreadcrumbs">
+							<jdoc:include type="module" name="breadcrumbs" />
+						</div>
+						<?php endif ; ?>
 					</div>
 					<?php if ($this->countModules('top')): ?>
 					<!-- BEGIN: TOP -->
