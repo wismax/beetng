@@ -20,7 +20,7 @@
        xmlns:bt="http://www.mantis-tgi.com/schema/bt/1.1"
        xsi:schemaLocation="
           http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
-          http://www.mantis-tgi.com/schema/bt         http://www.mantis-tgi.com/schema/bt/mtgi-bt-1.1.xsd">
+          http://www.mantis-tgi.com/schema/bt/1.1        http://www.mantis-tgi.com/schema/bt/mtgi-bt-1.1.xsd">
 
    <bt:manager application="myapp">
       <bt:xml-persister file="${catalina.home}/logs/myapp-beet.xml"/>]]><co id="log-location"/><![CDATA[
@@ -41,7 +41,7 @@
        xmlns:bt="http://www.mantis-tgi.com/schema/bt/1.1"
        xsi:schemaLocation="
           http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
-          http://www.mantis-tgi.com/schema/bt         http://www.mantis-tgi.com/schema/bt/mtgi-bt-1.1.xsd">
+          http://www.mantis-tgi.com/schema/bt/1.1        http://www.mantis-tgi.com/schema/bt/mtgi-bt-1.1.xsd">
 		
    <bt:manager application="myapp">
       <bt:session-context class="com.me.MySessionContextImpl]]><co id="custom-sc"/><![CDATA["/>
@@ -61,7 +61,7 @@
        xmlns:bt="http://www.mantis-tgi.com/schema/bt/1.1"
        xsi:schemaLocation="
           http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
-          http://www.mantis-tgi.com/schema/bt         http://www.mantis-tgi.com/schema/bt/mtgi-bt-1.1.xsd">
+          http://www.mantis-tgi.com/schema/bt/1.1        http://www.mantis-tgi.com/schema/bt/mtgi-bt-1.1.xsd">
 		
    <bt:config>
       <bt:manager id="loggerA]]><co id="multiple-managers"/><![CDATA[" application="myapp"
@@ -93,7 +93,7 @@
        xsi:schemaLocation="
           http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
           http://www.springframework.org/schema/tx    http://www.springframework.org/schema/tx/spring-tx-2.0.xsd
-          http://www.mantis-tgi.com/schema/bt         http://www.mantis-tgi.com/schema/bt/mtgi-bt-1.1.xsd
+          http://www.mantis-tgi.com/schema/bt/1.1        http://www.mantis-tgi.com/schema/bt/mtgi-bt-1.1.xsd
           http://www.springframework.org/schema/aop   http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
 		
    <bt:manager/>]]><co id="no-expression"/><![CDATA[
@@ -123,7 +123,7 @@
        xmlns:bt="http://www.mantis-tgi.com/schema/bt/1.1"
        xsi:schemaLocation="
           http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
-          http://www.mantis-tgi.com/schema/bt         http://www.mantis-tgi.com/schema/bt/mtgi-bt-1.1.xsd">
+          http://www.mantis-tgi.com/schema/bt/1.1        http://www.mantis-tgi.com/schema/bt/mtgi-bt-1.1.xsd">
 		
    <bt:manager application="myapp"/>
 		
