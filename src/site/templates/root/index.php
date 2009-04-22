@@ -15,6 +15,17 @@
 		<!--[if lt IE 7]><link rel="stylesheet" type="text/css" href="<?php echo JURI::base(); ?>templates/root/css/template_ie_6.css" /><![endif]-->
 	</head>
 	<body>
+
+		<script type="text/javascript">
+		var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+		document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+		</script>
+		<script type="text/javascript">
+		try {
+		var pageTracker = _gat._getTracker("UA-8485662-1");
+		pageTracker._trackPageview();
+		} catch(err) {}</script>
+
 		<div class="sky"></div>
 		<div class="earth">
 			
