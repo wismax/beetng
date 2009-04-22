@@ -20,7 +20,7 @@
 
 .segmentedlist .title, 
 .variablelist .title { 
-  background-color: lightgrey;
+  background-color: lightgray;
   margin: 0;
   padding: 5pt;
 }
@@ -36,7 +36,7 @@
 
 
 h2.title {
-  background-color: grey;
+  background-color: gray;
   color: #fafafa;
   padding: 10pt;
   border: 5px solid #333;
@@ -48,7 +48,7 @@ h2.title {
 }
 
 .section h3.title {
-  background-color: lightgrey;
+  background-color: lightgray;
   padding: 5pt;
   border: 1px solid black;
   margin-top: 2em;
