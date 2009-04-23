@@ -14,6 +14,7 @@
 package com.mtgi.analytics.servlet;
 
 import java.util.Collection;
+import java.util.Enumeration;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -27,6 +28,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.servlet.FrameworkServlet;
 
 import com.mtgi.analytics.BehaviorEvent;
 
@@ -44,23 +46,11 @@ public class BehaviorTrackingListener implements ServletRequestListener, Servlet
 	private static final String ATT_EVENTS = BehaviorTrackingListener.class.getName() + ".events";
 
 	private ServletRequestBehaviorTrackingAdapter[] adapters = null;
+	private boolean initialized = false;
 	
-	@SuppressWarnings("unchecked")
-	public void contextInitialized(ServletContextEvent event) {
-		ServletContext context = event.getServletContext();
-		WebApplicationContext spring = WebApplicationContextUtils.getWebApplicationContext(context);
-		if (spring != null) {
-			Collection<ServletRequestBehaviorTrackingAdapter> beans = spring.getBeansOfType(ServletRequestBehaviorTrackingAdapter.class, false, false).values();
-			if (!beans.isEmpty()) {
-				if (BehaviorTrackingFilter.isFiltered(context))
-					throw new IllegalStateException("You have configured both BehaviorTrackingFilters and BehaviorTrackingListeners in the same web application.  Only one of these methods may be used in a single application.");
-				adapters = beans.toArray(new ServletRequestBehaviorTrackingAdapter[beans.size()]);
-				log.info("BehaviorTracking for HTTP servlet requests started");
-			}
-		}
-	}
-
+	public void contextInitialized(ServletContextEvent event) {}
 	public void contextDestroyed(ServletContextEvent event) {
+		initialized = false;
 		if (adapters != null) {
 			log.info("BehaviorTracking for HTTP servlet requests stopped");
 			adapters = null;
@@ -68,6 +58,7 @@ public class BehaviorTrackingListener implements ServletRequestListener, Servlet
 	}
 
 	public void requestInitialized(ServletRequestEvent event) {
+		checkInit(event);
 		if (adapters != null) {
 			BehaviorEvent[] events = new BehaviorEvent[adapters.length];
 			ServletRequest request = event.getServletRequest();
@@ -100,4 +91,37 @@ public class BehaviorTrackingListener implements ServletRequestListener, Servlet
 		}
 	}
 
+	@SuppressWarnings("unchecked")
+	private synchronized void checkInit(ServletRequestEvent event) {
+		if (!initialized) {
+
+			WebApplicationContext spring = null;
+			ServletContext context = event.getServletContext();
+
+			//look first for MVC application context.
+			for (Enumeration atts = context.getAttributeNames(); spring == null && atts.hasMoreElements(); ) {
+				String name = (String)atts.nextElement();
+				if (name.startsWith(FrameworkServlet.SERVLET_CONTEXT_PREFIX)) {
+					Object value = context.getAttribute(name);
+					if (value instanceof WebApplicationContext)
+						spring = (WebApplicationContext)value;
+				}
+			}
+			
+			if (spring == null) //no MVC context, look for ContextLoaderListener-registered context
+				spring = WebApplicationContextUtils.getWebApplicationContext(context);
+			
+			if (spring != null) {
+				Collection<ServletRequestBehaviorTrackingAdapter> beans = spring.getBeansOfType(ServletRequestBehaviorTrackingAdapter.class, false, false).values();
+				if (!beans.isEmpty()) {
+					if (BehaviorTrackingFilter.isFiltered(context))
+						throw new IllegalStateException("You have configured both BehaviorTrackingFilters and BehaviorTrackingListeners in the same web application.  Only one of these methods may be used in a single application.");
+					adapters = beans.toArray(new ServletRequestBehaviorTrackingAdapter[beans.size()]);
+					log.info("BehaviorTracking for HTTP servlet requests started");
+				}
+			}
+			
+			initialized = true;
+		}
+	}
 }
