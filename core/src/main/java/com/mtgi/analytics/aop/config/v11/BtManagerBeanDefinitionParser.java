@@ -21,6 +21,7 @@ import static com.mtgi.analytics.aop.config.v11.ConfigurationConstants.CONFIG_SC
 import static com.mtgi.analytics.aop.config.v11.ConfigurationConstants.CONFIG_SESSION_CONTEXT;
 import static com.mtgi.analytics.aop.config.v11.ConfigurationConstants.CONFIG_TEMPLATE;
 
+import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -28,6 +29,7 @@ import org.springframework.aop.aspectj.AspectJExpressionPointcut;
 import org.springframework.aop.config.AopNamespaceUtils;
 import org.springframework.aop.support.DefaultBeanFactoryPointcutAdvisor;
 import org.springframework.beans.MutablePropertyValues;
+import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -107,8 +109,27 @@ public class BtManagerBeanDefinitionParser extends TemplateBeanDefinitionParser 
 	 */
 	public static final String ATT_SESSION_CONTEXT = "session-context";
 
+	private static final String AOP_REGISTRATION = "registerAspectJAutoProxyCreatorIfNecessary";
+	
+	//we want to support both 2.0 and 2.5 deployments without
+	//too much hassle; unfortunately, an incompatible API change in
+	//AopNamespaceUtils means we have to use reflection to do so.
+	private Method aopRegistration;
+	
 	public BtManagerBeanDefinitionParser() {
 		super(CONFIG_TEMPLATE, CONFIG_MANAGER);
+		
+		try {
+			//try Spring 2.5 method signature first.
+			aopRegistration = AopNamespaceUtils.class.getMethod(AOP_REGISTRATION, ParserContext.class, Element.class);
+		} catch (NoSuchMethodException allowed) {
+			//fallback to 2.0 signature
+			try {
+				aopRegistration = AopNamespaceUtils.class.getMethod(AOP_REGISTRATION, ParserContext.class, Object.class);
+			} catch (NoSuchMethodException e) {
+				throw new org.springframework.beans.factory.BeanDefinitionStoreException("Could not find method " + AopNamespaceUtils.class.getName() + "." + AOP_REGISTRATION + " with a recognized signature; are you using an unsupported version of Spring?");
+			}
+		}
 	}
 
 	@Override
@@ -146,7 +167,7 @@ public class BtManagerBeanDefinitionParser extends TemplateBeanDefinitionParser 
 		//handle AOP configuration if needed
 		if (element.hasAttribute(ATT_METHOD_EXPRESSION)) {
 			//activate global AOP proxying if it hasn't already been done (borrowed logic from AopNamespaceHandler / config element parser)
-			AopNamespaceUtils.registerAspectJAutoProxyCreatorIfNecessary(parserContext, element);
+			activateAopProxies(parserContext, element);
 			
 			//register pointcut definition for the provided expression.
 			RootBeanDefinition pointcut = new RootBeanDefinition(AspectJExpressionPointcut.class);
@@ -213,6 +234,14 @@ public class BtManagerBeanDefinitionParser extends TemplateBeanDefinitionParser 
 	protected TemplateComponentDefinition newComponentDefinition(String name,
 			Object source, DefaultListableBeanFactory factory) {
 		return new ManagerComponentDefinition(name, source, factory);
+	}
+	
+	protected void activateAopProxies(ParserContext context, Element source) {
+		try {
+			aopRegistration.invoke(null, context, source);
+		} catch (Exception e) {
+			throw new BeanDefinitionStoreException("Error activating AOP proxies while parsing bt:manager definition", e);
+		}
 	}
 	
 	/** 
