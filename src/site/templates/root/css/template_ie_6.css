@@ -37,6 +37,6 @@
 }
 
 /* seems to decrease incidence of background color / float bug */
-#rootCenter {
+#rootCenter, .leftfloat {
 	position: relative;
 }
