@@ -50,6 +50,7 @@
 }
 
 #rootHeader {
+  position: relative;
   color: #fff5f5;
   height: 52pt;
   padding: 5pt 10px;
@@ -127,6 +128,31 @@
   height: 52pt;
   display: table-cell;
   vertical-align: middle;
+  padding-right: 20pt;
+}
+
+/* top-positioned RSS link */
+/* top-positioned RSS link */
+#rootSyndicate {
+  padding: 0;
+  display: inline;
+  position: absolute;
+  right: 10pt;
+  top: 50%;
+  margin-top: -7px;
+}
+#rootSyndicate a {
+  margin: 0;
+  padding: 0;
+  text-decoration: none;
+}
+#rootSyndicate a img {
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+#rootSyndicate a span {
+  display: none;
 }
 
 #rootCenter {

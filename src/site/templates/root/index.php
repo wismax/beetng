@@ -57,12 +57,17 @@
 						</div>
 						<?php endif ; ?>
 					</div>
-					<?php if ($this->countModules('top')): ?>
 					<!-- BEGIN: TOP -->
+					<?php if ($this->countModules('top')): ?>
 					<div id="rootTop">
 						<jdoc:include type="modules" name="top" style="xhtml" />
 					</div>
+					<?php endif; ?>
 					<!-- END: TOP -->
+					<?php if ($this->countModules('syndicate')): ?>
+					<div id="rootSyndicate">
+						<jdoc:include type="modules" name="syndicate"/>
+					</div>
 					<?php endif; ?>
 				</div>
 				<!-- END HEADER -->
