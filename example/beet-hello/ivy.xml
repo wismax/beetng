@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<ivy-module version="2.0">
+    <info organisation="mtgi" module="beet-hello" status="milestone" revision="1.0.0">
+    	<description>
+    	Example web application demonstrating a range of beet tracking features.
+    	</description>
+	</info>
+	
+	<configurations>
+		<conf name="base" description="core module without runtime dependencies"/>
+		<conf name="source" description="source jar"/>
+		<conf name="compile" description="compile-time dependencies"/>
+		<conf name="test" description="dependencies used for junit testing"/>
+		
+		<conf name="1.5" extends="default" description="core module with dependencies, for SDK 1.5 and below"/>
+		<conf name="1.6" description="core module with runtime dependencies, for SDK 1.6 and higher"/>
+		<conf name="default" extends="1.6" description="alias for '1.6'" />
+	</configurations>
+
+	<publications>
+		<artifact name="beet-hello" type="war" conf="base,default,test"/>
+	</publications>
+	
+	<dependencies defaultconfmapping="1.5->1.5(default);1.6->1.6(default);default,compile,test->default">
+
+		<dependency org="springframework" name="spring" rev="2.5.+"/>
+		<dependency org="springframework" name="spring-webmvc" rev="2.5.+"/>
+		<dependency org="hibernate" name="hibernate" rev="3.2.+"/>
+		<dependency org="hibernate" name="hibernate-annotations" rev="3.3.0"/>
+		<dependency org="sun" name="persistence-api" rev="1.0"/>
+		<dependency org="mchange" name="c3p0" rev="0.9.+"/>
+		<dependency org="sun" name="jstl" rev="1.1"/>
+		<dependency org="sun" name="jta" rev="1.0"/>
+		<dependency org="hsqldb" name="hsqldb" rev="1.8.+"/>
+		
+		<dependency org="sun" name="servlet-api" rev="2.4" conf="compile"/>
+		
+	</dependencies>
+	
+</ivy-module>

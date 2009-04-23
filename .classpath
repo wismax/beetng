@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="utils/src/test/java"/>
+	<classpathentry kind="src" path="example/beet-hello/src/main/java"/>
 	<classpathentry kind="src" path="core/src/test/java"/>
 	<classpathentry kind="src" path="core/src/main/java"/>
 	<classpathentry kind="src" path="utils/src/main/java"/>
@@ -10,5 +11,6 @@
 	<classpathentry kind="lib" path="core/src/main/resources"/>
 	<classpathentry kind="lib" path="core/src/test/resources"/>
 	<classpathentry kind="lib" path="utils/src/main/sql"/>
+	<classpathentry kind="con" path="org.apache.ivyde.eclipse.cpcontainer.IVYDE_CONTAINER/example/beet-hello/ivy.xml/*"/>
 	<classpathentry kind="output" path="ide"/>
 </classpath>

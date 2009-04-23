@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<!-- BEGIN JMX CONFIG -->
+	<!-- boilerplate spring config to export JMX beans, including those supplied by beet. -->
+    <bean id="jmxAttributeSource" class="org.springframework.jmx.export.annotation.AnnotationJmxAttributeSource"/>
+    <bean class="org.springframework.jmx.export.MBeanExporter">
+        <property name="autodetect" value="true"/>
+        <property name="assembler">
+		    <bean class="org.springframework.jmx.export.assembler.MetadataMBeanInfoAssembler">
+		        <property name="attributeSource" ref="jmxAttributeSource"/>
+		    </bean>
+        </property>
+        <property name="namingStrategy">
+		    <bean class="org.springframework.jmx.export.naming.MetadataNamingStrategy">
+		        <property name="attributeSource" ref="jmxAttributeSource"/>
+		    </bean>
+        </property>
+    </bean>
+	<!-- END JMX CONFIG -->	
+
+	<!-- BEGIN APPLICATION LAYER BEANS -->
+	<bean class="org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor"/>
+
+	<!-- dao layer -->
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+		<property name="dataSourceName" value="helloData"/>
+		<property name="driverClass" value="org.hsqldb.jdbcDriver"/>
+		<property name="jdbcUrl" value="jdbc:hsqldb:mem:helloData"/>
+		<property name="maxPoolSize" value="2"/>
+		<property name="maxIdleTime" value="30"/>
+	</bean>
+
+	<bean id="hibernate" class="org.springframework.orm.hibernate3.HibernateTemplate">
+		<property name="sessionFactory">
+			<bean class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+				<property name="annotatedClasses" value="com.mtgi.analytics.example.model.HelloData"/>
+				<property name="dataSource" ref="dataSource"/>
+				<property name="hibernateProperties">
+					<props>
+						<prop key="hibernate.hbm2ddl.auto">create</prop>
+						<prop key="hibernate.dialect">org.hibernate.dialect.HSQLDialect</prop>
+					</props>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<!-- service layer -->
+	<bean id="helloService" class="com.mtgi.analytics.example.service.HelloService">
+		<property name="dao" ref="hibernate"/>
+	</bean>
+	
+	<!-- END APPLICATION LAYER BEANS -->
+	
+	<!-- BEGIN SPRING MVC BEANS -->
+
+	<bean class="com.mtgi.analytics.example.controller.HelloWorldController">
+		<property name="service" ref="helloService"/>
+		<property name="commandClass" value="com.mtgi.analytics.example.controller.HelloWorldController$Request"/>
+		<property name="commandName" value="helloWorldRequest"/>
+		<property name="formView" value="helloWorld"/>
+		<property name="successView" value="helloWorld"/>
+	</bean>
+
+	<!-- spring plumbing -->
+	<bean class="org.springframework.web.servlet.mvc.support.ControllerClassNameHandlerMapping"/>
+	<bean id="viewNameTranslator" class="org.springframework.web.servlet.view.DefaultRequestToViewNameTranslator" />
+	<bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/views/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+	<!-- END SPRING MVC BEANS -->
+	   
+</beans>
