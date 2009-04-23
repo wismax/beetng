@@ -22,10 +22,14 @@
           http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
           http://www.mantis-tgi.com/schema/bt/1.1        http://www.mantis-tgi.com/schema/bt/mtgi-bt-1.1.xsd">
 
+   <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>]]><co id="placeholder"/><![CDATA[
+   
    <bt:manager application="myapp">
       <bt:xml-persister file="${catalina.home}/logs/myapp-beet.xml"/>]]><co id="log-location"/><![CDATA[
    </bt:manager>]]></programlisting>
 			<calloutlist>
+				<callout arearefs="placeholder"><para>This spring utility class is required to use
+				system properties like catalina.home in your Spring configuration.</para></callout>
 				<callout arearefs="log-location"><para>Tomcat defines the catalina.home system property, which
 				is useful for specifying server-relative paths in the configuration.
 				The file extension listed here will be replaced at runtime with one appropriate
