@@ -29,8 +29,11 @@
 }
 
 #rootHeader h1.logo { background-image: none; }
-#rootHeader h1.logo a { padding-top: 0; }
-
+#rootHeader h1.logo a {
+   padding: 0;
+   margin-top: -12pt;
+   line-height: 60pt;
+}
 /* disable top nav rather than engineer a separate solution for ie6 */
 #rootTop  {
 	display: none;
