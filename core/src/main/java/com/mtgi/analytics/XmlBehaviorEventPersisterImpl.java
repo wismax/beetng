@@ -54,8 +54,8 @@ import com.sun.xml.fastinfoset.stax.StAXDocumentSerializer;
  * selected by {@link #setBinary(boolean)}.  Log rotation can be accomplished
  * by {@link #rotateLog()}.
  */
-@ManagedResource(objectName="com.mtgi:group=analytics,name=BehaviorTrackingLog", 
-		 		 description="Perform maintenance on BehaviorTracking XML logfiles")
+@ManagedResource(objectName="com.mtgi:group=analytics,name=BeetLog", 
+		 		 description="Perform maintenance on beet XML logfiles")
 public class XmlBehaviorEventPersisterImpl 
 	implements BehaviorEventPersister, InitializingBean, DisposableBean 
 {

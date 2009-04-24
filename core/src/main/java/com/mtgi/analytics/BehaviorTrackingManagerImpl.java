@@ -38,8 +38,8 @@ import com.mtgi.analytics.servlet.SpringSessionContext;
  * the configured threshold value.  The flush threshold can be configured with
  * {@link #setFlushThreshold(int)}.</p>
  */
-@ManagedResource(objectName="com.mtgi:group=analytics,name=BehaviorTracking", 
-		 		 description="Monitor and control user behavior tracking")
+@ManagedResource(objectName="com.mtgi:group=analytics,name=BeetManager", 
+		 		 description="Monitor and control basic beet behavior")
 public class BehaviorTrackingManagerImpl implements BehaviorTrackingManager, InitializingBean, BeanNameAware {
 
 	/*
