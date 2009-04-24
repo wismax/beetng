@@ -1,11 +1,12 @@
-   This product is distributed under the terms of the Mozilla Public
-   License, v1.1 (MPL).
+   This product (beet-hello) is distributed under the terms of the 
+   Mozilla Public License, v1.1 (MPL).
 
    This product includes software developed by the Apache Software 
    Foundation (http://www.apache.org).  This product also includes 
    software developed by the Spring Framework Project 
-   (http://www.springframework.org).  This software is licensed under
-   terms of the Apache Software License, version 2.0 (APL).
+   (http://www.springframework.org).  Spring and ASF software 
+   is licensed under terms of the Apache Software License, version 
+   2.0 (APL).
    
    This product is linked against and distributes in binary form
    the Hibernate 3.2.5 library (http://hibernate.org), licensed 
