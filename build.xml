@@ -3,6 +3,11 @@
 <project name="beet" default="all"
 		 xmlns:ivy="antlib:org.apache.ivy.ant">
 
+	<fileset id="licenses" dir="${basedir}">
+		<include name="notice.txt"/>
+		<include name="licenses/*.txt"/>
+	</fileset>
+	
 	<property name="local.properties" value="local.properties"/>
 	<property file="${local.properties}"/>
 
@@ -69,6 +74,7 @@
 					<fileset dir="${build.root}/utils/dist/jars"
 		                     includes="**/*.jar" excludes="**/*test*"/>
 					<fileset dir="utils/src/main/sh" includes="**/**"/>
+					<fileset refid="licenses"/>
 				</copy>
 				<copy todir="${utils.dist}/db">
 					<fileset dir="utils/src/main/sql" includes="**/**"/>
@@ -98,9 +104,8 @@
 				<copy todir="${release.dir}">
 					<fileset dir="${build.root}/core/dist/jars"
 		                     includes="**/*.jar" excludes="**/*test*"/>
+					<fileset refid="licenses"/>
 				</copy>
-				
-				<copy todir="${release.dir}" file="LICENSE.txt"/>
 
 				<copy todir="${release.dir}/docs" failonerror="false">
 					<fileset dir="${build.root}/core/docs" includes="api/**/*,userguide/**/*"/>
