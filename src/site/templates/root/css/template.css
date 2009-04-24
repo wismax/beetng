@@ -51,6 +51,7 @@
 
 #rootHeader {
   position: relative;
+  z-index: 100;
   color: #fff5f5;
   height: 52pt;
   padding: 5pt 10px;
@@ -336,6 +337,7 @@
 }
 
 .pagenavbar {
+  margin-top: 10pt;
   display: block;
   text-align: center;
   background-color: #efefef;
