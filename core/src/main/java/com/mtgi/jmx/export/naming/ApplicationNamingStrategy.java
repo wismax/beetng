@@ -13,6 +13,7 @@
  
 package com.mtgi.jmx.export.naming;
 
+import java.util.Hashtable;
 import java.util.regex.Pattern;
 
 import javax.management.MalformedObjectNameException;
@@ -27,8 +28,8 @@ import org.springframework.jmx.export.naming.ObjectNamingStrategy;
  * the application is converted into the 'package' property, which is set at
  * the beginning of the property list.</p>
  * 
- * <p>For example, <code>com.mtgi:group=analytics,name=BehaviorTrackingLog</code>
- * would become <code>myapp:package=com.mtgi,group=analytics,name=BehaviorTrackingLog</code>
+ * <p>For example, <code>com.mtgi:group=analytics,name=BeetLog</code>
+ * would become <code>myapp:package=com.mtgi,group=analytics,name=BeetLog</code>
  * if the application name is "myapp".</p>
  * 
  * <p>Useful primarily for complex deployments, where many applications
@@ -41,6 +42,7 @@ public class ApplicationNamingStrategy implements ObjectNamingStrategy {
 	
 	private String application;
 	private ObjectNamingStrategy delegate;
+	private String suffix;
 
 	@Required
 	public void setApplication(String application) {
@@ -52,22 +54,34 @@ public class ApplicationNamingStrategy implements ObjectNamingStrategy {
 		this.delegate = delegate;
 	}
 
+	/** 
+	 * Optional attribute identifying a suffix used to append to the end of
+	 * all ObjectNames produced by this strategy.  Defaults to none.
+	 */
+	public void setSuffix(String suffix) {
+		this.suffix = suffix;
+	}
+
 	public ObjectName getObjectName(Object managedBean, String beanKey)
 			throws MalformedObjectNameException {
 		ObjectName base = delegate.getObjectName(managedBean, beanKey);
 
-		StringBuffer name = new StringBuffer(application).append(':');
+		Hashtable<String,String> properties = new Hashtable<String,String>(base.getKeyPropertyList());
 		String domain = base.getDomain();
-		String properties = base.getKeyPropertyListString();
 		if (domain != null) {
-			name.append("package=").append(quote(domain));
-			if (properties != null)
-				name.append(',');
+			//append the prior domain name onto the package property.
+			String pkg = properties.get("package");
+			pkg = (pkg == null) ? domain : pkg + "." + domain;
+			properties.put("package", pkg);
 		}
-		if (properties != null)
-			name.append(properties);
+		if (suffix != null) {
+			//append the suffix to the object name.
+			String name = properties.get("name");
+			name = (name == null) ? suffix : name + "@" + suffix;
+			properties.put("name", name);
+		}
 		
-		return ObjectName.getInstance(name.toString());
+		return ObjectName.getInstance(application, properties);
 	}
 
 	/** reluctantly quote the given input string (quoting only applied if the string contains control characters) */
