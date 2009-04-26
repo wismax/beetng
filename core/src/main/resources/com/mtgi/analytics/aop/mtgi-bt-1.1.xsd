@@ -203,6 +203,12 @@
 							Default is every 5 minutes if unspecified.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:attribute>
+					<xsd:attribute name="register-mbeans" default="false" type="xsd:boolean">
+						<xsd:annotation>
+							<xsd:documentation>Boolean expression indicating whether JMX mbeans for this manager should be registered
+							with the platform MBean Server.  Defaults to false if unspecified.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
 					<xsd:attribute name="scheduler" type="xsd:string">
 						<xsd:annotation>
 							<xsd:documentation>Bean name of a Quartz scheduler bean to use for timed flush operations.

@@ -41,7 +41,7 @@ public class ApplicationNamingStrategyTest {
 		ObjectName name = ans.getObjectName(new XmlBehaviorEventPersisterImpl(), "testPersister");
 		assertNotNull("name is constructed", name);
 		assertEquals("name has been transformed correctly",
-					 ObjectName.getInstance("testApplication:package=com.mtgi,group=analytics,name=BeetLog"), 
+					 ObjectName.getInstance("testApplication:package=com.mtgi,group=analytics,type=BeetLog"), 
 					 name);
 		assertEquals("package name quoted properly", "com.mtgi", name.getKeyProperty("package"));
 	}
@@ -59,7 +59,7 @@ public class ApplicationNamingStrategyTest {
 		ObjectName name = ans.getObjectName(new XmlBehaviorEventPersisterImpl(), "testPersister");
 		assertNotNull("name is constructed", name);
 		assertEquals("name has been transformed correctly",
-					 ObjectName.getInstance("testApplication:package=com.mtgi,group=analytics,name=BeetLog@testPersister"), 
+					 ObjectName.getInstance("testApplication:package=com.mtgi,group=analytics,type=BeetLog,name=testPersister"), 
 					 name);
 		assertEquals("package name quoted properly", "com.mtgi", name.getKeyProperty("package"));
 	}

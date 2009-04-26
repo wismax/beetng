@@ -28,8 +28,14 @@ public interface ConfigurationConstants {
 	public static final String CONFIG_SESSION_CONTEXT = CONFIG_NAMESPACE + ".btSessionContext";
 	/** bean name for the default <code>bt:persister</code> configuration */
 	public static final String CONFIG_PERSISTER = CONFIG_NAMESPACE + ".btPersister";
+	
 	/** bean name for the default private Quartz Scheduler instance used by both <code>bt:manager</code> and <code>bt:persister</code> */
 	public static final String CONFIG_SCHEDULER = CONFIG_NAMESPACE + ".btScheduler";
 	/** bean name for the default private TaskExecutor instance used by the private scheduler and <code>bt:manager</code> */
 	public static final String CONFIG_EXECUTOR = CONFIG_NAMESPACE + ".btExecutor";
+
+	/** bean name for an MBeanExporter used to auto-register beet JMX features */
+	public static final String CONFIG_MBEAN_EXPORTER = CONFIG_NAMESPACE + ".btMBeanExporter";
+	/** bean name for the naming strategy used to register MBeans */
+	public static final String CONFIG_NAMING_STRATEGY = CONFIG_NAMESPACE + ".btJmxNamingStrategy";
 }

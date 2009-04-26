@@ -18,6 +18,7 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.FactoryBeanNotInitializedException;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
 /**
  * <p>Bootstraps a bean from one {@link BeanFactory} into another.  The intent is that we can
@@ -31,12 +32,18 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
  */
 public class TemplateBeanDefinitionFactory implements FactoryBean, DisposableBean {
 
-	private BeanFactory beanFactory;
+	private ConfigurableListableBeanFactory beanFactory;
 	private String beanName;
+	private boolean initialized = false;
 	
 	public Object getObject() throws Exception {
 		if (beanFactory == null || beanName == null)
 			throw new FactoryBeanNotInitializedException();
+		if (!initialized) {
+			//give post-processors and the like a chance to run.
+			initialized = true;
+			beanFactory.preInstantiateSingletons();
+		}
 		return beanFactory.getBean(beanName);
 	}
 
@@ -48,7 +55,7 @@ public class TemplateBeanDefinitionFactory implements FactoryBean, DisposableBea
 		return beanFactory.isSingleton(beanName);
 	}
 
-	public void setBeanFactory(BeanFactory beanFactory) {
+	public void setBeanFactory(ConfigurableListableBeanFactory beanFactory) {
 		this.beanFactory = beanFactory;
 	}
 

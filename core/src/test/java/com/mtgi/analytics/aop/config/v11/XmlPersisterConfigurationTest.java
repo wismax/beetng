@@ -16,8 +16,12 @@ package com.mtgi.analytics.aop.config.v11;
 import static org.junit.Assert.*;
 
 import java.io.File;
+import java.lang.management.ManagementFactory;
 import java.util.Arrays;
 import java.util.List;
+
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 
 import org.junit.After;
 import org.junit.Test;
@@ -27,6 +31,7 @@ import org.quartz.SchedulerFactory;
 import org.quartz.impl.StdSchedulerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.jmx.support.JmxUtils;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.unitils.UnitilsJUnit4TestClassRunner;
 import org.unitils.spring.annotation.SpringApplicationContext;
@@ -83,6 +88,11 @@ public class XmlPersisterConfigurationTest {
 		SchedulerFactory factory = new StdSchedulerFactory();
 		assertEquals("private scheduler was not created", 1, factory.getAllSchedulers().size());
 		assertSame(testScheduler, factory.getAllSchedulers().iterator().next());
+		
+		//verify that MBeans have been registered
+        MBeanServer server = JmxUtils.locateMBeanServer();
+        assertNotNull("manager mbean found", server.getMBeanInfo(new ObjectName("testApp:package=com.mtgi,group=analytics,type=BeetManager,name=xmlTracking")));
+        ObjectName logName = new ObjectName("testApp:package=com.mtgi,group=analytics,type=BeetLog,name=xmlTracking");
+        assertNotNull("log mbean found", server.getMBeanInfo(logName));
 	}
-	
 }

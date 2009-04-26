@@ -11,7 +11,7 @@
 
 	<bt:config>
 
-	  <bt:manager id="xmlTracking" application="testApp" 
+	  <bt:manager id="xmlTracking" application="testApp" register-mbeans="true"
 	  			  scheduler="testScheduler" task-executor="testExecutor"
 	  			  track-method-expression="execution(* com.mtgi.analytics.aop.config..*Xml(..))">
 	  	<bt:xml-persister binary="false" compress="false" file="${java.io.tmpdir}/xml-tracking.xml"/>

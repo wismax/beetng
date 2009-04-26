@@ -97,4 +97,32 @@
 		</property>
 	</bean>
 	
+	<!-- mbean auto-registration support -->
+    <bean id="com.mtgi.analytics.btJmxAttributeSource" 
+    	  class="org.springframework.jmx.export.annotation.AnnotationJmxAttributeSource"/>
+	<bean id="com.mtgi.analytics.btJmxNamingStrategy"
+		  class="com.mtgi.jmx.export.naming.ApplicationNamingStrategy">
+		<property name="application">
+			<bean factory-bean="com.mtgi.analytics.btManager" factory-method="getApplication"/>
+		</property>
+		<property name="suffix" value="beet"/>
+		<property name="delegate">
+			<bean class="org.springframework.jmx.export.naming.MetadataNamingStrategy">
+				<property name="attributeSource" ref="com.mtgi.analytics.btJmxAttributeSource"/>
+			</bean>
+		</property>
+    </bean>
+    <bean id="com.mtgi.analytics.btMBeanExporter" class="org.springframework.jmx.export.MBeanExporter">
+    	<description>Exports Beet MBeans to the platform MBeanServer.  Uses an instance of
+    	ApplicationNamingStrategy to put all beans under the domain name of the application,
+    	to avoid naming collisions if we have multiple apps on the same server.</description>
+    	<property name="autodetect" value="true"/>
+        <property name="assembler">
+		    <bean class="org.springframework.jmx.export.assembler.MetadataMBeanInfoAssembler">
+		        <property name="attributeSource" ref="com.mtgi.analytics.btJmxAttributeSource"/>
+		    </bean>
+        </property>
+        <property name="namingStrategy" ref="com.mtgi.analytics.btJmxNamingStrategy"/>
+    </bean>
+    
 </beans>

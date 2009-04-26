@@ -14,12 +14,7 @@
 package com.mtgi.analytics.aop.config.v11;
 
 import static com.mtgi.analytics.aop.config.v11.BtXmlPersisterBeanDefinitionParser.CONFIG_PERSISTER;
-import static com.mtgi.analytics.aop.config.v11.ConfigurationConstants.CONFIG_EXECUTOR;
-import static com.mtgi.analytics.aop.config.v11.ConfigurationConstants.CONFIG_MANAGER;
-import static com.mtgi.analytics.aop.config.v11.ConfigurationConstants.CONFIG_NAMESPACE;
-import static com.mtgi.analytics.aop.config.v11.ConfigurationConstants.CONFIG_SCHEDULER;
-import static com.mtgi.analytics.aop.config.v11.ConfigurationConstants.CONFIG_SESSION_CONTEXT;
-import static com.mtgi.analytics.aop.config.v11.ConfigurationConstants.CONFIG_TEMPLATE;
+import static com.mtgi.analytics.aop.config.v11.ConfigurationConstants.*;
 
 import java.lang.reflect.Method;
 import java.util.HashSet;
@@ -29,6 +24,7 @@ import org.springframework.aop.aspectj.AspectJExpressionPointcut;
 import org.springframework.aop.config.AopNamespaceUtils;
 import org.springframework.aop.support.DefaultBeanFactoryPointcutAdvisor;
 import org.springframework.beans.MutablePropertyValues;
+import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
@@ -36,6 +32,7 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.RuntimeBeanNameReference;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.parsing.CompositeComponentDefinition;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.factory.xml.NamespaceHandler;
@@ -94,6 +91,10 @@ public class BtManagerBeanDefinitionParser extends TemplateBeanDefinitionParser 
 	 */
 	public static final String ATT_METHOD_EXPRESSION = "track-method-expression";
 	/**
+	 * Set to true/false to enable JMX mbean registration for this manager.  Defaults to true if unspecified.
+	 */
+	public static final String ATT_REGISTER_MBEANS = "register-mbeans";
+	/**
 	 * Bean name reference to an implementation of {@link BehaviorEventPersister} defined in the application context.
 	 * A private instance of {@link XmlBehaviorEventPersisterImpl} is created if none is specified.  This attribute
 	 * cannot be used in combination with a nested persister tag (<code>xml-persister</code>, <code>jdbc-persister</code>,
@@ -146,6 +147,17 @@ public class BtManagerBeanDefinitionParser extends TemplateBeanDefinitionParser 
 		overrideProperty(ATT_APPLICATION, template, element, false);
 		overrideProperty(ATT_FLUSH_THRESHOLD, template, element, false);
 
+		//wake up MBeanExporter if we're going to be doing MBean registration.
+		if ("true".equalsIgnoreCase(element.getAttribute(ATT_REGISTER_MBEANS))) {
+			AbstractBeanDefinition exporter = (AbstractBeanDefinition)factory.getBeanDefinition(CONFIG_MBEAN_EXPORTER);
+			exporter.setLazyInit(false);
+
+			//append manager ID to mbean name, in case of multiple managers in a single application.
+			BeanDefinition naming = factory.getBeanDefinition(CONFIG_NAMING_STRATEGY);
+			naming.getPropertyValues().addPropertyValue("suffix", managerId);
+		}
+
+		//prefer references to beans in the parent factory if they've been specified
 		if (element.hasAttribute(ATT_SCHEDULER))
 			factory.registerAlias(element.getAttribute(ATT_SCHEDULER), CONFIG_SCHEDULER);
 		
@@ -255,13 +267,28 @@ public class BtManagerBeanDefinitionParser extends TemplateBeanDefinitionParser 
 		CompositeComponentDefinition parent = parserContext.getContainingComponent();
 		if (parent instanceof ManagerComponentDefinition) {
 			//we are nested; add to enclosing bean def.
+			ManagerComponentDefinition mcd = (ManagerComponentDefinition)parent;
 			BeanDefinition managerDef = parserContext.getContainingBeanDefinition();
 
 			MutablePropertyValues props = managerDef.getPropertyValues();
-			props.removePropertyValue(parentProperty);
+			PropertyValue current = props.getPropertyValue(parentProperty);
+			if (current != null) {
+				props.removePropertyValue(parentProperty);
+
+				//if the original value is a reference, replace it with an alias to the nested bean definition.
+				//this means the nested bean takes the place of the default definition
+				//in other places where it might be referenced, as well as during mbean export
+				Object value = current.getValue();
+				DefaultListableBeanFactory factory = mcd.getTemplateFactory();
+				if (value instanceof RuntimeBeanReference) {
+					String ref = ((RuntimeBeanReference)value).getBeanName();
+					if (factory.getBeanDefinition(ref) != nested.getBeanDefinition())
+						mcd.getTemplateFactory().registerAlias(nested.getBeanName(), ref);
+				}
+			}
 			props.addPropertyValue(parentProperty, nested);
 			
-			((ManagerComponentDefinition)parent).addNestedProperty(parentProperty);
+			mcd.addNestedProperty(parentProperty);
 			return true;
 		}
 		//bean is not nested inside bt:manager
