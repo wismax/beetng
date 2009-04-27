@@ -101,11 +101,11 @@
     <bean id="com.mtgi.analytics.btJmxAttributeSource" 
     	  class="org.springframework.jmx.export.annotation.AnnotationJmxAttributeSource"/>
 	<bean id="com.mtgi.analytics.btJmxNamingStrategy"
-		  class="com.mtgi.jmx.export.naming.ApplicationNamingStrategy">
-		<property name="application">
+		  class="com.mtgi.jmx.export.naming.AppendNamingStrategy">
+		<property name="domain">
 			<bean factory-bean="com.mtgi.analytics.btManager" factory-method="getApplication"/>
 		</property>
-		<property name="suffix" value="beet"/>
+		<property name="key" value="group"/>
 		<property name="delegate">
 			<bean class="org.springframework.jmx.export.naming.MetadataNamingStrategy">
 				<property name="attributeSource" ref="com.mtgi.analytics.btJmxAttributeSource"/>

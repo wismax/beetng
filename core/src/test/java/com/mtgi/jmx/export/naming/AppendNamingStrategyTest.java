@@ -26,7 +26,7 @@ import org.springframework.jmx.export.naming.ObjectNamingStrategy;
 
 import com.mtgi.analytics.XmlBehaviorEventPersisterImpl;
 
-public class ApplicationNamingStrategyTest {
+public class AppendNamingStrategyTest {
 
 	@Test
 	public void testNamingStrategy() throws MalformedObjectNameException {
@@ -34,34 +34,34 @@ public class ApplicationNamingStrategyTest {
 		MetadataNamingStrategy delegate = new MetadataNamingStrategy();
 		delegate.setAttributeSource(new AnnotationJmxAttributeSource());
 		
-		ApplicationNamingStrategy ans = new ApplicationNamingStrategy();
+		AppendNamingStrategy ans = new AppendNamingStrategy();
 		ans.setDelegate(delegate);
-		ans.setApplication("testApplication");
+		ans.setDomain("testApplication");
 		
 		ObjectName name = ans.getObjectName(new XmlBehaviorEventPersisterImpl(), "testPersister");
 		assertNotNull("name is constructed", name);
 		assertEquals("name has been transformed correctly",
-					 ObjectName.getInstance("testApplication:package=com.mtgi,group=analytics,type=BeetLog"), 
-					 name);
-		assertEquals("package name quoted properly", "com.mtgi", name.getKeyProperty("package"));
+					 "testApplication:package=com.mtgi.analytics,name=BeetLog", 
+					 name.toString());
+		assertEquals("package name quoted properly", "com.mtgi.analytics", name.getKeyProperty("package"));
 	}
 
 	@Test
-	public void testSuffix()  throws MalformedObjectNameException {
+	public void testNewKey()  throws MalformedObjectNameException {
 		MetadataNamingStrategy delegate = new MetadataNamingStrategy();
 		delegate.setAttributeSource(new AnnotationJmxAttributeSource());
 		
-		ApplicationNamingStrategy ans = new ApplicationNamingStrategy();
+		AppendNamingStrategy ans = new AppendNamingStrategy();
 		ans.setDelegate(delegate);
-		ans.setSuffix("testPersister");
-		ans.setApplication("testApplication");
+		ans.setValue("testPersister");
+		ans.setDomain("testApplication");
 		
 		ObjectName name = ans.getObjectName(new XmlBehaviorEventPersisterImpl(), "testPersister");
 		assertNotNull("name is constructed", name);
 		assertEquals("name has been transformed correctly",
-					 ObjectName.getInstance("testApplication:package=com.mtgi,group=analytics,type=BeetLog,name=testPersister"), 
-					 name);
-		assertEquals("package name quoted properly", "com.mtgi", name.getKeyProperty("package"));
+					 "testApplication:package=com.mtgi.analytics,group=BeetLog,name=testPersister", 
+					 name.toString());
+		assertEquals("package name quoted properly", "com.mtgi.analytics", name.getKeyProperty("package"));
 	}
 
 	@Test
@@ -72,20 +72,20 @@ public class ApplicationNamingStrategyTest {
 		
 		ObjectNamingStrategy mock = createMock(ObjectNamingStrategy.class);
 		expect(mock.getObjectName(inst, beanName))
-			.andReturn(ObjectName.getInstance("topLevel:package=com.mtgi,group=analytics,name=foobar"))
+			.andReturn(ObjectName.getInstance("topLevel:package=com.mtgi.analytics,group=stuff,name=foobar"))
 			.once();
 		replay(mock);
 		
-		ApplicationNamingStrategy ans = new ApplicationNamingStrategy();
+		AppendNamingStrategy ans = new AppendNamingStrategy();
 		ans.setDelegate(mock);
-		ans.setSuffix("testPersister");
-		ans.setApplication("testApplication");
+		ans.setValue("testPersister");
+		ans.setDomain("testApplication");
 		
 		ObjectName name = ans.getObjectName(inst, beanName);
 		assertNotNull("name is constructed", name);
 		assertEquals("name has been transformed correctly",
-					 ObjectName.getInstance("testApplication:package=com.mtgi.topLevel,group=analytics,name=foobar@testPersister"), 
-					 name);
+					 "testApplication:package=com.mtgi.analytics.topLevel,group=stuff.foobar,name=testPersister", 
+					 name.toString());
 	}
 	
 	@Test
@@ -114,6 +114,6 @@ public class ApplicationNamingStrategyTest {
 			"\"back\\\\slash\""
 		};
 		for (int i = 0; i < text.length; ++i)
-			assertEquals(expected[i], ApplicationNamingStrategy.quote(text[i]));
+			assertEquals(expected[i], AppendNamingStrategy.quote(text[i]));
 	}
 }

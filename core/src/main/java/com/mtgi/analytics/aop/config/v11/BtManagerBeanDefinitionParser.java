@@ -154,7 +154,7 @@ public class BtManagerBeanDefinitionParser extends TemplateBeanDefinitionParser 
 
 			//append manager ID to mbean name, in case of multiple managers in a single application.
 			BeanDefinition naming = factory.getBeanDefinition(CONFIG_NAMING_STRATEGY);
-			naming.getPropertyValues().addPropertyValue("suffix", managerId);
+			naming.getPropertyValues().addPropertyValue("value", managerId);
 		}
 
 		//prefer references to beans in the parent factory if they've been specified
@@ -272,9 +272,9 @@ public class BtManagerBeanDefinitionParser extends TemplateBeanDefinitionParser 
 
 			MutablePropertyValues props = managerDef.getPropertyValues();
 			PropertyValue current = props.getPropertyValue(parentProperty);
+			boolean innerBean = true;
+			
 			if (current != null) {
-				props.removePropertyValue(parentProperty);
-
 				//if the original value is a reference, replace it with an alias to the nested bean definition.
 				//this means the nested bean takes the place of the default definition
 				//in other places where it might be referenced, as well as during mbean export
@@ -282,12 +282,18 @@ public class BtManagerBeanDefinitionParser extends TemplateBeanDefinitionParser 
 				DefaultListableBeanFactory factory = mcd.getTemplateFactory();
 				if (value instanceof RuntimeBeanReference) {
 					String ref = ((RuntimeBeanReference)value).getBeanName();
-					if (factory.getBeanDefinition(ref) != nested.getBeanDefinition())
+					
+					if (factory.getBeanDefinition(ref) == nested.getBeanDefinition()) {
+						//the nested definition is the same as the default definition
+						//by reference, so we don't need to make it an inner bean definition.
+						innerBean = false;
+					} else {
 						mcd.getTemplateFactory().registerAlias(nested.getBeanName(), ref);
+					}
 				}
 			}
-			props.addPropertyValue(parentProperty, nested);
-			
+			if (innerBean)
+				props.addPropertyValue(parentProperty, nested);
 			mcd.addNestedProperty(parentProperty);
 			return true;
 		}

@@ -16,7 +16,6 @@ package com.mtgi.analytics.aop.config.v11;
 import static org.junit.Assert.*;
 
 import java.io.File;
-import java.lang.management.ManagementFactory;
 import java.util.Arrays;
 import java.util.List;
 
@@ -91,8 +90,11 @@ public class XmlPersisterConfigurationTest {
 		
 		//verify that MBeans have been registered
         MBeanServer server = JmxUtils.locateMBeanServer();
-        assertNotNull("manager mbean found", server.getMBeanInfo(new ObjectName("testApp:package=com.mtgi,group=analytics,type=BeetManager,name=xmlTracking")));
-        ObjectName logName = new ObjectName("testApp:package=com.mtgi,group=analytics,type=BeetLog,name=xmlTracking");
+        assertNotNull("manager mbean found", server.getMBeanInfo(new ObjectName("testApp:package=com.mtgi.analytics,group=BeetManager,name=xmlTracking")));
+        ObjectName logName = new ObjectName("testApp:package=com.mtgi.analytics,group=BeetLog,name=xmlTracking");
         assertNotNull("log mbean found", server.getMBeanInfo(logName));
+        
+        assertEquals(persister.getFileSize(), server.getAttribute(logName, "FileSize"));
 	}
+	
 }
