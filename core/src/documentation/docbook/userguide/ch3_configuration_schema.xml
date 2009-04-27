@@ -3,7 +3,7 @@
 	
 		namespacePrefix = bt:
 		rootElement     = section
-		rootElementId   = config_schema
+		rootElementId	= config_schema
 		sectionPrefix   = elt_
 -->
 <section id="config_schema">
@@ -102,6 +102,13 @@
             <seg>optional</seg>
             <seg>
                <para>Quartz Cron expression describing how often events should be flushed to the persister. Default is every 5 minutes if unspecified.</para>
+            </seg>
+         </seglistitem>
+         <seglistitem>
+            <seg>register-mbeans</seg>
+            <seg>optional</seg>
+            <seg>
+               <para>Boolean expression indicating whether JMX mbeans for this manager should be registered with the platform MBean Server. Defaults to false if unspecified.</para>
             </seg>
          </seglistitem>
          <seglistitem>
