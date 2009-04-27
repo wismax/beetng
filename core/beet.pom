@@ -5,9 +5,12 @@
 	<packaging>jar</packaging>
 	<name>Beet</name>
 	<version>1.4.0</version>
-	<description>Beet records performance metrics and user behavior information
-	for Spring-based Java applications.</description>
+	<description>Beet records performance metrics and user behavior information for Spring-based Java applications.</description>
 	<url>http://beet.sourceforge.net</url>
+	<issueManagement>
+		<system>SourceForge Tracker</system>
+		<url>https://sourceforge.net/tracker/?group_id=258926</url>
+	</issueManagement>
 	<licenses>
 		<license>
 			<name>Mozilla Public License, Version 1.1</name>
