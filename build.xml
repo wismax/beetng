@@ -146,6 +146,9 @@
 		<ivy:install from="online" to="local" transitive="true"
 					 organisation="mtgi" module="beet-utils" revision="latest.integration"
 					 overwrite="true"/>
+		<ivy:install from="online" to="local" transitive="true"
+					 organisation="mtgi" module="beet-hello" revision="latest.integration"
+					 overwrite="true"/>
 	</target>
 	
 	<target name="release">
