@@ -51,11 +51,12 @@
 
 #rootHeader {
   position: relative;
+  border: 3pt solid #feaec4;
   z-index: 100;
   color: #fff5f5;
   height: 52pt;
   padding: 5pt 10px;
-  background-color: #cf3f5f;
+  background: #cf3f5f url('../images/rgrad.png') repeat-x bottom center ;
   border-top-right-radius: 10pt;
   border-top-left-radius: 10pt;
   
@@ -245,7 +246,8 @@
   white-space: nowrap;
 
   color: #fff5f5;
-  background-color: #cf3f5f;
+  border: 2pt solid #fecee4;
+  background: #cf3f5f url('../images/rgrad.png') repeat-x bottom center ;
 
   border-style: solid;
   border-width: 2pt 0 0 0;

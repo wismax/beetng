@@ -3,7 +3,7 @@
 #rootHeaderLeft {
 	display: inline;
 	float: left;
-	margin-right: 40pt;
+	margin-right: 30pt;
 }
 
 #rootHeader h1 {
@@ -55,6 +55,7 @@
   position: absolute;
   top: 50%;
   margin-top: -1.5ex;
+  z-index: 100;
 }
 
 #rootTop > .moduletable > ul.menu > li {
@@ -62,8 +63,16 @@
   float: left;
 }
 
+#rootTop .parent:hover > ul {
+	width: 22ex;
+}
+
 #rootBreadcrumbs {
   display: none;
+}
+
+#rootSyndicate {
+  right: 5pt;
 }
 
 .ieTaunt {

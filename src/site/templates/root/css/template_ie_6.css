@@ -17,6 +17,10 @@
 	text-align: left;
 }
 
+#rootHeader {
+	background-image: none;
+}
+
 /* IE6 doesn't recognize the CSS descendant selectors used in template.css */
 #rootHeader h1 a, 
 #rootHeader h1 a:visited, 
@@ -43,3 +47,4 @@
 #rootCenter, .leftfloat {
 	position: relative;
 }
+
