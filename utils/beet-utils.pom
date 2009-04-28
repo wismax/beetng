@@ -1,13 +1,11 @@
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.sourceforge.beet</groupId>
-	<artifactId>beet</artifactId>
+	<artifactId>beet-utils</artifactId>
 	<packaging>jar</packaging>
-	<name>Beet Core</name>
-	<version>1.4.0</version>
-	<description>Beet records performance metrics and user behavior information for Spring-based Java applications.
-
-The optional stax-impl dependency is only required for Java 5 deployments.</description>
+	<name>Beet Utils</name>
+	<version>1.2.0</version>
+	<description>Beet-utils provides command line utilities for processing beet log data.</description>
 	<url>http://beet.sourceforge.net</url>
 	<issueManagement>
 		<system>SourceForge Tracker</system>
@@ -31,45 +29,27 @@ The optional stax-impl dependency is only required for Java 5 deployments.</desc
 	</organization>
 	<dependencies>
 		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring</artifactId>
-			<version>2.0.6</version>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.aspectj</groupId>
-			<artifactId>aspectjrt</artifactId>
-			<version>1.5.3</version>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.aspectj</groupId>
-			<artifactId>aspectjweaver</artifactId>
-			<version>1.5.3</version>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>cglib</groupId>
-			<artifactId>cglib</artifactId>
-			<version>2.1_3</version>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>commons-logging</groupId>
-			<artifactId>commons-logging</artifactId>
-			<version>1.1.1</version>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>opensymphony</groupId>
-			<artifactId>quartz-all</artifactId>
-			<version>1.6.0</version>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
 			<groupId>com.sun.xml.fastinfoset</groupId>
 			<artifactId>FastInfoset</artifactId>
 			<version>1.2.2</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.beet</groupId>
+			<artifactId>beet</artifactId>
+			<version>1.4.0</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>saxon</groupId>
+			<artifactId>saxon</artifactId>
+			<version>8.8</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>xerces</groupId>
+			<artifactId>xercesImpl</artifactId>
+			<version>2.8.1</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>

@@ -1,0 +1,11 @@
+since 1.4.0_b1
+
+ new features:
+  * beet-core: new configuration attribute <bt:manager register-mbeans="true"/>, in response to issue 2780646
+
+ bugfixes:
+  * beet-core issue 2780646: xml-persister mbean not registered
+  * beet-core issue 2779161: http-requests broken when used with Spring MVC
+  * beet-core issue 2779090: method-tracking incompatible with Spring 2.5
+  * user-guide issue 2778765: legibility problems in IE
+  * user-guide issue 2779723: XSD url typo in chapter 3 examples
