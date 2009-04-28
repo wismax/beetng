@@ -14,7 +14,7 @@
 					mechanisms and user identity providers.</entry>
 				</row>
 				<row>
-					<entry><ulink url="../../../utils/docs/api/index.html">Log Analysis Utilities</ulink></entry>
+					<entry><ulink url="../../../../utils/docs/api/index.html">Log Analysis Utilities</ulink></entry>
 					<entry>is a library useful for manipulating common behavior tracking log formats.  These
 					tools are primarily intended for command line use, but can be programmatically extended
 					to support custom data loaders.</entry>

@@ -108,7 +108,11 @@
 				</copy>
 
 				<copy todir="${release.dir}/docs" failonerror="false">
-					<fileset dir="${build.root}/core/docs" includes="api/**/*,userguide/**/*"/>
+					<fileset dir="${build.root}">
+						<include name="core/docs/api/**/*"/>
+						<include name="core/docs/userguide/**/*"/>
+						<include name="utils/docs/api/**/*"/>
+					</fileset>
 				</copy>
 
 				<bundle basename="${target.dir}/beet-java@{current.version}-${ivy.revision.mtgi-beet}"
