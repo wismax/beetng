@@ -90,8 +90,8 @@ public class XmlPersisterConfigurationTest {
 		
 		//verify that MBeans have been registered
         MBeanServer server = JmxUtils.locateMBeanServer();
-        assertNotNull("manager mbean found", server.getMBeanInfo(new ObjectName("testApp:package=com.mtgi.analytics,group=BeetManager,name=xmlTracking")));
-        ObjectName logName = new ObjectName("testApp:package=com.mtgi.analytics,group=BeetLog,name=xmlTracking");
+        assertNotNull("manager mbean found", server.getMBeanInfo(new ObjectName("testApp:package=com.mtgi.analytics,group=xmlTracking,name=BeetManager")));
+        ObjectName logName = new ObjectName("testApp:package=com.mtgi.analytics,group=xmlTracking,name=BeetLog");
         assertNotNull("log mbean found", server.getMBeanInfo(logName));
         
         assertEquals(persister.getFileSize(), server.getAttribute(logName, "FileSize"));
