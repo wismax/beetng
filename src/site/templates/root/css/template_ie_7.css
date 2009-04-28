@@ -1,0 +1,74 @@
+@import url("fonts_ie.css");
+
+#rootHeaderLeft {
+	display: inline;
+	float: left;
+	margin-right: 30pt;
+}
+
+#rootHeader h1 {
+	font-weight: normal;
+}
+
+#rootHeader h1.logo-text a {
+	margin-top: -15pt ! important;
+	line-height: 75pt ! important;
+}
+
+#rootHeader h1.logo {
+	height: 50pt;
+}
+
+#rootTop {
+	display: inline;
+}
+
+#rootLeft ul.menu {
+	margin: 0;
+}
+
+#rootLeft .minwidth, #sfLogo .minWidth {
+	width: 150px;
+}
+
+#rootLeft .moduletable {
+	margin-top: 10pt;
+}
+
+#rootContent {
+  padding: 10pt;
+  overflow: auto;
+}
+
+#rootFooter .copyright {
+	margin-left: 150px;
+	padding-left: 20pt;
+}
+
+#rootTop > .moduletable {
+  position: absolute;
+  top: 50%;
+  margin-top: -1.5ex;
+  z-index: 100;
+}
+
+#rootTop > .moduletable > ul.menu > li {
+  display: inline;
+  float: left;
+}
+
+#rootBreadcrumbs {
+  display: none;
+}
+
+#rootSyndicate {
+  right: 5pt;
+}
+
+.ieTaunt {
+	top: 0;
+}
+
+.blog .article_column .contentpaneopen {
+  margin-top: 10pt;
+}

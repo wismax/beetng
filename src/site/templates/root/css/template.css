@@ -289,7 +289,7 @@
   position: absolute;
   z-index: 100;
   width: 20ex;
-  left: -5ex;
+  left: -25%;
 }
 
 #rootTop .parent:last-child > ul {

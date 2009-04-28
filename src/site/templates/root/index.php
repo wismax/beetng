@@ -12,6 +12,7 @@
 		<link rel="stylesheet" href="<?php echo JURI::base(); ?>templates/system/css/general.css" type="text/css" />
 		<link rel="stylesheet" href="<?php echo JURI::base(); ?>templates/root/css/template.css" type="text/css" />
 		<!--[if IE]><link rel="stylesheet" type="text/css" href="<?php echo JURI::base(); ?>templates/root/css/template_ie.css" /><![endif]-->
+		<!--[if lt IE 8]><link rel="stylesheet" type="text/css" href="<?php echo JURI::base(); ?>templates/root/css/template_ie_7.css" /><![endif]-->
 		<!--[if lt IE 7]><link rel="stylesheet" type="text/css" href="<?php echo JURI::base(); ?>templates/root/css/template_ie_6.css" /><![endif]-->
 	</head>
 	<body>
