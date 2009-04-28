@@ -169,13 +169,15 @@
 			Many portal application servers (Sun Glassfish and BEA WebLogic come to mind) have some behavior 
 			tracking features; make sure you consider the capabilities of your target platform. Even if you have 
 			some tools available, beet may offer you something in simplicity, flexibility, and performance.</para>
-			<para>There are also a few excellent open source projects out there geared toward gathering performance
-			metrics in a production system.  You may want to evaluate:
+			<para>There is also a growing body of excellent open source projects out there geared toward 
+			gathering performance metrics and monitoring a production system.  You may want to evaluate:
 			<itemizedlist>
+				<listitem><para><ulink url="http://jamonapi.sourceforge.net/">JAMon</ulink></para></listitem>
+				<listitem><para><ulink url="http://perf4j.codehaus.org/">Perf4j</ulink></para></listitem>
 				<listitem><para><ulink url="https://helios.dev.java.net/">Helios</ulink></para></listitem>
-				<listitem><para><ulink url="http://www.springsource.com/products/ams">Spring AMS</ulink></para></listitem>
 				<listitem><para><ulink url="http://messadmin.sourceforge.net/">MessAdmin</ulink></para></listitem>
 				<listitem><para><ulink url="https://sourceforge.net/projects/jmeasurement2">jmeasurement</ulink></para></listitem>
+				<listitem><para><ulink url="http://www.jmanage.org/">jmanage</ulink></para></listitem>
 			</itemizedlist>
 			and there are many others.  The Helios product site in particular features a long list of related products.
 			</para>
