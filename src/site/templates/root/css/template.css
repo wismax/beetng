@@ -287,8 +287,9 @@
   display: block;
   position: absolute;
   z-index: 100;
-  width: 20ex;
-  left: -25%;
+  width: 22ex;
+  left: -11ex;
+  margin-left: 50%;
 }
 
 #rootTop .parent:last-child > ul {

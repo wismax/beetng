@@ -16,7 +16,8 @@
 }
 
 #rootHeader h1.logo {
-	height: 50pt;
+	margin-top: -20pt;
+	height: 70pt;
 }
 
 #rootTop {

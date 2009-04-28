@@ -7,10 +7,6 @@
 	padding-top: 50pt;
 }
 
-#rootTop .parent:hover > ul {
-	width: 22ex;
-}
-
 .ieTaunt {
 	position: relative;
 	top: 10pt;
