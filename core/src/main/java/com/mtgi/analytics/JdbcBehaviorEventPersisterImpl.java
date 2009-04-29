@@ -113,106 +113,100 @@ public class JdbcBehaviorEventPersisterImpl extends JdbcDaoSupport
 
 	public int persist(final Queue<BehaviorEvent> events) {
 
-		int count = 0;
-		if (!events.isEmpty()) {
-		
-			count = (Integer)getJdbcTemplate().execute(new ConnectionCallback() {
-	
-				public Object doInConnection(Connection con) throws SQLException, DataAccessException {
-	
-					//if this connection is behavior tracking, suspend tracking.
-					//we don't generate more events while persisting.
-					BehaviorTrackingConnectionProxy bt = null;
-					for (Connection c = con; 
-						 bt == null && c instanceof ConnectionProxy; 
-						 c = ((ConnectionProxy)c).getTargetConnection()) 
-					{
-						if (c instanceof BehaviorTrackingConnectionProxy) {
-							bt = (BehaviorTrackingConnectionProxy)c;
-							bt.suspendTracking();
-						}
-					}
-					
-					try {
-						int tally = 0; //return total events persisted.
-						
-						boolean doBatch = supportsBatchUpdates(con);
-						EventDataElementSerializer dataSerializer = new EventDataElementSerializer(xmlFactory);
-	
-						PreparedStatement insert = con.prepareStatement(insertSql);
-						try {
-							
-							PreparedStatement idQuery = con.prepareStatement(idSql);
-							try {
-								
-								//keep track of statements added to the batch so that we can time our
-								//flushes.
-								int batchCount = 0;
-								
-								//go until the queue is drained.
-								while (!events.isEmpty()) {
-									
-									//pop the next event off of the queue.  event may already have an ID assigned if any
-									//of its child events has been persisted.
-									BehaviorEvent next = events.remove();
-									assignIds(next, idQuery);
+		int count = (Integer)getJdbcTemplate().execute(new ConnectionCallback() {
 
-									//populate identifying information for the event into the insert statement.
-									insert.setLong(1, (Long)next.getId());
-									
-									BehaviorEvent parent = next.getParent();
-									nullSafeSet(insert, 2, parent == null ? null : parent.getId(), Types.BIGINT);
+			public Object doInConnection(Connection con) throws SQLException, DataAccessException {
 
-									insert.setString(3, next.getApplication());
-									insert.setString(4, next.getType());
-									insert.setString(5, next.getName());
-									insert.setTimestamp(6, new java.sql.Timestamp(next.getStart().getTime()));
-									insert.setLong(7, next.getDuration());
-	
-									//set optional context information on the event.
-									nullSafeSet(insert, 8, next.getUserId(), Types.VARCHAR);
-									nullSafeSet(insert, 9, next.getSessionId(), Types.VARCHAR);
-									nullSafeSet(insert, 10, next.getError(), Types.VARCHAR);
-		
-									//convert event data to XML
-									String data = dataSerializer.serialize(next.getData(), true);
-									nullSafeSet(insert, 11, data, Types.VARCHAR);
-	
-									if (doBatch) {
-										insert.addBatch();
-										if (++batchCount >= batchSize) {
-											insert.executeBatch();
-											batchCount = 0;
-										}
-									} else {
-										insert.executeUpdate();
-									}
-	
-									++tally;
-								}
-	
-								//flush any lingering batch inserts through to the server.
-								if (batchCount > 0)
-									insert.executeBatch();
-								
-							} finally {
-								closeStatement(idQuery);
-							}
-							
-						} finally {
-							closeStatement(insert);
-						}
-						
-						return tally;
-						
-					} finally {
-						if (bt != null)
-							bt.resumeTracking();
+				//if this connection is behavior tracking, suspend tracking.
+				//we don't generate more events while persisting.
+				BehaviorTrackingConnectionProxy bt = null;
+				for (Connection c = con; 
+					 bt == null && c instanceof ConnectionProxy; 
+					 c = ((ConnectionProxy)c).getTargetConnection()) 
+				{
+					if (c instanceof BehaviorTrackingConnectionProxy) {
+						bt = (BehaviorTrackingConnectionProxy)c;
+						bt.suspendTracking();
 					}
 				}
 				
-			});
-		}
+				try {
+					int tally = 0; //return total events persisted.
+					
+					boolean doBatch = supportsBatchUpdates(con);
+					EventDataElementSerializer dataSerializer = new EventDataElementSerializer(xmlFactory);
+
+					PreparedStatement insert = con.prepareStatement(insertSql);
+					try {
+						
+						PreparedStatement idQuery = con.prepareStatement(idSql);
+						try {
+							
+							//keep track of statements added to the batch so that we can time our
+							//flushes.
+							int batchCount = 0;
+							
+							for (BehaviorEvent next : events) {
+								
+								//event may already have an ID assigned if any
+								//of its child events has been persisted.
+								assignIds(next, idQuery);
+
+								//populate identifying information for the event into the insert statement.
+								insert.setLong(1, (Long)next.getId());
+								
+								BehaviorEvent parent = next.getParent();
+								nullSafeSet(insert, 2, parent == null ? null : parent.getId(), Types.BIGINT);
+
+								insert.setString(3, next.getApplication());
+								insert.setString(4, next.getType());
+								insert.setString(5, next.getName());
+								insert.setTimestamp(6, new java.sql.Timestamp(next.getStart().getTime()));
+								insert.setLong(7, next.getDuration());
+
+								//set optional context information on the event.
+								nullSafeSet(insert, 8, next.getUserId(), Types.VARCHAR);
+								nullSafeSet(insert, 9, next.getSessionId(), Types.VARCHAR);
+								nullSafeSet(insert, 10, next.getError(), Types.VARCHAR);
+	
+								//convert event data to XML
+								String data = dataSerializer.serialize(next.getData(), true);
+								nullSafeSet(insert, 11, data, Types.VARCHAR);
+
+								if (doBatch) {
+									insert.addBatch();
+									if (++batchCount >= batchSize) {
+										insert.executeBatch();
+										batchCount = 0;
+									}
+								} else {
+									insert.executeUpdate();
+								}
+
+								++tally;
+							}
+
+							//flush any lingering batch inserts through to the server.
+							if (batchCount > 0)
+								insert.executeBatch();
+							
+						} finally {
+							closeStatement(idQuery);
+						}
+						
+					} finally {
+						closeStatement(insert);
+					}
+					
+					return tally;
+					
+				} finally {
+					if (bt != null)
+						bt.resumeTracking();
+				}
+			}
+			
+		});
 		
 		return count;
 	}

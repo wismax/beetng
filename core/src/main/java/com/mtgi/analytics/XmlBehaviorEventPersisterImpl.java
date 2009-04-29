@@ -167,8 +167,7 @@ public class XmlBehaviorEventPersisterImpl
 		try {
 			BehaviorEventSerializer serializer = new BehaviorEventSerializer();
 			
-			while (!events.isEmpty()) {
-				BehaviorEvent event = events.remove();
+			for (BehaviorEvent event : events) {
 				if (event.getId() == null)
 					event.setId(randomUUID());
 				

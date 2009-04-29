@@ -20,11 +20,19 @@ import java.util.Queue;
  */
 public interface BehaviorEventPersister {
 	/**
-	 * Drain the given event queue, persisting all instances to the
-	 * database.  Persisters must support the persisting of child events
+	 * <p>Store the given completed events, assigning unique identifiers to
+	 * each and persisting all instances to the database.  Some of the
+	 * events may already have identifiers assigned; in this case, that
+	 * identifer should be respected and a new one not assigned.</p>
+	 * 
+	 * <p>Persisters must support the persisting of child events
 	 * before their parents, since this is generally the natural order
-	 * in which events are completed.  This method returns when the queue 
-	 * is empty.
+	 * in which events are completed.</p>
+	 * 
+	 * <p>Some members of the given collection may have parent events that 
+	 * are not in the collection itself.  These parent events should 
+	 * not be persisted, though they <i>must</i> be assigned IDs.</p>
+	 * 
 	 * @return the number of persisted events
 	 */
 	public int persist(Queue<BehaviorEvent> events);
