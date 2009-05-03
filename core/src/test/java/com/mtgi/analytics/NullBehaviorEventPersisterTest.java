@@ -39,8 +39,8 @@ public class NullBehaviorEventPersisterTest {
 	@Test
 	public void testEmptyQueue(){
 		LinkedList<BehaviorEvent> queue = new LinkedList<BehaviorEvent>();
-		assertEquals("no events persisted", 0, inst.persist(queue));
-		assertEquals("no events added", 0, queue.size());
+		inst.persist(queue);
+		assertTrue("queue unmodified", queue.isEmpty());
 	}
 	
 	@Test
@@ -51,8 +51,8 @@ public class NullBehaviorEventPersisterTest {
 		for (int i = 0; i < 3; ++i)
 			JdbcBehaviorEventPersisterTest.createEvent(null, 1, 3, 3, counter, events);
 		LinkedList<BehaviorEvent> queue = new LinkedList<BehaviorEvent>(events);
-		assertEquals("all events persisted", 39, inst.persist(queue));
-		assertEquals("queue has been cleared", 0, queue.size());
+		inst.persist(queue);
+		assertEquals("queue unmodified by persistence operation", 39, queue.size());
 	}
 	
 }

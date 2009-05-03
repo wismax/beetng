@@ -219,11 +219,11 @@ public class BehaviorTrackingManagerImpl implements BehaviorTrackingManager, Ini
 		EventDataElement data = flushEvent.addData();
 		flushEvent.start();
 
-		int count = -1;
+		int count = oldList.size();
 		event.set(flushEvent);
 		try {
 			
-			count = persister.persist(oldList);
+			persister.persist(oldList);
 			if (log.isDebugEnabled()) log.debug("Flushed " + count + " events with " + pendingFlush + " remaining");
 			
 			return count;

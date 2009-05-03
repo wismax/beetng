@@ -96,8 +96,7 @@ public class CustomPersisterConfigurationTest {
 			this.innerBean = innerBean;
 		}
 
-		public int persist(Queue<BehaviorEvent> events) {
-			return 0;
+		public void persist(Queue<BehaviorEvent> events) {
 		}
 		
 	}

@@ -111,9 +111,9 @@ public class JdbcBehaviorEventPersisterImpl extends JdbcDaoSupport
 		this.xmlFactory = XMLOutputFactory.newInstance();
 	}
 
-	public int persist(final Queue<BehaviorEvent> events) {
+	public void persist(final Queue<BehaviorEvent> events) {
 
-		int count = (Integer)getJdbcTemplate().execute(new ConnectionCallback() {
+		getJdbcTemplate().execute(new ConnectionCallback() {
 
 			public Object doInConnection(Connection con) throws SQLException, DataAccessException {
 
@@ -131,8 +131,6 @@ public class JdbcBehaviorEventPersisterImpl extends JdbcDaoSupport
 				}
 				
 				try {
-					int tally = 0; //return total events persisted.
-					
 					boolean doBatch = supportsBatchUpdates(con);
 					EventDataElementSerializer dataSerializer = new EventDataElementSerializer(xmlFactory);
 
@@ -182,8 +180,6 @@ public class JdbcBehaviorEventPersisterImpl extends JdbcDaoSupport
 								} else {
 									insert.executeUpdate();
 								}
-
-								++tally;
 							}
 
 							//flush any lingering batch inserts through to the server.
@@ -198,7 +194,7 @@ public class JdbcBehaviorEventPersisterImpl extends JdbcDaoSupport
 						closeStatement(insert);
 					}
 					
-					return tally;
+					return null;
 					
 				} finally {
 					if (bt != null)
@@ -207,8 +203,6 @@ public class JdbcBehaviorEventPersisterImpl extends JdbcDaoSupport
 			}
 			
 		});
-		
-		return count;
 	}
 	
 	private void assignIds(BehaviorEvent event, PreparedStatement idQuery) throws SQLException {

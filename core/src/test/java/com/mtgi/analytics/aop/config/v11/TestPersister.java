@@ -37,11 +37,8 @@ public class TestPersister implements BehaviorEventPersister {
 		return events.size();
 	}
 	
-	public synchronized int persist(Queue<BehaviorEvent> events) {
+	public synchronized void persist(Queue<BehaviorEvent> events) {
 		this.events.addAll(events);
-		int c = events.size();
-		events.clear();
-		return c;
 	}
 	
 }

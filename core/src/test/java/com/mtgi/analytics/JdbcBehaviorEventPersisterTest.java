@@ -32,7 +32,7 @@ public class JdbcBehaviorEventPersisterTest extends JdbcEventTestCase {
 
 	@Test
 	public void testEmptyQueue() throws SQLException {
-		assertEquals("no events to persist", 0, persister.persist(new LinkedList<BehaviorEvent>()));
+		persister.persist(new LinkedList<BehaviorEvent>());
 		
 		ResultSet rs = stmt.executeQuery("select count(*) from BEHAVIOR_TRACKING_EVENT");
 		assertTrue(rs.next());
@@ -55,7 +55,8 @@ public class JdbcBehaviorEventPersisterTest extends JdbcEventTestCase {
 			createEvent(null, 1, 3, 3, counter, events);
 		LinkedList<BehaviorEvent> queue = new LinkedList<BehaviorEvent>(events);
 
-		assertEquals("entire event tree persisted", 39, persister.persist(queue));
+		persister.persist(queue);
+		assertEquals("queue unmodified by persistence operation", 39, queue.size());
 
 		//use the dbunit API to do a full check of data contents.  we can't use simple
 		//annotations because we have to exclude variable date columns from comparison.

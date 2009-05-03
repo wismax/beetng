@@ -162,8 +162,7 @@ public class XmlBehaviorEventPersisterImpl
 		return file.length();
 	}
 
-	public int persist(Queue<BehaviorEvent> events) {
-		int count = 0;
+	public void persist(Queue<BehaviorEvent> events) {
 		try {
 			BehaviorEventSerializer serializer = new BehaviorEventSerializer();
 			
@@ -179,8 +178,6 @@ public class XmlBehaviorEventPersisterImpl
 					serializer.serialize(writer, event);
 					writer.writeCharacters("\n");
 				}
-				
-				++count;
 			}
 			
 			synchronized (this) {
@@ -192,8 +189,6 @@ public class XmlBehaviorEventPersisterImpl
 			log.error("Error persisting events; discarding " + events.size() + " events without saving", error);
 			events.clear();
 		}
-		
-		return count;
 	}
 
 	/**

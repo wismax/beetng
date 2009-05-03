@@ -32,8 +32,6 @@ public interface BehaviorEventPersister {
 	 * <p>Some members of the given collection may have parent events that 
 	 * are not in the collection itself.  These parent events should 
 	 * not be persisted, though they <i>must</i> be assigned IDs.</p>
-	 * 
-	 * @return the number of persisted events
 	 */
-	public int persist(Queue<BehaviorEvent> events);
+	public void persist(Queue<BehaviorEvent> events);
 }

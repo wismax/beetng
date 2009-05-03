@@ -69,7 +69,7 @@ public class XmlBehaviorEventPersisterTest {
 	
 	@Test
 	public void testEmptyQueue() {
-		assertEquals("no events to persist", 0, persister.persist(new LinkedList<BehaviorEvent>()));
+		persister.persist(new LinkedList<BehaviorEvent>());
 		assertEquals("no events written to log", 0, file.length());
 		assertEquals(0, persister.getFileSize());
 		assertFalse("persister defaults to plain text format", persister.isBinary());
@@ -84,7 +84,8 @@ public class XmlBehaviorEventPersisterTest {
 			JdbcBehaviorEventPersisterTest.createEvent(null, 1, 3, 3, counter, events);
 		LinkedList<BehaviorEvent> queue = new LinkedList<BehaviorEvent>(events);
 
-		assertEquals("entire event tree persisted", 39, persister.persist(queue));
+		persister.persist(queue);
+		assertEquals("queue unmodified by persistence operation", 39, queue.size());
 		assertEquals("persister reports correct file size", file.length(), persister.getFileSize());
 		
 		//now perform verification of log data against the expected results.
@@ -138,7 +139,8 @@ public class XmlBehaviorEventPersisterTest {
 			JdbcBehaviorEventPersisterTest.createEvent(null, 1, 3, 3, counter, events);
 		LinkedList<BehaviorEvent> queue = new LinkedList<BehaviorEvent>(events);
 
-		assertEquals("entire event tree persisted", 39, persister.persist(queue));
+		persister.persist(queue);
+		assertEquals("queue unmodified by persistence operation", 39, queue.size());
 		assertEquals("persister reports correct file size", file.length(), persister.getFileSize());
 		
 		//unzip and convert binary to flat xml for comparison.  this also verifies that 'rotateLog'
@@ -218,7 +220,8 @@ public class XmlBehaviorEventPersisterTest {
 			JdbcBehaviorEventPersisterTest.createEvent(null, 1, 3, 3, counter, events);
 		LinkedList<BehaviorEvent> queue = new LinkedList<BehaviorEvent>(events);
 
-		assertEquals("entire event tree persisted", 39, persister.persist(queue));
+		persister.persist(queue);
+		assertEquals("queue unmodified by persistence operation", 39, queue.size());
 		assertEquals("persister reports correct file size", file.length(), persister.getFileSize());
 		
 		//convert binary to flat xml for comparison.  this also verifies that 'rotateLog'
