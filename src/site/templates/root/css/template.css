@@ -3,14 +3,14 @@
 /* background images */
 .sky {
 	height: 110pt;
-	background: #bfbfff url('../images/grass.png') repeat-x scroll bottom;
+	background: #bfbfff url('../images/grass.png') repeat-x scroll bottom left;
 }
 
 .earth {
 	background-color: #b28257;
 	overflow: visible;
 	z-index: 10;
-	background: #785331 url('../images/dirt.png') repeat-x scroll top;
+	background: #785331 url('../images/dirt.png') repeat-x scroll top left;
     margin-bottom: -160pt;
 }
 
