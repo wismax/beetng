@@ -6,18 +6,14 @@
 	margin-right: 30pt;
 }
 
-#rootHeader h1 {
-	font-weight: normal;
-}
-
-#rootHeader h1.logo-text a {
-	margin-top: -15pt ! important;
-	line-height: 75pt ! important;
-}
-
 #rootHeader h1.logo {
-	margin-top: -20pt;
-	height: 70pt;
+	background-position: top left;
+	margin-top: 5pt;
+}
+#rootHeader h1.logo a { 
+	width: 140px;
+	padding-top: 52pt;
+	display: block;
 }
 
 #rootTop {

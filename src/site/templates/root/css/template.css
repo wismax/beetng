@@ -103,14 +103,20 @@
 
 /* image logo - hide text */
 #rootHeader h1.logo {
-	background: transparent url('../images/beet-logo.png') no-repeat scroll center left;
-	margin-left: 2pt;
+    min-width: 140px;
+    min-height: 35pt;
+    background: transparent url('../images/beet-logo.png') no-repeat scroll center left;
+    margin-left: 2pt;
+    overflow: hidden;
 }
 
 #rootHeader h1.logo > a, 
 #rootHeader h1.logo > a:visited, 
 #rootHeader h1.logo > a:hover {
-	color: transparent;
+  height: 100%;
+  display: block;
+  color: transparent;
+  font-size: 0;
 }
 
 #rootBreadcrumbs {
@@ -227,8 +233,18 @@
 }
 
 #rootTop > .moduletable > ul.menu > li {
-  display: inline-block;
   position: relative;
+  display: inline-block;
+}
+/* workaround for FF2 inline-block problems */
+#rootTop > .moduletable > ul.menu > li, x:-moz-any-link {
+  display: block;
+  float: left;
+}
+/* normal behavior for FF3 */
+#rootTop > .moduletable > ul.menu > li, x:-moz-any-link, x:default { 
+  display: inline-block;
+  float: none; 
 }
 
 #rootTop > .moduletable > ul.menu > li > a {
