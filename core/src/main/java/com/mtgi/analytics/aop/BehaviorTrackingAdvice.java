@@ -33,7 +33,9 @@ import com.mtgi.analytics.EventDataElement;
  */
 public class BehaviorTrackingAdvice implements MethodInterceptor {
 
-	private String eventType = "method";
+	public static final String DEFAULT_EVENT_TYPE = "method";
+	
+	private String eventType = DEFAULT_EVENT_TYPE;
 	private BehaviorTrackingManager trackingManager;
 	
 	private String application;

@@ -39,9 +39,10 @@ import com.mtgi.analytics.EventDataElement;
  */
 public class BehaviorTrackingDataSource extends DelegatingDataSource {
 
+	public static final String DEFAULT_EVENT_TYPE = "jdbc";
 	private static Class<?>[] PROXY_TYPE = { BehaviorTrackingConnectionProxy.class };
 	
-	private String eventType = "jdbc";
+	private String eventType = DEFAULT_EVENT_TYPE;
 	private BehaviorTrackingManager trackingManager;
 
 	public void setEventType(String eventType) {
