@@ -197,6 +197,13 @@
                </seg>
             </seglistitem>
             <seglistitem>
+               <seg>name-parameters</seg>
+               <seg>optional</seg>
+               <seg>
+                  <para>If specified, a comma-separated list of request parameters that should be included as part of the event name. This is useful if you want to differentiate events by key parameter values, rather than by URL alone. If unspecified, no parameters are included in the event name.</para>
+               </seg>
+            </seglistitem>
+            <seglistitem>
                <seg>uri-pattern</seg>
                <seg>optional</seg>
                <seg>

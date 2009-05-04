@@ -17,6 +17,7 @@ import static org.springframework.web.context.support.WebApplicationContextUtils
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -49,12 +50,16 @@ import com.mtgi.analytics.EventDataElement;
  */
 public class BehaviorTrackingFilter implements Filter {
 
+	private static final Pattern LIST_SEPARATOR = Pattern.compile("[\\r\\n\\s,;]+");
+	
 	/** filter parameter specifying the bean name of the BehaviorTrackingManager instance to use in the application spring context. */
 	public static final String PARAM_MANAGER_NAME = "com.mtgi.analytics.manager";
 	/** filter parameter specifying the eventType value to use when logging behavior tracking events. */
 	public static final String PARAM_EVENT_TYPE = "com.mtgi.analytics.servlet.event";
 	/** filter parameter specifying a list of parameters to include in logging; defaults to all if unspecified */
 	public static final String PARAM_PARAMETERS_INCLUDE = "com.mtgi.analytics.parameters.include";
+	/** filter parameter specifying a list of parameters to include in the event name; defaults to none if unspecified */
+	public static final String PARAM_PARAMETERS_NAME = "com.mtgi.analytics.parameters.name";
 
 	public static final String ATT_FILTER_REGISTERED = BehaviorTrackingFilter.class.getName() + ".count";
 	
@@ -98,10 +103,16 @@ public class BehaviorTrackingFilter implements Filter {
 
 		//see if there is an event type name configured.
 		String eventType = config.getInitParameter(PARAM_EVENT_TYPE);
+		
+		//parameters included in event data
 		String params = config.getInitParameter(PARAM_PARAMETERS_INCLUDE);
-		String[] parameters = params == null ? null : params.split("[\\r\\n\\s,;]+");
+		String[] parameters = params == null ? null : LIST_SEPARATOR.split(params);
 
-		delegate = new ServletRequestBehaviorTrackingAdapter(eventType, manager, parameters, null);
+		//parameters included in event name
+		String nameParams = config.getInitParameter(PARAM_PARAMETERS_NAME);
+		String[] nameParameters = nameParams == null ? null : LIST_SEPARATOR.split(nameParams);
+
+		delegate = new ServletRequestBehaviorTrackingAdapter(eventType, manager, parameters, nameParameters, null);
 
 		//increment count of tracking filters registered in the servlet context.  the filter
 		//and alternative request listener check this attribute to make sure both are not registered at once.

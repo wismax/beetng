@@ -106,6 +106,28 @@ public class BehaviorTrackingFilterTest extends JdbcEventTestCase {
 	    assertEventDataMatches("BehaviorTrackingFilterTest.testPostRequest-result.xml");
 	}
 	
+	/** Test the optional inclusion of key parameters with event name */
+	@Test
+	public void testNameParameters() throws Exception {
+		NameValuePair[] parameters = {
+			new NameValuePair("dispatch", "stuff"),
+			new NameValuePair("param1", "hello"),
+			new NameValuePair("param1", "world"),
+			new NameValuePair("param2", ""),
+			new NameValuePair("param3", "72<"),
+			new NameValuePair("dispatch2", "v1")
+		};
+		WebRequestSettings request = new WebRequestSettings(new URL("http://localhost:8888/app/test/path"));
+		request.setEncodingType(FormEncodingType.URL_ENCODED);
+		request.setSubmitMethod(SubmitMethod.POST);
+		request.setRequestParameters(asList(parameters));
+		
+		webClient.getPage(request);
+		assertNotNull("servlet was hit", servlet);
+	    manager.flush();
+	    assertEventDataMatches("BehaviorTrackingFilterTest.testNameParameters-result.xml");
+	}
+	
 	/** Verify that tracking events are logged for extension-mapped servlet paths */
 	@Test
 	public void testExtensionMapping() throws Exception {

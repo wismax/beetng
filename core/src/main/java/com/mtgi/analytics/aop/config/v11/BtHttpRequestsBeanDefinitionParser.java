@@ -33,9 +33,12 @@ import com.mtgi.analytics.servlet.ServletRequestBehaviorTrackingAdapter;
  */
 public class BtHttpRequestsBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 
+	private static final Pattern LIST_SEPARATOR = Pattern.compile("[,;]+");
+	
 	private static final String ATT_EVENT_TYPE = "event-type";
 	private static final String ATT_PARAMETERS = "parameters";
 	private static final String ATT_URI_PATTERN = "uri-pattern";
+	private static final String ATT_NAME_PARAMETERS = "name-parameters";
 
 	@Override
 	protected Class<?> getBeanClass(Element element) {
@@ -57,12 +60,13 @@ public class BtHttpRequestsBeanDefinitionParser extends AbstractSingleBeanDefini
 		String managerId = (String)parserContext.getContainingBeanDefinition().getAttribute("id");
 		builder.addConstructorArgReference(managerId);
 
-		//parameter list for logging, if any.
+		//parameter list to include in event data, if any.
 		String paramList = element.getAttribute(ATT_PARAMETERS);
-		if (StringUtils.hasText(paramList))
-			builder.addConstructorArg(paramList.split("[,;]+"));
-		else
-			builder.addConstructorArg(null);
+		builder.addConstructorArg(parseList(paramList));
+
+		//parameter list to include in event name, if any
+		String nameList = element.getAttribute(ATT_NAME_PARAMETERS);
+		builder.addConstructorArg(parseList(nameList));
 
 		//URI patterns, if any.  can be specified as attribute or nested elements.
 		ArrayList<Pattern> accum = new ArrayList<Pattern>();
@@ -84,7 +88,11 @@ public class BtHttpRequestsBeanDefinitionParser extends AbstractSingleBeanDefini
 
 		parserContext.getReaderContext().registerWithGeneratedName(builder.getBeanDefinition());
 	}
-
 	
+	private static final String[] parseList(String paramList) {
+		if (StringUtils.hasText(paramList))
+			return LIST_SEPARATOR.split(paramList);
+		return null;
+	}
 	
 }

@@ -169,6 +169,10 @@
          <param-value>dispatch</param-value>
       </init-param>
       <init-param>
+         <param-name>com.mtgi.analytics.parameters.name</param-name>]]><co id="filter-name"/><![CDATA[
+         <param-value>dispatch</param-value>
+      </init-param>
+      <init-param>
          <param-name>com.mtgi.analytics.servlet.event</param-name>]]><co id="filter-type"/><![CDATA[
          <param-value>http-request</param-value>
       </init-param>
@@ -188,6 +192,8 @@
 			<calloutlist>
 				<callout arearefs="filter-params"><para>An optional comma-separated list of parameters to include
 				in the event data logs.  If unspecified, all parameters are logged.</para></callout>
+				<callout arearefs="filter-name"><para>An optional comma-separated list of parameters to include
+				with the request URI in the event name.  If unspecified, no parameters are included in the name.</para></callout>
 				<callout arearefs="filter-type"><para>The value to specify for "event-type" in the event data
 				logs.  Primarily useful if you want to define several different filters and be able to identify
 				which generated each event.  Defaults to "http-request" if unspecified.</para></callout>

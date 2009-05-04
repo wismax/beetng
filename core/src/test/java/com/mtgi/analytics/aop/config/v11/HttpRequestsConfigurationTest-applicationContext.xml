@@ -15,7 +15,7 @@
 		<bt:custom-persister id="persister" class="com.mtgi.analytics.aop.config.v11.TestPersister"/>
 	
 		<bt:manager id="firstManager" application="first" session-context="sessionContext" persister="persister">
-			<bt:http-requests event-type="req" uri-pattern="/app/test/.*tracked.*" parameters="dispatch,foo">
+			<bt:http-requests event-type="req" uri-pattern="/app/test/.*tracked.*" name-parameters="dispatch" parameters="dispatch,foo">
 				<bt:uri-pattern>/app/test/also\.traq</bt:uri-pattern>
 			</bt:http-requests>
 		</bt:manager>

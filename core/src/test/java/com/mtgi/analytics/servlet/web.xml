@@ -51,6 +51,10 @@
 		<description>Logs HTTP requests as Behavior Tracking events.</description>
 		<filter-name>tracking</filter-name>
 		<filter-class>com.mtgi.analytics.servlet.BehaviorTrackingFilter</filter-class>
+		<init-param>
+			<param-name>com.mtgi.analytics.parameters.name</param-name>
+			<param-value>dispatch,dispatch2</param-value>
+		</init-param>
 	</filter>
 	
 	<filter-mapping>

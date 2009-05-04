@@ -35,15 +35,24 @@ import com.mtgi.analytics.EventDataElement;
  */
 public class ServletRequestBehaviorTrackingAdapter {
 	
+	public static final String DEFAULT_EVENT_TYPE = "http-request";
+	
+	public static final String PARAMETERS_ELEMENT = "parameters";
+	public static final String PARAM_ELEMENT = "param";
+	public static final String VALUE_ELEMENT = "value";
+	public static final String NAME_ATTRIBUTE = "name";
+	
 	private String eventType;
 	private BehaviorTrackingManager manager;
 	private String[] parameters;
+	private String[] nameParameters;
 	private Pattern[] uriPatterns;
 	
-	public ServletRequestBehaviorTrackingAdapter(String eventType, BehaviorTrackingManager manager, String[] parameters, Pattern[] uriPatterns) {
-		this.eventType = StringUtils.hasText(eventType) ? eventType: "http-request";
+	public ServletRequestBehaviorTrackingAdapter(String eventType, BehaviorTrackingManager manager, String[] parameters, String[] nameParameters, Pattern[] uriPatterns) {
+		this.eventType = StringUtils.hasText(eventType) ? eventType: DEFAULT_EVENT_TYPE;
 		this.manager = manager;
 		this.parameters = parameters;
+		this.nameParameters = nameParameters;
 		this.uriPatterns = uriPatterns;
 	}
 
@@ -53,20 +62,19 @@ public class ServletRequestBehaviorTrackingAdapter {
 		if (!match(req))
 			return null;
 
-		//use the request path as an event name, excluding proto, host, and query string.
-		String eventName = req.getRequestURI();
+		String eventName = getEventName(req); 
 		BehaviorEvent event = manager.createEvent(eventType, eventName);
 
 		//log relevant request data and parameters to the event.
 		EventDataElement data = event.addData();
-		data.add("uri", eventName);
+		data.add("uri", req.getRequestURI());
 		data.add("protocol", req.getProtocol());
 		data.add("method", req.getMethod());
 		data.add("remote-address", req.getRemoteAddr());
 		data.add("remote-host", req.getRemoteHost());
 		
-		EventDataElement parameters = data.addElement("parameters");
 		if (this.parameters != null) {
+			EventDataElement parameters = data.addElement(PARAMETERS_ELEMENT);
 			//include only configured parameters
 			for (String name : this.parameters) {
 				String[] values = request.getParameterValues(name);
@@ -74,6 +82,7 @@ public class ServletRequestBehaviorTrackingAdapter {
 					addParameter(parameters, name, values);
 			}
 		} else {
+			EventDataElement parameters = data.addElement(PARAMETERS_ELEMENT);
 			//include all parameters
 			for (Enumeration<?> params = request.getParameterNames(); params.hasMoreElements(); ) {
 				String name = (String)params.nextElement();
@@ -91,6 +100,28 @@ public class ServletRequestBehaviorTrackingAdapter {
 			manager.stop(event);
 	}
 	
+	protected String getEventName(HttpServletRequest request) {
+		//use the request path as an event name, excluding proto, host, and query string.
+		String eventName = request.getRequestURI();
+		//optionally use important parameters as part of the event name
+		if (nameParameters != null) {
+			char sep = '?';
+			StringBuffer buf = new StringBuffer(eventName);
+			for (String name : this.nameParameters) {
+				String[] values = request.getParameterValues(name);
+				if (values != null) {
+					for (String v : values) {
+						buf.append(sep).append(name).append('=').append(v);
+						sep = '&';
+					}
+				}
+			}
+			eventName = buf.toString();
+		}
+
+		return eventName;
+	}
+	
 	protected boolean match(HttpServletRequest request) {
 		if (uriPatterns == null)
 			return true;
@@ -101,10 +132,10 @@ public class ServletRequestBehaviorTrackingAdapter {
 	}
 	
 	private static final void addParameter(EventDataElement parameters, String name, String[] values) {
-		EventDataElement param = parameters.addElement("param");
-		param.add("name", name);
+		EventDataElement param = parameters.addElement(PARAM_ELEMENT);
+		param.add(NAME_ATTRIBUTE, name);
 		for (String v : values)
-			param.addElement("value").setText(v);
+			param.addElement(VALUE_ELEMENT).setText(v);
 	}
 	
 }

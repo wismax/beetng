@@ -144,6 +144,14 @@
 											should be logged with behavior events.  If unspecified, all parameters are logged.]]></xsd:documentation>
 										</xsd:annotation>
 								</xsd:attribute>
+								<xsd:attribute name="name-parameters" type="xsd:string">
+										<xsd:annotation>
+											<xsd:documentation><![CDATA[If specified, a comma-separated list of request parameters that
+											should be included as part of the event name.  This is useful if you want to differentiate
+											events by key parameter values, rather than by URL alone.  If unspecified, no parameters are 
+											included in the event name.]]></xsd:documentation>
+										</xsd:annotation>
+								</xsd:attribute>
 								<xsd:attribute name="uri-pattern" type="xsd:string">
 										<xsd:annotation>
 											<xsd:documentation><![CDATA[Equivalent to a single nested uri-pattern element, provided

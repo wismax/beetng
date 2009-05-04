@@ -16,6 +16,7 @@ package com.mtgi.analytics.aop.config.v11;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -78,31 +79,35 @@ public class HttpRequestsConfigurationTest {
 	    webClient.getPage("http://localhost:8888/app/test/path?param1=hello&param1=world&param2&param3=72%3C");
 	    assertNotNull("Servlet was hit", servlet);
 	    webClient.getPage("http://localhost:8888/app/test/also.traq?param1=hello&param1=world&param2&param3=72%3C&dispatch=dang");
+	    webClient.getPage("http://localhost:8888/app/test/also.traq?param1=nodispatch&param1=world&param2&param3=72%3C");
 
 	    Collection<BehaviorTrackingManagerImpl> managers = servlet.context.getBeansOfType(BehaviorTrackingManager.class).values();
 	    for (BehaviorTrackingManagerImpl m : managers)
 	    	m.flush();
 	    
-	    TestPersister persister = (TestPersister)servlet.context.getBean("persister");
-	    assertEquals("five events persisted", 5, persister.count());
-
-	    //hash out the events so that we can verify logging.
-	    Map<EventKey, BehaviorEvent> events = new HashMap<EventKey, BehaviorEvent>();
-	    for (BehaviorEvent be : persister.events())
-	    	events.put(new EventKey(be), be);
-	    
 	    //first manager only gets events matching supplied filter patterns, and has
 	    //a custom event type configured.  second manager gets all events.
 	    EventKey[] expected = {
+	    	new EventKey("first", "req", "/app/test/also.traq?dispatch=dang"),
 	    	new EventKey("first", "req", "/app/test/also.traq"),
 	    	new EventKey("first", "behavior-tracking", "flush"),
 	    	new EventKey("second", "http-request", "/app/test/path"),
 	    	new EventKey("second", "http-request", "/app/test/also.traq"),
+	    	new EventKey("second", "http-request", "/app/test/also.traq"),
 	    	new EventKey("second", "behavior-tracking", "flush")
 	    };
-	    for (int i = 0; i < expected.length; ++i) {
-	    	assertNotNull("received event[" + i + "]", events.remove(expected[i]));
-	    }
+	    
+	    TestPersister persister = (TestPersister)servlet.context.getBean("persister");
+	    assertEquals("expected events persisted", expected.length, persister.count());
+
+	    //hash out the events so that we can verify logging.
+	    ArrayList<EventKey> events = new ArrayList<EventKey>();
+	    for (BehaviorEvent be : persister.events())
+	    	events.add(new EventKey(be));
+	    
+	    for (int i = 0; i < expected.length; ++i)
+	    	assertNotNull("received event[" + i + "] in correct order", events.remove(expected[i]));
+	    assertEquals("all receivedevents accounted for", 0, events.size());
 	}
 
 //	/** Same as testGetRequest, but with POST form parameters instead of URL query string */
