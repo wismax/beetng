@@ -18,8 +18,6 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
