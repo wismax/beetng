@@ -33,6 +33,14 @@
          </varlistentry>
          <varlistentry>
             <term>
+               <xref linkend="elt_persister_chain" endterm="elt_persister_chain_title"/>
+            </term>
+            <listitem>
+               <para/>
+            </listitem>
+         </varlistentry>
+         <varlistentry>
+            <term>
                <xref linkend="elt_xml_persister" endterm="elt_xml_persister_title"/>
             </term>
             <listitem>
@@ -143,6 +151,14 @@
       </segmentedlist>
       <variablelist>
          <title>&lt;bt:manager&gt; Nested Elements</title>
+         <varlistentry>
+            <term>
+               <xref linkend="elt_persister_chain" endterm="elt_persister_chain_title"/>
+            </term>
+            <listitem>
+               <para>Configure a multiple persisters for this manager.</para>
+            </listitem>
+         </varlistentry>
          <varlistentry>
             <term>
                <xref linkend="elt_xml_persister" endterm="elt_xml_persister_title"/>
@@ -273,6 +289,59 @@
             </seg>
          </seglistitem>
       </segmentedlist>
+   </section>
+   <section id="elt_persister_chain">
+      <title id="elt_persister_chain_title">&lt;bt:persister-chain&gt;</title>
+      <emphasis role="bold">Java Bean Type:</emphasis>
+      <ulink url="../../api/com/mtgi/analytics/ChainingEventPersisterImpl.html">com.mtgi.analytics.ChainingEventPersisterImpl</ulink>
+      <para>A delegating BehaviorEventPersister that sends events to a list of persisters. For example, you can configure both an mbean-persister for JMX statistics monitoring and an xml-persister to store raw data. Normally this element will occur as a child of <xref linkend="elt_manager" endterm="elt_manager_title" />.</para>
+      <variablelist>
+         <title>&lt;bt:persister-chain&gt; Nested Elements</title>
+         <varlistentry>
+            <term>
+               <xref linkend="elt_xml_persister" endterm="elt_xml_persister_title"/>
+            </term>
+            <listitem>
+               <para>Add an XML logging persister to the chain.</para>
+            </listitem>
+         </varlistentry>
+         <varlistentry>
+            <term>
+               <xref linkend="elt_jdbc_persister" endterm="elt_jdbc_persister_title"/>
+            </term>
+            <listitem>
+               <para>Add a JDBC logging persister to the chain.</para>
+            </listitem>
+         </varlistentry>
+         <varlistentry>
+            <term>
+               <xref linkend="elt_mbean_persister" endterm="elt_mbean_persister_title"/>
+            </term>
+            <listitem>
+               <para>Add a JMX monitoring persister to the chain.</para>
+            </listitem>
+         </varlistentry>
+         <varlistentry>
+            <term>
+               <xref linkend="elt_custom_persister" endterm="elt_custom_persister_title"/>
+            </term>
+            <listitem>
+               <para>Add a custom BehaviorEventPersister implementation to the chain.</para>
+            </listitem>
+         </varlistentry>
+         <varlistentry>
+            <term>beans:ref</term>
+            <listitem>
+               <para>Add a reference by name to a persister bean defined elsewhere in the Spring configuration.</para>
+            </listitem>
+         </varlistentry>
+         <varlistentry>
+            <term>beans:idref</term>
+            <listitem>
+               <para>Add a reference by ID to a persister bean defined elsewhere in the Spring configuration.</para>
+            </listitem>
+         </varlistentry>
+      </variablelist>
    </section>
    <section id="elt_xml_persister">
       <title id="elt_xml_persister_title">&lt;bt:xml-persister&gt;</title>
