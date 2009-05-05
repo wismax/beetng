@@ -36,7 +36,8 @@
 		<dependency org="bea" name="stax-impl" rev="1.2.0" conf="1.5,compile,test"/>
 		
 		<!-- only needed for compile/test -->
-		<dependency org="springframework" name="spring" rev="2.5.+" conf="compile,test"/>
+		<dependency org="springframework" name="spring" rev="2.0.+" conf="compile,test"/>
+		<dependency org="springframework" name="spring-webmvc" rev="2.0.+" conf="compile,test"/>
 		<dependency org="sun" name="servlet-api" rev="2.4" conf="compile,test"/>
 
 		<!-- only needed for test -->
@@ -53,7 +54,6 @@
 		<dependency org="hibernate" name="hibernate" rev="3.2.+" conf="test"/>
 		<dependency org="hibernate" name="hibernate-annotations" rev="3.3.0" conf="test"/>
 		<dependency org="springframework" name="spring-test" rev="2.5.+" conf="test"/>
-		<dependency org="springframework" name="spring-webmvc" rev="2.5.+" conf="test"/>
 		
 	</dependencies>
 	

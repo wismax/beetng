@@ -23,8 +23,9 @@ import java.util.Queue;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.quartz.Scheduler;
-import org.quartz.SchedulerFactory;
-import org.quartz.impl.StdSchedulerFactory;
+import org.quartz.impl.SchedulerRepository;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.unitils.UnitilsJUnit4TestClassRunner;
@@ -63,16 +64,21 @@ public class CustomPersisterConfigurationTest {
 		assertEquals("default executor type provided", ThreadPoolTaskExecutor.class, executor.getClass());
 
 		//test the state of the global scheduler configuration.
-		SchedulerFactory factory = new StdSchedulerFactory();
-		Scheduler sched = factory.getScheduler("BehaviorTrackingScheduler");
+		Scheduler sched = (Scheduler)persister.beanFactory.getBean(ConfigurationConstants.CONFIG_SCHEDULER);
+		assertEquals("scheduler has expected name", "BehaviorTrackingScheduler", sched.getSchedulerName());
 		
 		List<String> triggers = Arrays.asList(sched.getTriggerNames("BehaviorTracking"));
 		assertEquals("flush job scheduled", 1, triggers.size());
 		assertTrue("flush job scheduled", triggers.contains("defaultTrackingManager_flush_trigger"));
-		
-		Collection<?> schedulers = factory.getAllSchedulers();
-		assertEquals("private scheduler created", 1, schedulers.size());
-		assertTrue(schedulers.contains(sched));
+
+		SchedulerRepository repos = SchedulerRepository.getInstance();
+		Collection<?> schedulers = repos.lookupAll();
+		if (!schedulers.isEmpty()) {
+			//prior to 2.5, spring registered the scheduler in the global repository.
+			//if that's the case, verify that's the only scheduler created.
+			assertEquals("private scheduler created", 1, schedulers.size());
+			assertSame(sched, schedulers.iterator().next());
+		}
 		
 		//verify the default session context implementation has been selected.
 		SessionContext context = defaultTrackingManager.getSessionContext();
@@ -83,11 +89,16 @@ public class CustomPersisterConfigurationTest {
 	public static class TestBean {
 	}
 	
-	public static class TestPersister implements BehaviorEventPersister {
+	public static class TestPersister implements BehaviorEventPersister, BeanFactoryAware {
 
 		private String prop;
 		private TestBean innerBean;
+		private BeanFactory beanFactory;
 		
+		public void setBeanFactory(BeanFactory beanFactory) {
+			this.beanFactory = beanFactory;
+		}
+
 		public void setProp(String prop) {
 			this.prop = prop;
 		}
