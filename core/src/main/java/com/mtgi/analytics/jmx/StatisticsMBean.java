@@ -8,7 +8,15 @@ import org.springframework.jmx.export.annotation.ManagedResource;
 
 import com.mtgi.analytics.BehaviorEvent;
 
-@ManagedResource
+/**
+ * Tracks aggregate statistics for a class of events.  Data points are added
+ * with {@link #add(BehaviorEvent)}, after which various statistics can be queried
+ * with calls like {@link #getAverageTime()} or {@link #getStandardDeviation()}.
+ * Statistics can be reset with {@link #reset()}.
+ * 
+ * @see StatisticsMBeanEventPersisterImpl
+ */
+@ManagedResource(description="Aggregate statistics for a single type of behavior tracking event")
 public class StatisticsMBean {
 
 	private long count;
@@ -25,42 +33,42 @@ public class StatisticsMBean {
 	private Date lastInvocation;
 	//TODO: throughput statistics, histogram ?
 
-	@ManagedAttribute
+	@ManagedAttribute(description="The number of events received")
 	public long getCount() {
 		return count;
 	}
 
-	@ManagedAttribute
+	@ManagedAttribute(description="The number of received events that ended in error")
 	public long getErrorCount() {
 		return errorCount;
 	}
 
-	@ManagedAttribute
+	@ManagedAttribute(description="The average event execution time, in milliseconds")
 	public double getAverageTime() {
 		return averageTime;
 	}
 
-	@ManagedAttribute
+	@ManagedAttribute(description="The maximum event execution time, in milliseconds")
 	public long getMaxTime() {
 		return maxTime;
 	}
 
-	@ManagedAttribute
+	@ManagedAttribute(description="The minimum event execution time, in milliseconds")
 	public Long getMinTime() {
 		return minTime;
 	}
 
-	@ManagedAttribute
+	@ManagedAttribute(description="The standard deviation of event execution time, in milliseconds")
 	public double getStandardDeviation() {
 		return standardDeviation;
 	}
 
-	@ManagedAttribute
+	@ManagedAttribute(description="The start time of the last event recorded")
 	public Date getLastInvocation() {
 		return lastInvocation;
 	}
 	
-	@ManagedOperation
+	@ManagedOperation(description="Reset all tracked statistics for this type of event to their starting values")
 	public synchronized void reset() {
 		count = errorCount = maxTime = 0;
 		averageTime = standardDeviation = nVariance = 0;
