@@ -33,36 +33,40 @@ import com.mtgi.analytics.sql.BehaviorTrackingDataSource;
 public class EventTypeNamingStrategy implements ObjectNamingStrategy, InitializingBean {
 
 	private Map<String,ObjectNamingStrategy> namingStrategies;
+	private ObjectNamingStrategy nestedNamingStrategy;
 	private ObjectNamingStrategy defaultNamingStrategy;
 	
 	public void setNamingStrategies(Map<String, ObjectNamingStrategy> namingStrategies) {
 		this.namingStrategies = namingStrategies;
 	}
 	
-	protected ObjectNamingStrategy getStrategy(String type) {
-		return namingStrategies.get(type);
-	}
-
 	public void setDefaultNamingStrategy(ObjectNamingStrategy defaultNamingStrategy) {
 		this.defaultNamingStrategy = defaultNamingStrategy;
+	}
+
+	public void setNestedNamingStrategy(ObjectNamingStrategy nestedNamingStrategy) {
+		this.nestedNamingStrategy = nestedNamingStrategy;
 	}
 
 	public void afterPropertiesSet() {
 		if (namingStrategies == null) {
 			HashMap<String,ObjectNamingStrategy> namingStrategies = new HashMap<String,ObjectNamingStrategy>();
+			BehaviorEventNamingStrategy simple = new BehaviorEventNamingStrategy();
 			
 			//simple stateless naming strategies are effective for method calls and http URIs
 			namingStrategies.put(BehaviorTrackingAdvice.DEFAULT_EVENT_TYPE, new MethodNamingStrategy());
-			namingStrategies.put(ServletRequestBehaviorTrackingAdapter.DEFAULT_EVENT_TYPE, new BehaviorEventNamingStrategy());
-			
-			//sql events are hard to name effectively -- use the 'nested' strategy to name them
-			//subordinate to whatever event triggered them.
-			NestedEventNamingStrategy nestedStrat = new NestedEventNamingStrategy();
-			nestedStrat.setParentStrategy(this);
-			namingStrategies.put(BehaviorTrackingDataSource.DEFAULT_EVENT_TYPE, nestedStrat);
+			namingStrategies.put(ServletRequestBehaviorTrackingAdapter.DEFAULT_EVENT_TYPE, simple);
+			namingStrategies.put(BehaviorTrackingDataSource.DEFAULT_EVENT_TYPE, simple);
 			
 			setNamingStrategies(namingStrategies);
 		}
+		
+		if (nestedNamingStrategy == null) {
+			NestedEventNamingStrategy nestedStrat = new NestedEventNamingStrategy();
+			nestedStrat.setParentStrategy(this);
+			nestedNamingStrategy = nestedStrat;
+		}
+		
 		if (defaultNamingStrategy == null) 
 			//fall through strategy just uses obvious mapping of "application:type=event-type,name=event-name"
 			setDefaultNamingStrategy(new BehaviorEventNamingStrategy());
@@ -71,10 +75,20 @@ public class EventTypeNamingStrategy implements ObjectNamingStrategy, Initializi
 	public ObjectName getObjectName(Object managedBean, String beanKey) throws MalformedObjectNameException 
 	{
 		BehaviorEvent event = (BehaviorEvent)managedBean;
-		ObjectNamingStrategy delegate = getStrategy(event.getType());
-		if (delegate == null)
-			delegate = defaultNamingStrategy;
-		return delegate.getObjectName(event, null);
+		return getStrategy(event).getObjectName(event, null);
+	}
+	
+	protected ObjectNamingStrategy getNestedNamingStrategy() {
+		return nestedNamingStrategy;
+	}
+
+	protected ObjectNamingStrategy getStrategy(BehaviorEvent event) {
+		if (event.getParent() == null) {
+			ObjectNamingStrategy strat = namingStrategies.get(event.getType());
+			return strat == null ? defaultNamingStrategy : strat;
+		} else {
+			return nestedNamingStrategy;
+		}
 	}
 
 }

@@ -1,6 +1,6 @@
 package com.mtgi.analytics.jmx;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import javax.management.MalformedObjectNameException;
 
@@ -20,7 +20,7 @@ public class NestedEventNamingStrategyTest {
 	public void setUp() {
 		EventTypeNamingStrategy parent = new EventTypeNamingStrategy();
 		parent.afterPropertiesSet();
-		inst = (NestedEventNamingStrategy)parent.getStrategy(BehaviorTrackingDataSource.DEFAULT_EVENT_TYPE);
+		inst = (NestedEventNamingStrategy)parent.getNestedNamingStrategy();
 	}
 	
 	@After
@@ -43,7 +43,7 @@ public class NestedEventNamingStrategyTest {
 		BehaviorEvent event = new TestEvent(parent, BehaviorTrackingDataSource.DEFAULT_EVENT_TYPE, "executeUpdate", "testApp", null, null);
 		event.addData().addElement("sql").setText("insert into FOO values (1, 2)");
 		assertEquals("nested sql event name computed correctly",
-				"testApp:type=method-monitor,package=com.mtgi,group=analytics.test,class=SomeType,name=someMethod,nestedType=jdbc,nestedName=executeUpdate",
+				"testApp:type=method-monitor,package=com.mtgi,group=analytics.test,class=SomeType,name=someMethod,nested=jdbc_executeUpdate",
 				inst.getObjectName(event, null).toString());
 	}
 	
@@ -56,9 +56,9 @@ public class NestedEventNamingStrategyTest {
 
 		assertEquals("deep nested sql event name computed correctly",
 				"testApp:type=method-monitor,package=com.mtgi,group=analytics.test,class=SomeType,name=someMethod," +
-				"nestedType=jdbc,nestedName=executeUpdate," +
-				"nestedType[2]=jdbc,nestedName[2]=executeUpdate_2," +
-				"nestedType[3]=jdbc,nestedName[3]=executeUpdate_3",
+				"nested=jdbc_executeUpdate," +
+				"nested[2]=jdbc_executeUpdate_2," +
+				"nested[3]=jdbc_executeUpdate_3",
 				inst.getObjectName(event, null).toString());
 	}
 	
@@ -66,12 +66,13 @@ public class NestedEventNamingStrategyTest {
 	public void testNestingOverflow() throws MalformedObjectNameException {
 		BehaviorEvent parent = new TestEvent(null, BehaviorTrackingAdvice.DEFAULT_EVENT_TYPE, "com.mtgi.analytics.test.SomeType.someMethod", "testApp", null, null);
 		BehaviorEvent event = new TestEvent(parent, BehaviorTrackingDataSource.DEFAULT_EVENT_TYPE, "executeUpdate", "testApp", null, null);
-		for (int i = 2; i <= 4; ++i)
+		for (int i = 2; i <= 14; ++i)
 			event = new TestEvent(event, BehaviorTrackingDataSource.DEFAULT_EVENT_TYPE, "executeUpdate_" + i, "testApp", null, null);
 
-		assertEquals("nesting overflow event name falls back on simple naming scheme",
-				"testApp:type=jdbc-monitor,name=executeUpdate_4",
-				inst.getObjectName(event, null).toString());
+		try {
+			inst.getObjectName(event, null);
+			fail("overflow exception should be raised");
+		} catch (IllegalStateException expected) {}
 	}
 	
 }

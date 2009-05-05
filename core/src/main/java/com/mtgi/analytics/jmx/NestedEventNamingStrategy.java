@@ -2,6 +2,8 @@ package com.mtgi.analytics.jmx;
 
 import static com.mtgi.jmx.export.naming.AppendNamingStrategy.quote;
 
+import java.util.Hashtable;
+
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
@@ -20,18 +22,16 @@ import com.mtgi.analytics.BehaviorEvent;
  * <code>parentDomain:key0=value0,...,keyN=valueN</code>, then <code>E</code>'s {@link ObjectName}
  * will be 
  * 
- * <pre>parentDomain:key0=value0,...,keyN=valueN,nestedType=T,nestedName=N</pre>
+ * <pre>parentDomain:key0=value0,...,keyN=valueN,nested=T_N</pre>
  * 
- * If P's ObjectName already contains a key <code>nestedName</code>, then <code>nestedName[2]</code> and
- * <code>nestedType[2]</code> will be appended instead, and so on for more deeply nested events.</p>
- * @author Jason.Trump
- *
+ * If P's ObjectName already contains a key <code>nested</code>, then <code>nested[2]</code>
+ * will be appended instead, and so on for more deeply nested events.</p>
  */
 public class NestedEventNamingStrategy extends BehaviorEventNamingStrategy
 		implements ObjectNamingStrategy {
 
 	private ObjectNamingStrategy parentStrategy;
-	private int maxDepth = 3;
+	private int maxDepth = 10;
 
 	@Required
 	public void setParentStrategy(ObjectNamingStrategy parentStrategy) {
@@ -46,24 +46,27 @@ public class NestedEventNamingStrategy extends BehaviorEventNamingStrategy
 	public ObjectName getObjectName(Object managedBean, String beanKey) throws MalformedObjectNameException {
 		BehaviorEvent event = (BehaviorEvent)managedBean;
 		BehaviorEvent parent = event.getParent();
-		if (parent != null) {
-			String parentName = parentStrategy.getObjectName(parent, null).toString();
-			String nestedKey = "nestedName";
-			String nestedType = "nestedType";
+		if (parent == null) {
+			//root event, delegate to parent strategy to determine name.
+			return parentStrategy.getObjectName(managedBean, beanKey);
+		} else {
+			//descend on parent name
+			ObjectName pName = getObjectName(parent, null);
+			Hashtable<String,String> props = pName.getKeyPropertyList();
+
+			String nestedKey = "nested";
 			//attempt to construct a unique name by adding grouping keys to our parent's name.
 			//fail out after max depth.
 			for (int i = 0; i < maxDepth; ++i) {
-				if (parentName.lastIndexOf(nestedKey) > 0) {
-					nestedKey = "nestedName[" + (i + 2) + "]";
-					nestedType = "nestedType[" + (i + 2) + "]";
+				if (props.containsKey(nestedKey)) {
+					nestedKey = "nested[" + (i + 2) + "]";
 				} else {
-					return ObjectName.getInstance(parentName + 
-						',' + nestedType + '=' + quote(event.getType()) + 
-						',' + nestedKey + '=' + quote(event.getName()));
+					return ObjectName.getInstance(pName.toString() + 
+						',' + nestedKey + '=' + quote(event.getType() + '_' + event.getName()));
 				}
 			}
+			throw new IllegalStateException("Maximum event depth of " + maxDepth + " exceeded");
 		}
-		//fall-through to default naming
-		return super.getObjectName(managedBean, null);
 	}
+	
 }

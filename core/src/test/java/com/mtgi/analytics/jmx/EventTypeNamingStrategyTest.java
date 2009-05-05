@@ -37,6 +37,15 @@ public class EventTypeNamingStrategyTest {
 	}
 	
 	@Test
+	public void testNestedMethodEvents() throws MalformedObjectNameException {
+		BehaviorEvent event = new TestEvent(null, ServletRequestBehaviorTrackingAdapter.DEFAULT_EVENT_TYPE, "/request/uri?param=value", "testApp", null, null);
+		event = new TestEvent(event, BehaviorTrackingAdvice.DEFAULT_EVENT_TYPE, "com.mtgi.analytics.test.SomeType.someMethod", "testApp", null, null);
+		assertEquals("request event name computed correctly",
+				"testApp:type=http-request-monitor,name=\"/request/uri\\?param=value\",nestedType=method,nestedName=com.mtgi.analytics.test.SomeType.someMethod",
+				inst.getObjectName(event, null).toString());
+	}
+	
+	@Test
 	public void testHttpRequestEvents() throws MalformedObjectNameException {
 		BehaviorEvent event = new TestEvent(null, ServletRequestBehaviorTrackingAdapter.DEFAULT_EVENT_TYPE, "/request/uri?param=value", "testApp", null, null);
 		assertEquals("request event name computed correctly",
