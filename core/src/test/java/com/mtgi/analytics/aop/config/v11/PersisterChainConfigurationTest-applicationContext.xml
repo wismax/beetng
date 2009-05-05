@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns:bt="http://www.mantis-tgi.com/schema/bt/1.1" 
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+	   		http://www.springframework.org/schema/beans		http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+			http://www.mantis-tgi.com/schema/bt/1.1			http://www.mantis-tgi.com/schema/bt/mtgi-bt-1.1.xsd">
+
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" />
+
+	<bt:config>
+
+		<bt:manager id="multiTracking" application="testApp" register-mbeans="true"
+					track-method-expression="execution(* com.mtgi.analytics.aop.config..*Chained(..))">
+			<bt:persister-chain>
+				<bt:xml-persister file="${java.io.tmpdir}/chained-tracking.xml" />
+				<bt:mbean-persister />
+				<ref local="customPersister"/>
+			</bt:persister-chain>
+		</bt:manager>
+
+		<bt:custom-persister id="customPersister" class="com.mtgi.analytics.aop.config.v11.PersisterChainConfigurationTest$CustomPersister"/>
+
+	</bt:config>
+
+</beans>

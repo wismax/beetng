@@ -26,6 +26,9 @@ public class ChainingEventPersisterImpl implements BehaviorEventPersister {
 	public void setDelegates(Collection<BehaviorEventPersister> delegates) {
 		this.delegates = delegates;
 	}
+	public Collection<BehaviorEventPersister> getDelegates() {
+		return delegates;
+	}
 
 	public void persist(Queue<BehaviorEvent> events) {
 		//TODO: perform invocations through TaskExecutor to allow multi-threading.

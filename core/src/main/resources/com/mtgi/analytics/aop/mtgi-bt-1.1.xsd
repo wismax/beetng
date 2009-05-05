@@ -41,6 +41,7 @@
 				<xsd:choice maxOccurs="unbounded">
 					<xsd:element ref="manager"/>
 					<xsd:element ref="session-context"/>
+					<xsd:element ref="persister-chain"/>
 					<xsd:element ref="xml-persister"/>
 					<xsd:element ref="jdbc-persister"/>
 					<xsd:element ref="mbean-persister"/>
@@ -71,6 +72,13 @@
 				<xsd:extension base="beans:identifiedType">
 					<xsd:sequence>
 						<xsd:choice minOccurs="0">
+							<xsd:element ref="bt:persister-chain">
+								<xsd:annotation>
+									<xsd:documentation><![CDATA[
+									Configure a multiple persisters for this manager.
+									]]></xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
 							<xsd:element ref="bt:xml-persister">
 								<xsd:annotation>
 									<xsd:documentation><![CDATA[
@@ -308,6 +316,72 @@
 		</xsd:complexType>
 	</xsd:element>
 
+	<xsd:element name="persister-chain">
+		<xsd:annotation>
+			<xsd:documentation source="java:com.mtgi.analytics.ChainingEventPersisterImpl"><![CDATA[
+ 		 	A delegating BehaviorEventPersister that sends events to a list of persisters.
+			For example, you can configure both an mbean-persister for JMX statistics monitoring and
+			an xml-persister to store raw data.  Normally this element will occur as a child
+			of <bt:manager>.
+			]]></xsd:documentation>
+			<xsd:appinfo>
+				<tool:annotation>
+					<tool:exports type="com.mtgi.analytics.ChainingEventPersisterImpl"/>
+				</tool:annotation>
+			</xsd:appinfo>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="beans:identifiedType">
+					<xsd:choice minOccurs="0" maxOccurs="unbounded">
+						<xsd:element ref="bt:xml-persister">
+							<xsd:annotation>
+								<xsd:documentation><![CDATA[
+								Add an XML logging persister to the chain.
+								]]></xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element ref="bt:jdbc-persister">
+							<xsd:annotation>
+								<xsd:documentation><![CDATA[
+								Add a JDBC logging persister to the chain.
+								]]></xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element ref="bt:mbean-persister">
+							<xsd:annotation>
+								<xsd:documentation><![CDATA[
+								Add a JMX monitoring persister to the chain.
+								]]></xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element ref="bt:custom-persister">
+							<xsd:annotation>
+								<xsd:documentation><![CDATA[
+								Add a custom BehaviorEventPersister implementation to the chain.
+								]]></xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element ref="beans:ref">
+							<xsd:annotation>
+								<xsd:documentation><![CDATA[
+								Add a reference by name to a persister bean defined elsewhere in the Spring configuration.
+								]]></xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element ref="beans:idref">
+							<xsd:annotation>
+								<xsd:documentation><![CDATA[
+								Add a reference by ID to a persister bean defined elsewhere in the Spring configuration.
+								]]></xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+					</xsd:choice>
+				</xsd:extension>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	
 	<xsd:element name="xml-persister">
 		<xsd:complexType>
 			<xsd:annotation>

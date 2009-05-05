@@ -133,6 +133,7 @@ public class BtManagerBeanDefinitionParser extends TemplateBeanDefinitionParser 
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	protected void transform(ConfigurableListableBeanFactory factory,
 			BeanDefinition template, Element element,
@@ -183,6 +184,7 @@ public class BtManagerBeanDefinitionParser extends TemplateBeanDefinitionParser 
 			
 			//register pointcut definition for the provided expression.
 			RootBeanDefinition pointcut = new RootBeanDefinition(AspectJExpressionPointcut.class);
+			//rely on deprecated method to maintain spring 2.0 support
 			pointcut.setSingleton(false);
 			pointcut.setSynthetic(true);
 			pointcut.getPropertyValues().addPropertyValue("expression", element.getAttribute(ATT_METHOD_EXPRESSION));
