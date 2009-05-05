@@ -41,7 +41,7 @@ public class EventTypeNamingStrategyTest {
 		BehaviorEvent event = new TestEvent(null, ServletRequestBehaviorTrackingAdapter.DEFAULT_EVENT_TYPE, "/request/uri?param=value", "testApp", null, null);
 		event = new TestEvent(event, BehaviorTrackingAdvice.DEFAULT_EVENT_TYPE, "com.mtgi.analytics.test.SomeType.someMethod", "testApp", null, null);
 		assertEquals("request event name computed correctly",
-				"testApp:type=http-request-monitor,name=\"/request/uri\\?param=value\",nestedType=method,nestedName=com.mtgi.analytics.test.SomeType.someMethod",
+				"testApp:type=http-request-monitor,name=\"/request/uri\\?param=value\",nested=method_com.mtgi.analytics.test.SomeType.someMethod",
 				inst.getObjectName(event, null).toString());
 	}
 	
@@ -68,7 +68,7 @@ public class EventTypeNamingStrategyTest {
 		BehaviorEvent event = new TestEvent(parent, BehaviorTrackingDataSource.DEFAULT_EVENT_TYPE, "executeUpdate", "testApp", null, null);
 		event.addData().addElement("sql").setText("insert into FOO values (1, 2)");
 		assertEquals("nested sql event name computed correctly",
-				"testApp:type=method-monitor,package=com.mtgi,group=analytics.test,class=SomeType,name=someMethod,nestedType=jdbc,nestedName=executeUpdate",
+				"testApp:type=method-monitor,package=com.mtgi,group=analytics.test,class=SomeType,name=someMethod,nested=jdbc_executeUpdate",
 				inst.getObjectName(event, null).toString());
 	}
 	
