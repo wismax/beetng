@@ -43,6 +43,7 @@
 					<xsd:element ref="session-context"/>
 					<xsd:element ref="xml-persister"/>
 					<xsd:element ref="jdbc-persister"/>
+					<xsd:element ref="mbean-persister"/>
 					<xsd:element ref="custom-persister"/>
 				</xsd:choice>
 			</xsd:sequence>
@@ -83,6 +84,15 @@
 								<xsd:annotation>
 									<xsd:documentation><![CDATA[
 									Configure JDBC logging for this manager.
+									]]></xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+							<xsd:element ref="bt:mbean-persister">
+								<xsd:annotation>
+									<xsd:documentation><![CDATA[
+									Configure JMX monitoring for this manager.  Event statistics are
+									aggregated in MBeans, where they can be viewed from a JMX console for
+									monitoring quality-of-service.
 									]]></xsd:documentation>
 								</xsd:annotation>
 							</xsd:element>
@@ -391,6 +401,22 @@
 		</xsd:complexType>
 	</xsd:element>
 
+	<xsd:element name="mbean-persister" type="beanType">
+		<xsd:annotation>
+			<xsd:documentation source="java:com.mtgi.analytics.jmx.StatisticsMBeanEventPersisterImpl"><![CDATA[
+	Stores aggregate event statistics in memory, for access from a JMX console.
+	Generally this element will appear as a child of <bt:manager> without an "id", 
+	though it is possible to declare it as a top-level bean if you want to inject 
+	it into other application beans.
+			]]></xsd:documentation>
+			<xsd:appinfo>
+				<tool:annotation>
+					<tool:exports type="com.mtgi.analytics.BehaviorEventPersister"/>
+				</tool:annotation>
+			</xsd:appinfo>
+		</xsd:annotation>
+	</xsd:element>
+	
 	<xsd:element name="custom-persister" type="beanType">
 		<xsd:annotation>
 			<xsd:documentation source="java:com.mtgi.analytics.BehaviorEventPersister"><![CDATA[

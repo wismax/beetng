@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:bt="http://www.mantis-tgi.com/schema/bt/1.1" 
+       xmlns:jee="http://www.springframework.org/schema/jee"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans  http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mantis-tgi.com/schema/bt/1.1      http://www.mantis-tgi.com/schema/bt/mtgi-bt-1.1.xsd
+       http://www.springframework.org/schema/jee    http://www.springframework.org/schema/jee/spring-jee-2.0.xsd">
+
+	<bean class="org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor"/>
+
+	<bt:manager application="testApp" register-mbeans="true"
+				flush-schedule="0/2 * * * * ?"
+	            track-method-expression="execution(* com.mtgi.analytics.jmx.StatisticsMBeanEventPersisterTest.Service.*(..))">
+		<bt:mbean-persister/>
+		<bt:http-requests name-parameters="command"/>
+	</bt:manager>
+	
+	<bean id="dataSource" 
+		  class="org.unitils.database.UnitilsDataSourceFactoryBean"
+		  bt:tracking-manager="defaultTrackingManager"/>
+
+	<bean id="hibernate" class="org.springframework.orm.hibernate3.HibernateTemplate"
+		  lazy-init="false">
+		<property name="sessionFactory">
+			<bean class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+				<property name="annotatedClasses" value="com.mtgi.analytics.jmx.StatisticsMBeanEventPersisterTest$Data"/>
+				<property name="dataSource" ref="dataSource"/>
+				<property name="hibernateProperties">
+					<props>
+						<prop key="hibernate.hbm2ddl.auto">create</prop>
+						<prop key="hibernate.dialect">org.hibernate.dialect.HSQLDialect</prop>
+					</props>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="service" class="com.mtgi.analytics.jmx.StatisticsMBeanEventPersisterTest$Service">
+		<property name="dao" ref="hibernate"/>
+	</bean>
+
+	<bean name="/invoke.do" class="com.mtgi.analytics.jmx.StatisticsMBeanEventPersisterTest$Controller">
+		<property name="service" ref="service"/>
+	</bean>
+
+	<bean class="org.springframework.web.servlet.mvc.support.ControllerBeanNameHandlerMapping"/>
+	   
+</beans>

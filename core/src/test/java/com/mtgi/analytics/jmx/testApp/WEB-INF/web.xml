@@ -1,0 +1,25 @@
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
+    version="2.4">
+
+	<description>test web application</description>
+
+	<!-- ordinarily these listeners are automatically detected by the servlet container, but we have to manually
+	declare them in unit test environment because we have no WEB-INF/lib dir for the container to scan. -->
+	<listener>
+		<listener-class>com.mtgi.analytics.servlet.BehaviorTrackingListener</listener-class>
+	</listener>
+
+	<servlet>
+		<servlet-name>test</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>test</servlet-name>
+		<url-pattern>/test/*</url-pattern>
+	</servlet-mapping>
+	
+</web-app>

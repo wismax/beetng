@@ -49,6 +49,14 @@
          </varlistentry>
          <varlistentry>
             <term>
+               <xref linkend="elt_mbean_persister" endterm="elt_mbean_persister_title"/>
+            </term>
+            <listitem>
+               <para/>
+            </listitem>
+         </varlistentry>
+         <varlistentry>
+            <term>
                <xref linkend="elt_custom_persister" endterm="elt_custom_persister_title"/>
             </term>
             <listitem>
@@ -149,6 +157,14 @@
             </term>
             <listitem>
                <para>Configure JDBC logging for this manager.</para>
+            </listitem>
+         </varlistentry>
+         <varlistentry>
+            <term>
+               <xref linkend="elt_mbean_persister" endterm="elt_mbean_persister_title"/>
+            </term>
+            <listitem>
+               <para>Configure JMX monitoring for this manager. Event statistics are aggregated in MBeans, where they can be viewed from a JMX console for monitoring quality-of-service.</para>
             </listitem>
          </varlistentry>
          <varlistentry>
@@ -366,6 +382,12 @@
          <title id="elt_id_sql_title">&lt;bt:id-sql&gt;</title>
          <para>Overrides the default SQL statement used to retrieve new event IDs.</para>
       </section>
+   </section>
+   <section id="elt_mbean_persister">
+      <title id="elt_mbean_persister_title">&lt;bt:mbean-persister&gt;</title>
+      <emphasis role="bold">Java Bean Type:</emphasis>
+      <ulink url="../../api/com/mtgi/analytics/jmx/StatisticsMBeanEventPersisterImpl.html">com.mtgi.analytics.jmx.StatisticsMBeanEventPersisterImpl</ulink>
+      <para>Stores aggregate event statistics in memory, for access from a JMX console. Generally this element will appear as a child of <xref linkend="elt_manager" endterm="elt_manager_title" /> without an "id", though it is possible to declare it as a top-level bean if you want to inject it into other application beans.</para>
    </section>
    <section id="elt_custom_persister">
       <title id="elt_custom_persister_title">&lt;bt:custom-persister&gt;</title>
