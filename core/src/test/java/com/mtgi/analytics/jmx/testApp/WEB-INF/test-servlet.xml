@@ -45,7 +45,5 @@
 	<bean name="/invoke.do" class="com.mtgi.analytics.jmx.StatisticsMBeanEventPersisterTest$Controller">
 		<property name="service" ref="service"/>
 	</bean>
-
-	<bean class="org.springframework.web.servlet.mvc.support.ControllerBeanNameHandlerMapping"/>
 	   
 </beans>
