@@ -151,11 +151,44 @@
 				You can easily export a binary log to a simple XML format legible to humans or other XML
 				processing utilities:
 				<informalexample><screen>&gt; zcat path/to/log.bxml.gz | java -jar bt-utils.jar -tool xml &gt; result.xml</screen></informalexample>
+				<example>
+					<title>Sample XML Data</title>
+					<programlisting><![CDATA[<event id="244f5f4e-21d0-4044-b71f-ba39bb96cfbd"]]><co id="eventId"/><![CDATA[
+       parent-id="778e4a40-48a8-4386-b93c-72e322663a90"]]><co id="parentId"/><![CDATA[>
+    <type>jdbc</type><name>executeBatch</name><application>beet-hello</application>
+    <start>2009-04-23T13:50:37.625-07:00</start><duration-ms>0</duration-ms>
+    <session-id>53FAB2406DB3CFAE8BD4201D6DD60D73</session-id>]]><co id="sessionId"/><![CDATA[
+    <event-data>]]><co id="eventData"/><![CDATA[<sql>delete from HelloData where id=?</sql>
+        <batch><parameters><param>1</param></parameters></batch>
+    </event-data>
+</event>
+<event id="778e4a40-48a8-4386-b93c-72e322663a90" parent-id="9d2f5856-193f-4fe7-a7d5-51b5a355e4cf">
+    <type>method</type><name>com.mtgi.analytics.example.service.HelloService.delete</name><application>beet-hello</application>
+    <start>2009-04-23T13:50:37.531-07:00</start><duration-ms>109</duration-ms>
+    <session-id>53FAB2406DB3CFAE8BD4201D6DD60D73</session-id>
+    <event-data><parameters><param>{object}</param></parameters><result/></event-data>
+</event>
+<event id="9d2f5856-193f-4fe7-a7d5-51b5a355e4cf">
+    <type>http-request</type><name>/beet-hello/</name><application>beet-hello</application>
+    <start>2009-04-23T13:50:37.515-07:00</start><duration-ms>157</duration-ms>
+    <event-data uri="/beet-hello/" protocol="HTTP/1.1" method="POST" remote-address="127.0.0.1" remote-host="127.0.0.1">
+        <parameters><param name="command"><value>delete</value></param></parameters>
+    </event-data>
+</event>]]></programlisting>
+					<calloutlist>
+						<callout arearefs="eventId"><para>Each event is identified by a globally unique identifier.</para></callout>
+						<callout arearefs="parentId"><para>Events that are triggered by an enclosing event include a reference
+						to their parent's ID.</para></callout>
+						<callout arearefs="sessionId"><para>Events include user and session ID, if applicable.</para></callout>
+						<callout arearefs="eventData"><para>event-data contains flexible type-specific information about a recorded event,
+						such as parameter data, SQL text, and so on.</para></callout>
+					</calloutlist>
+				</example>
 			</para>
-			<para>Be careful, though; the default compressed-binary format has a compression ratio
+			<para>Be careful.  The default compressed-binary format has a compression ratio
 			of around 20:1 compared to its plain-text counterpart, so you can use a lot of disk this way.
 			If you plan to apply an XSL transform to the output document, consider the XSLT mode of the
-			export tool asoutlined below.</para>
+			export tool as outlined below.</para>
 		</section>
 		
 		<section>
