@@ -13,10 +13,9 @@
  
 package com.mtgi.analytics.aop.config.v11;
 
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
-import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.support.BeanDefinitionReaderUtils;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
@@ -32,9 +31,9 @@ public class BtMBeanPersisterBeanDefinitionParser extends AbstractSingleBeanDefi
 	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 		if (parserContext.isNested()) {
-			AbstractBeanDefinition def = builder.getBeanDefinition();
+			BeanDefinition def = builder.getBeanDefinition();
 			String id = element.hasAttribute("id") ? element.getAttribute("id")
-												   : BeanDefinitionReaderUtils.generateBeanName(def, parserContext.getReaderContext().getRegistry(), true);
+												   : parserContext.getReaderContext().generateBeanName(def);
 			BeanDefinitionHolder holder = new BeanDefinitionHolder(def, id);
 			BtManagerBeanDefinitionParser.registerNestedBean(holder, "persister", parserContext);
 		}

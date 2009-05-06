@@ -52,7 +52,7 @@ public class BtPersisterChainBeanDefinitionParser extends AbstractSingleBeanDefi
 		if (parserContext.isNested()) {
 			AbstractBeanDefinition def = builder.getBeanDefinition();
 			String id = element.hasAttribute("id") ? element.getAttribute("id")
-												   : BeanDefinitionReaderUtils.generateBeanName(def, parserContext.getReaderContext().getRegistry(), true);
+													: parserContext.getReaderContext().generateBeanName(def);
 			BeanDefinitionHolder holder = new BeanDefinitionHolder(def, id);
 			BtManagerBeanDefinitionParser.registerNestedBean(holder, "persister", parserContext);
 		}
