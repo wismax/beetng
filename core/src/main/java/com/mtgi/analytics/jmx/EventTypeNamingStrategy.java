@@ -65,7 +65,7 @@ public class EventTypeNamingStrategy implements ObjectNamingStrategy, Initializi
 		if (nestedNamingStrategy == null) {
 			NestedEventNamingStrategy nestedStrat = new NestedEventNamingStrategy();
 			nestedStrat.setParentStrategy(this);
-			nestedNamingStrategy = nestedStrat;
+			setNestedNamingStrategy(nestedStrat);
 		}
 		
 		if (defaultNamingStrategy == null) 
