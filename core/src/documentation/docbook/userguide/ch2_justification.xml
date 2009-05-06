@@ -167,20 +167,51 @@
 			however :).  Generally the benefit of a commercial alternative will be in the out-of-the-box data 
 			analysis tools; with our library, you mostly get the data, and what you do with it is your business. 
 			Many portal application servers (Sun Glassfish and BEA WebLogic come to mind) have some behavior 
-			tracking features; make sure you consider the capabilities of your target platform. Even if you have 
+			tracking features; make sure you consider the capabilities of your target platform.  Even if you have 
 			some tools available, beet may offer you something in simplicity, flexibility, and performance.</para>
-			<para>There is also a growing body of excellent open source projects out there geared toward 
+			
+			<para>There is a growing body of excellent open source projects out there geared toward 
 			gathering performance metrics and monitoring a production system.  You may want to evaluate:
 			<itemizedlist>
 				<listitem><para><ulink url="http://jamonapi.sourceforge.net/">JAMon</ulink></para></listitem>
 				<listitem><para><ulink url="http://perf4j.codehaus.org/">Perf4j</ulink></para></listitem>
 				<listitem><para><ulink url="https://helios.dev.java.net/">Helios</ulink></para></listitem>
-				<listitem><para><ulink url="http://messadmin.sourceforge.net/">MessAdmin</ulink></para></listitem>
 				<listitem><para><ulink url="https://sourceforge.net/projects/jmeasurement2">jmeasurement</ulink></para></listitem>
-				<listitem><para><ulink url="http://www.jmanage.org/">jmanage</ulink></para></listitem>
 			</itemizedlist>
-			and there are many others.  The Helios product site in particular features a long list of related products.
+			and there are many others.  Each tool has advantages and drawbacks.  Beet is focused on delivering:
+			<itemizedlist>
+				<listitem><para><emphasis>Single event granularity</emphasis>.  Many tools take the approach of
+				statistical aggregation to monitor quality-of-service.  While you can use beet in this way, beet 
+				also maintains detailed information about individual executions (method calls, HTTP requests, SQL statements)
+				and how those executions are nested for more effective post-mortem analysis of system outages.  
+				This configurable level of detail includes parameter values and user names.</para></listitem>
+				<listitem><para><emphasis>Deploy-time installation</emphasis>.  Beet is designed for use in existing
+				production applications, without necessitating a recompile.</para></listitem>
+				<listitem><para><emphasis>Centralized configuration</emphasis>.  All aspects of beet configuration
+				can be centralized in a single Spring configuration file, usually in 3-4 lines of simple markup.</para></listitem>
+				<listitem><para><emphasis>Application scope</emphasis>.  Beet does not require manipulation of the JVM
+				or its runtime parameters, so you can instrument an application when you don't have strong control of
+				the production environment.</para></listitem>
+				<listitem><para><emphasis>Integration</emphasis>.  Beet is designed for high-performance, meaningful data capture.
+				It exposes data through JMX or XML to integrate with other popular monitoring and aggregation tools, rather 
+				than providing monolithic data analysis services.</para></listitem>
+			</itemizedlist>
 			</para>
+			
+			<section>
+				<title>Related Tools</title>
+				<para>As described in <xref linkend="chapter_jmx_administration"/>, beet can export mbeans for
+				integration with JMX monitoring tools.  Besides jconsole (which ships standard with an SDK install),
+				some open source tools worth considering in this role:
+				<itemizedlist>
+					<listitem><para><ulink url="http://www.hyperic.com/">Hyperic HQ</ulink></para></listitem>
+					<listitem><para><ulink url="http://mc4j.org/confluence/display/mc4j/Home">MC4J</ulink></para></listitem>
+					<listitem><para><ulink url="http://www.jmanage.org/">jmanage</ulink></para></listitem>
+				</itemizedlist>
+				You should also check out <ulink url="http://messadmin.sourceforge.net/">MessAdmin</ulink> for examining
+				and administering session state in JEE applications.</para>
+			</section>
+			
 		</section>
 	</section>
 </chapter>
