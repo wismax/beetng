@@ -23,9 +23,10 @@ import com.mtgi.analytics.sql.BehaviorTrackingDataSource;
  * 
  * <p>If no custom strategies are registered, default behavior for each event type is as follows:
  * <dl>
+ * 	<dd>nested event (regardless of type)</dd><dt>{@link NestedEventNamingStrategy}</dt>
  * 	<dd>http-request</dd><dt>{@link BehaviorEventNamingStrategy}</dt>
  * 	<dd>method</dd><dt>{@link MethodNamingStrategy}</dt>
- * 	<dd>jdbc</dd><dt>{@link NestedEventNamingStrategy}</dt>
+ * 	<dd>jdbc</dd><dt>{@link BehaviorEventNamingStrategy}</dt>
  * 	<dd>all other event types</dd><dt>{@link BehaviorEventNamingStrategy}</dt>
  * </dl>
  * </p>
