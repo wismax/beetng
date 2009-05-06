@@ -19,7 +19,7 @@
 	<section id="section_simple_installation">
 		<title>Simplified Installation</title> 
 		<para>These steps should get you up and running directly.  You can find a more verbose version
-		of these instructions online at <ulink url="http://beet.sourceforge.net/tutorial">The Beet Tutorial</ulink>.  
+		of these instructions online at <ulink url="http://beet.sourceforge.net/documentation/tutorial">The Beet Tutorial</ulink>.  
 		This configuration can be expanded and fine-tuned in many ways, see <xref linkend="chapter_configuration"/> for details.  
 		The steps for a basic installation into an existing Spring application are:
 		<orderedlist>
