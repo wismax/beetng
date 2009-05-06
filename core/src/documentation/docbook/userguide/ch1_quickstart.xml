@@ -18,15 +18,14 @@
 	</section>
 	<section id="section_simple_installation">
 		<title>Simplified Installation</title> 
-		<para>The beet.jar library and dependencies should be included in the target  
-		application's library directory, e.g. <literal>WEB-INF/lib</literal> for web applications.  
-		beet is then enabled separately for tracking HTTP requests, Java  
-		method calls, and/or SQL queries. Behavior can be fine-tuned in many ways, see 
-		<xref linkend="chapter_configuration"/> for details.  The steps for a basic installation at all layers 
-		of an existing Spring application are:
-
+		<para>These steps should get you up and running directly.  You can find a more verbose version
+		of these instructions online at <ulink url="http://beet.sourceforge.net/tutorial">The Beet Tutorial</ulink>.  
+		This configuration can be expanded and fine-tuned in many ways, see <xref linkend="chapter_configuration"/> for details.  
+		The steps for a basic installation into an existing Spring application are:
 		<orderedlist>
-			<listitem><para>Add the library and its dependencies to the application.</para></listitem>
+			<listitem><para>Download an appropriate release package from <ulink url="http://beet.sourceforge.net/downloads">SourceForge</ulink>.</para></listitem>
+			<listitem><para>Add the library <literal>beet.jar</literal> and its dependency jars to your application
+			(e.g. in the WEB-INF/lib directory for WAR archives).</para></listitem>
 			<listitem>
 				<para>Add behavior tracking markup to your Spring applicationContext.xml file
 				(modify values to suit your application): 
@@ -40,12 +39,15 @@
           http://www.mantis-tgi.com/schema/bt/1.1         http://www.mantis-tgi.com/schema/bt/mtgi-bt-1.1.xsd">
 
       <bt:manager application="myapp"]]><co id="appname"/><![CDATA[
+      			  register-mbeans="true"]]><co id="mbeans"/><![CDATA[
                   track-method-expression="execution(* com.mtgi.analytics..*Tracked(..))"]]><co id="pattern"/><![CDATA[>
          <bt:http-requests parameters="dispatch"/>]]><co id="http-requests"/><![CDATA[
       </bt:manager>]]></programlisting>
 					<calloutlist>
 						<callout arearefs="appname"><para>The name of this application, as it will
 						appear in behavior tracking logs.</para></callout>
+						<callout arearefs="mbeans"><para>Optional mbean registration, if you plan
+						to use a JMX tool like JConsole to monitor your application.</para></callout>
 						<callout arearefs="pattern"><para>(optional) An AspectJ pointcut expression identifying which
 						methods you want to track in your application.  This example identifies "all methods
 						in the com.mtgi.analytics package with names ending in "Tracked".  For a detailed 
@@ -85,7 +87,7 @@
 		</para>
 	</section>
 
-	<section>
+	<section id="section_log_analysis">
 		<title>Log Analysis</title>
 		<para>The beet build generates a command-line tool suite for 
 		analyzing beet logs. The tool suite can be used to convert binary 

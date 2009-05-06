@@ -151,7 +151,7 @@
 											will be matched against this expression.
 											
 											This element has equivalent behavior to the uri-pattern attribute, but
-											can appear multiple time.
+											can appear multiple times.
 											]]></xsd:documentation>
 										</xsd:annotation>
 									</xsd:element>

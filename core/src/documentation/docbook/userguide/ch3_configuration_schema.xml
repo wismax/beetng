@@ -258,7 +258,7 @@
                </term>
                <listitem>
                   <para>A regular expression identifying URIs that should be logged to the behavior event persister. The value of HttpServletRequest.getServletURI() will be matched against this expression.</para>
-                  <para>This element has equivalent behavior to the uri-pattern attribute, but can appear multiple time.</para>
+                  <para>This element has equivalent behavior to the uri-pattern attribute, but can appear multiple times.</para>
                </listitem>
             </varlistentry>
          </variablelist>
