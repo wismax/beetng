@@ -1,18 +1,23 @@
    This product (beet-hello) is distributed under the terms of the 
-   Mozilla Public License, v1.1 (MPL).
+   Mozilla Public License, v1.1 (MPL).  Beet includes aspectj library 
+   binaries, also licensed under the MPL.
 
-   This product includes software developed by the Apache Software 
+   Beet-hello includes software developed by the Apache Software 
    Foundation (http://www.apache.org).  This product also includes 
    software developed by the Spring Framework Project 
    (http://www.springframework.org).  Spring and ASF software 
    is licensed under terms of the Apache Software License, version 
-   2.0 (APL).
+   2.0 (ASL).  Unless otherwise noted, other libraries
+   distributed with beet are also licensed under the ASL.
    
-   This product is linked against and distributes in binary form
+   Beet-hello is linked against and distributes in binary form
    the Hibernate 3.2.5 library (http://hibernate.org), licensed 
    under the terms of the GNU Lesser General Public License, 
    version 2.1 (LGPL).  You may obtain the source for this library from
    http://beet.sourceforge.net/ivyrep/hibernate/hibernate/3.2.5/sources.
    
-   Reference copies of all three licenses (MPL, APL, LGPL) can be found
+   Beet-hello also includes the ASM library in binary form, which
+   is licensed separately on its own terms (ASML).
+   
+   Reference copies of all four licenses (MPL, ASL, ASML, LGPL) can be found
    in the 'licenses' directory of this archive.

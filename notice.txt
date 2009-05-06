@@ -1,11 +1,16 @@
-   This product is distributed under the terms of the Mozilla Public
-   License, v1.1 (MPL).
+   This product (beet) is distributed under the terms of the Mozilla 
+   Public License, v1.1 (MPL).  Beet includes the aspectj and saxon 
+   libraries in binary form, also licensed under the MPL.
 
-   This product includes software developed by the Apache Software 
+   Beet includes software developed by the Apache Software 
    Foundation (http://www.apache.org) and software developed by 
    the Spring Framework Project (http://www.springframework.org).  
    Both are licensed under terms of the Apache Software License, 
-   version 2.0 (APL).
+   version 2.0 (ASL).  Unless otherwise noted, other libraries
+   distributed with beet are also licensed under the ASL.
    
-   Reference copies of both licenses (MPL, APL) can be found
-   in the 'licenses' directory of this archive.
+   Beet includes the ASM library in binary form, which
+   is licensed separately on its own terms (ASML).
+   
+   Reference copies of all three licenses (MPL, ASL, ASML) can 
+   be found in the 'licenses' directory of this archive.
