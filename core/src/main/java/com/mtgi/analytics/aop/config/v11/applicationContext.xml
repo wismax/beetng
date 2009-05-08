@@ -98,6 +98,16 @@
 	</bean>
 	
 	<!-- mbean auto-registration support -->
+	<bean id="com.mtgi.analytics.btMBeanServer" class="org.springframework.jmx.support.MBeanServerFactoryBean">
+		<property name="locateExistingServerIfPossible" value="true"/>
+	</bean>
+	<bean id="com.mtgi.analytics.btMBeanPersister" class="com.mtgi.analytics.jmx.StatisticsMBeanEventPersisterImpl">
+		<description>Default configuration values for a bt:mbean-persister tag.  This definition is
+		loaded by BtMBeanPersisterBeanDefinitionParser, and then manipulated to suit the attributes
+		and sub-elements provided at runtime.</description>
+		<property name="server" ref="com.mtgi.analytics.btMBeanServer"/>
+	</bean>
+	
     <bean id="com.mtgi.analytics.btJmxAttributeSource" 
     	  class="org.springframework.jmx.export.annotation.AnnotationJmxAttributeSource"/>
 	<bean id="com.mtgi.analytics.btJmxNamingStrategy"
@@ -117,6 +127,7 @@
     	ApplicationNamingStrategy to put all beans under the domain name of the application,
     	to avoid naming collisions if we have multiple apps on the same server.</description>
     	<property name="autodetect" value="true"/>
+    	<property name="server" ref="com.mtgi.analytics.btMBeanServer"/>
         <property name="assembler">
 		    <bean class="org.springframework.jmx.export.assembler.MetadataMBeanInfoAssembler">
 		        <property name="attributeSource" ref="com.mtgi.analytics.btJmxAttributeSource"/>

@@ -235,6 +235,17 @@
 							with the platform MBean Server.  Defaults to false if unspecified.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:attribute>
+					<xsd:attribute name="mbean-server" type="xsd:string">
+						<xsd:annotation>
+							<xsd:documentation>When register-mbeans="true", specify a reference to the MBeanServer instance on
+							which mbeans should be registered.  Defaults to the platform MBeanServer if unspecified.</xsd:documentation>
+							<xsd:appinfo>
+								<tool:annotation kind="ref">
+									<tool:expected-type type="javax.management.MBeanServer"/>
+								</tool:annotation>
+							</xsd:appinfo>
+						</xsd:annotation>
+					</xsd:attribute>
 					<xsd:attribute name="scheduler" type="xsd:string">
 						<xsd:annotation>
 							<xsd:documentation>Bean name of a Quartz scheduler bean to use for timed flush operations.
@@ -475,20 +486,39 @@
 		</xsd:complexType>
 	</xsd:element>
 
-	<xsd:element name="mbean-persister" type="beanType">
-		<xsd:annotation>
-			<xsd:documentation source="java:com.mtgi.analytics.jmx.StatisticsMBeanEventPersisterImpl"><![CDATA[
-	Stores aggregate event statistics in memory, for access from a JMX console.
-	Generally this element will appear as a child of <bt:manager> without an "id", 
-	though it is possible to declare it as a top-level bean if you want to inject 
-	it into other application beans.
-			]]></xsd:documentation>
-			<xsd:appinfo>
-				<tool:annotation>
-					<tool:exports type="com.mtgi.analytics.BehaviorEventPersister"/>
-				</tool:annotation>
-			</xsd:appinfo>
-		</xsd:annotation>
+	<xsd:element name="mbean-persister">
+		<xsd:complexType>
+			<xsd:annotation>
+				<xsd:documentation source="java:com.mtgi.analytics.jmx.StatisticsMBeanEventPersisterImpl"><![CDATA[
+		Stores aggregate event statistics in memory, for access from a JMX console.
+		Generally this element will appear as a child of <bt:manager> without an "id", 
+		though it is possible to declare it as a top-level bean if you want to inject 
+		it into other application beans.
+				]]></xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation>
+						<tool:exports type="com.mtgi.analytics.BehaviorEventPersister"/>
+					</tool:annotation>
+				</xsd:appinfo>
+			</xsd:annotation>
+			<xsd:complexContent>
+				<xsd:extension base="beans:identifiedType">
+					<xsd:attribute name="server" type="xsd:string">
+						<xsd:annotation>
+							<xsd:documentation><![CDATA[Specify a reference to the MBeanServer instance on
+							which mbeans should be registered.  Defaults to the MBeanServer used by
+							any enclosing <bt:manager> tag, or the platform MBeanServer if not
+							enclosed in a <bt:manager> tag.]]></xsd:documentation>
+							<xsd:appinfo>
+								<tool:annotation kind="ref">
+									<tool:expected-type type="javax.management.MBeanServer"/>
+								</tool:annotation>
+							</xsd:appinfo>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:extension>
+			</xsd:complexContent>
+		</xsd:complexType>
 	</xsd:element>
 	
 	<xsd:element name="custom-persister" type="beanType">

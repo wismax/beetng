@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns:bt="http://www.mantis-tgi.com/schema/bt/1.1" xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+	   		http://www.springframework.org/schema/beans		http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+			http://www.mantis-tgi.com/schema/bt/1.1			http://www.mantis-tgi.com/schema/bt/mtgi-bt-1.1.xsd">
+
+	<bt:config>
+		<bt:manager id="manager1" application="testApp" register-mbeans="true" mbean-server="firstServer">
+			<bt:persister-chain>
+				<bt:xml-persister/>
+				<bt:mbean-persister/>
+			</bt:persister-chain>
+		</bt:manager>
+		<bt:manager id="manager2" application="testApp" register-mbeans="true" mbean-server="firstServer">
+			<bt:mbean-persister server="secondServer"/>
+		</bt:manager>
+	</bt:config>
+
+	<bean id="firstServer" class="org.springframework.jmx.support.MBeanServerFactoryBean"/>
+	<bean id="secondServer" class="org.springframework.jmx.support.MBeanServerFactoryBean"/>
+
+</beans>

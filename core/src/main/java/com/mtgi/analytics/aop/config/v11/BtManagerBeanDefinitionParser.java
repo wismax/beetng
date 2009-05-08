@@ -95,6 +95,13 @@ public class BtManagerBeanDefinitionParser extends TemplateBeanDefinitionParser 
 	 */
 	public static final String ATT_REGISTER_MBEANS = "register-mbeans";
 	/**
+	 * When {@link #ATT_REGISTER_MBEANS} is specified, identifies a reference
+	 * to the MBeanServer to target for registration.  Defaults to the platform 
+	 * MBean server if unspecified.
+	 */
+	public static final String ATT_MBEAN_SERVER = "mbean-server";
+	
+	/**
 	 * Bean name reference to an implementation of {@link BehaviorEventPersister} defined in the application context.
 	 * A private instance of {@link XmlBehaviorEventPersisterImpl} is created if none is specified.  This attribute
 	 * cannot be used in combination with a nested persister tag (<code>xml-persister</code>, <code>jdbc-persister</code>,
@@ -133,7 +140,6 @@ public class BtManagerBeanDefinitionParser extends TemplateBeanDefinitionParser 
 		}
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	protected void transform(ConfigurableListableBeanFactory factory,
 			BeanDefinition template, Element element,
@@ -159,6 +165,9 @@ public class BtManagerBeanDefinitionParser extends TemplateBeanDefinitionParser 
 		}
 
 		//prefer references to beans in the parent factory if they've been specified
+		if (element.hasAttribute(ATT_MBEAN_SERVER))
+			factory.registerAlias(element.getAttribute(ATT_MBEAN_SERVER), CONFIG_MBEAN_SERVER);
+		
 		if (element.hasAttribute(ATT_SCHEDULER))
 			factory.registerAlias(element.getAttribute(ATT_SCHEDULER), CONFIG_SCHEDULER);
 		

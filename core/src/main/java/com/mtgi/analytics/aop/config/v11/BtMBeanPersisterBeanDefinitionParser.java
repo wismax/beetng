@@ -13,40 +13,36 @@
  
 package com.mtgi.analytics.aop.config.v11;
 
+import static com.mtgi.analytics.aop.config.v11.ConfigurationConstants.CONFIG_MBEAN_PERSISTER;
+import static com.mtgi.analytics.aop.config.v11.ConfigurationConstants.CONFIG_TEMPLATE;
+
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
+import com.mtgi.analytics.aop.config.TemplateBeanDefinitionParser;
 import com.mtgi.analytics.jmx.StatisticsMBeanEventPersisterImpl;
 
 /** 
  * Parses the <code>bt:mbean-persister</code> tag to produce an {@link StatisticsMBeanEventPersisterImpl} bean,
  * for inclusion in an enclosing <code>bt:manager</code> tag or as a standalone managed bean.
  */
-public class BtMBeanPersisterBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
+public class BtMBeanPersisterBeanDefinitionParser extends TemplateBeanDefinitionParser 
+{
+	public BtMBeanPersisterBeanDefinitionParser() {
+		super(CONFIG_TEMPLATE, CONFIG_MBEAN_PERSISTER);
+	}
 
 	@Override
-	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
+	protected void transform(ConfigurableListableBeanFactory factory, BeanDefinition template, Element element, ParserContext parserContext) {
+		String id = overrideAttribute("id", template, element);
+		overrideProperty("server", template, element, true);
 		if (parserContext.isNested()) {
-			BeanDefinition def = builder.getBeanDefinition();
-			String id = element.hasAttribute("id") ? element.getAttribute("id")
-												   : parserContext.getReaderContext().generateBeanName(def);
-			BeanDefinitionHolder holder = new BeanDefinitionHolder(def, id);
-			BtManagerBeanDefinitionParser.registerNestedBean(holder, "persister", parserContext);
+			if (id == null)
+				id = parserContext.getReaderContext().generateBeanName(template);
+			BtManagerBeanDefinitionParser.registerNestedBean(new BeanDefinitionHolder(template, id), "persister", parserContext);
 		}
 	}
-
-	@Override
-	protected Class<?> getBeanClass(Element element) {
-		return StatisticsMBeanEventPersisterImpl.class;
-	}
-
-	@Override
-	protected boolean shouldGenerateIdAsFallback() {
-		return true;
-	}
-
 }
