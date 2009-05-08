@@ -57,7 +57,7 @@ public class ChainingEventPersisterTest {
 		//we program the first mock persister to add a marker event to the queue.
 		//this is normally not allowed, but it helps us to verify that the persisters are
 		//invoked in the correct order.
-		final BehaviorEvent marker = new BehaviorEvent(null, "test", "markerEvent", "testApp", null, null);
+		final BehaviorEvent marker = new BehaviorEvent(null, "test", "markerEvent", "testApp", null, null, null);
 		
 		//the first persister adds the marker event to the queue, only if it is empty.
 		mock.persist(same(events));

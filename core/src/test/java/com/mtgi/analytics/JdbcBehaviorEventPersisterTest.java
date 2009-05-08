@@ -135,7 +135,7 @@ public class JdbcBehaviorEventPersisterTest extends JdbcEventTestCase {
 		String session = (user == null ? null : user + select(sessions, index));
 		
 		BehaviorEvent ret = new BehaviorEvent(parent, select(types, index), select(names, index), 
-				select(apps, index), user, session);
+				select(apps, index), user, session, null);
 		ret.start();
 		
 		//give the events some duration to make things more interesting.

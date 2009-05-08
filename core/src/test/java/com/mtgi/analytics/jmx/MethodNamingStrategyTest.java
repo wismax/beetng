@@ -67,7 +67,7 @@ public class MethodNamingStrategyTest {
 		private static final long serialVersionUID = -631522178925423193L;
 
 		public TestEvent(String name) {
-			super(null, "method", name, "testApp", null, null);
+			super(null, "method", name, "testApp", null, null, null);
 		}
 	}
 }

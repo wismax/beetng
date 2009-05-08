@@ -43,24 +43,25 @@ public class BehaviorEvent implements Serializable {
 	private static final Log log = LogFactory.getLog(BehaviorEvent.class);
 
 	private Serializable id;
-	private BehaviorEvent parent;
-	private String type;
-	private String name;
-	private String application;
-	private String userId;
-	private String sessionId;
+	private final BehaviorEvent parent;
+	private final String type;
+	private final String name;
+	private final String application;
+	private final String userId;
+	private final String sessionId;
 	private Date start;
 	private Long duration;
-	private EventDataElement data = DeferredDataElement.INSTANCE;
+	private EventDataElement data;
 	private String error;
 	
-	protected BehaviorEvent(BehaviorEvent parent, String type, String name, String application, String userId, String sessionId) {
+	protected BehaviorEvent(BehaviorEvent parent, String type, String name, String application, String userId, String sessionId, EventDataElement data) {
 		this.parent = parent;
 		this.type = type;
 		this.name = name;
 		this.application = application;
 		this.userId = userId;
 		this.sessionId = sessionId;
+		this.data = (data == null ? DeferredDataElement.INSTANCE : data);
 	}
 
 	@Override

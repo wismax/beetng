@@ -120,7 +120,7 @@ public class StatisticsMBeanTest {
 		private Date startDate;
 
 		public TestEvent(Date startDate, long duration) {
-			super(null, "stats", "test", "testApp", null, null);
+			super(null, "stats", "test", "testApp", null, null, null);
 			this.duration = duration;
 			this.startDate = startDate;
 		}

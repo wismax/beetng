@@ -49,7 +49,7 @@ public class BehaviorEventSerializerTest {
 	@Test
 	public void testAllFields() throws Exception {
 		
-		BehaviorEvent parent = new BehaviorEvent(null, "test-event", "root", "test", "user", "session");
+		BehaviorEvent parent = new BehaviorEvent(null, "test-event", "root", "test", "user", "session", null);
 		parent.setId("a");
 		parent.start();
 
@@ -147,7 +147,7 @@ public class BehaviorEventSerializerTest {
 		private Long duration;
 		
 		public FixedEvent(BehaviorEvent parent, String type, String name, String application, String userId, String sessionId, Date start, Long duration) {
-			super(parent, type, name, application, userId, sessionId);
+			super(parent, type, name, application, userId, sessionId, null);
 			this.date = start;
 			this.duration = duration;
 		}

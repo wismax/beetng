@@ -23,7 +23,7 @@ public class BehaviorEventTest {
 
 	@Test
 	public void testStart() {
-		BehaviorEvent event = new BehaviorEvent(null, "request", "/foo", "test", "me", "1");
+		BehaviorEvent event = new BehaviorEvent(null, "request", "/foo", "test", "me", "1", null);
 		assertNull("no start time yet", event.getStart());
 		assertNull("no duration", event.getDuration());
 		assertFalse(event.isStarted());
@@ -54,7 +54,7 @@ public class BehaviorEventTest {
 	
 	@Test
 	public void testStop() throws InterruptedException {
-		BehaviorEvent event = new BehaviorEvent(null, "request", "/foo", "test", "me", "1");
+		BehaviorEvent event = new BehaviorEvent(null, "request", "/foo", "test", "me", "1", null);
 		assertFalse(event.isStarted());
 		assertFalse(event.isEnded());
 
@@ -117,17 +117,17 @@ public class BehaviorEventTest {
 	
 	@Test
 	public void testNesting() {
-		BehaviorEvent root = new BehaviorEvent(null, "request", "/foo", "test", "me", "1");
+		BehaviorEvent root = new BehaviorEvent(null, "request", "/foo", "test", "me", "1", null);
 		assertTrue("event with no parent is root", root.isRoot());
 		
 		root.start();
 		
-		BehaviorEvent c10 = new BehaviorEvent(root, "request", "/bad", "test", "me", "1");
+		BehaviorEvent c10 = new BehaviorEvent(root, "request", "/bad", "test", "me", "1", null);
 		assertSame("child points to parent", root, c10.getParent());
 		
 		assertFalse("child node is not a root", c10.isRoot());
 		
-		BehaviorEvent c11 = new BehaviorEvent(root, "request", "/bad", "test", "me", "1");
+		BehaviorEvent c11 = new BehaviorEvent(root, "request", "/bad", "test", "me", "1", null);
 		assertSame("child points to parent", root, c11.getParent());
 		assertFalse("child node is not a root", c11.isRoot());
 		
@@ -138,7 +138,7 @@ public class BehaviorEventTest {
 	@Test
 	public void testCtor() {
 		//test read-only properties supplied in constructor.
-		BehaviorEvent event = new BehaviorEvent(null, "application", "hello.world", "test", "me", "1");
+		BehaviorEvent event = new BehaviorEvent(null, "application", "hello.world", "test", "me", "1", null);
 		assertNull("no parent", event.getParent());
 		assertEquals("application", event.getType());
 		assertEquals("hello.world", event.getName());
@@ -149,7 +149,7 @@ public class BehaviorEventTest {
 	
 	@Test
 	public void testEventDataElement() {
-		BehaviorEvent event = new BehaviorEvent(null, "application", "hello.world", "test", "me", "1");
+		BehaviorEvent event = new BehaviorEvent(null, "application", "hello.world", "test", "me", "1", null);
 		
 		EventDataElement element = event.getData();
 		assertNotNull("data element not null", element);
@@ -199,7 +199,7 @@ public class BehaviorEventTest {
 	
 	@Test
 	public void testToString() {
-		BehaviorEvent event = new BehaviorEvent(null, "application", "hello.world", "test", "me", "1");
+		BehaviorEvent event = new BehaviorEvent(null, "application", "hello.world", "test", "me", "1", null);
 		//a trivial example, with several null attributes and no parent.
 		assertEquals("behavior-event: id=\"null\" " +
 					 "type=\"application\" name=\"hello.world\" application=\"test\" " +
@@ -211,7 +211,7 @@ public class BehaviorEventTest {
 		event.start();
 
 		//a more complete example, with parent id, error message, and time statistics.
-		BehaviorEvent child = new BehaviorEvent(event, "child", "foo", "test", "you", "2");
+		BehaviorEvent child = new BehaviorEvent(event, "child", "foo", "test", "you", "2", null);
 		child.addData().setText("ignored");
 		child.setId(2);
 		child.start();

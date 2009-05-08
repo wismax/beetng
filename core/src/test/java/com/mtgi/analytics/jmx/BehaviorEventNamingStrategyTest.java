@@ -32,7 +32,7 @@ public class BehaviorEventNamingStrategyTest {
 		private static final long serialVersionUID = -631522178925423193L;
 
 		public TestEvent(String app, String type, String name) {
-			super(null, type, name, app, null, null);
+			super(null, type, name, app, null, null, null);
 		}
 	}
 }

@@ -110,6 +110,11 @@ public class BtManagerBeanDefinitionParser extends TemplateBeanDefinitionParser 
 	 */
 	public static final String ATT_SESSION_CONTEXT = "session-context";
 
+	/**
+	 * Comma-separated list of event types for which auxiliary event data should not be collected.
+	 */
+	public static final String ATT_EVENT_DATA_EXCLUDES = "event-data-excludes";
+	
 	private static final String AOP_REGISTRATION = "registerAspectJAutoProxyCreatorIfNecessary";
 	
 	//we want to support both 2.0 and 2.5 deployments without
@@ -133,7 +138,6 @@ public class BtManagerBeanDefinitionParser extends TemplateBeanDefinitionParser 
 		}
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	protected void transform(ConfigurableListableBeanFactory factory,
 			BeanDefinition template, Element element,

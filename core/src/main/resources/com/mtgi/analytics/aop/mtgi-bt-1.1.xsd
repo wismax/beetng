@@ -270,6 +270,14 @@
 							</xsd:appinfo>
 						</xsd:annotation>
 					</xsd:attribute>
+					<xsd:attribute name="event-data-excludes" type="xsd:string">
+						<xsd:annotation>
+							<xsd:documentation><![CDATA[Comma-separated list of event types for which auxiliary event-data
+							should not be collected.  This can be used to decrease the verbosity of event logging;
+							for example, it can be quite redundant to log parameter data for HTTP requests, Java method calls,
+							and SQL statements at the same time.]]></xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
 				</xsd:extension>
 			</xsd:complexContent>
 		</xsd:complexType>

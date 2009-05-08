@@ -13,7 +13,11 @@
  
 package com.mtgi.analytics;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -89,6 +93,8 @@ public class BehaviorTrackingManagerImpl implements BehaviorTrackingManager, Ini
 	private int flushThreshold = 100;
 	private TaskExecutor executor;
 
+	private Map<String,NullEventDataElement> dataExcludes;
+	
 	//tracks the currently executing event on the calling thread
 	private ThreadLocal<BehaviorEvent> event = new ThreadLocal<BehaviorEvent>();
 
@@ -126,7 +132,8 @@ public class BehaviorTrackingManagerImpl implements BehaviorTrackingManager, Ini
 		//too many pending events waiting for closure.
 		return new BehaviorEvent(event.get(), type, name, application, 
 								 sessionContext.getContextUserId(), 
-								 sessionContext.getContextSessionId());
+								 sessionContext.getContextSessionId(), 
+								 dataExcludes.get(type));
 	}
 
 	public void start(BehaviorEvent evt) {
@@ -316,25 +323,41 @@ public class BehaviorTrackingManagerImpl implements BehaviorTrackingManager, Ini
 	}
 	
 	/**
-	 * Specify the maximum number of completed events to queue in memory before
-	 * forcing a flush to the persister.  Default is 100 if unspecified.
+	 * <p>Specify the maximum number of completed events to queue in memory before
+	 * forcing a flush to the persister.  Default is 100 if unspecified.</p>
 	 * 
-	 * Note that this value is treated as advice and not strictly obeyed.
+	 * <p>Note that this value is treated as advice and not strictly obeyed.
 	 * For example, additional events may accumulate during the time it takes to
-	 * rotate the event buffer after the flush threshold is first observed crossed.
+	 * rotate the event buffer after the flush threshold is first observed crossed.</p>
 	 * 
-	 * In other words, persister implementations must not assume that the flush
-	 * threshold is a hard upper limit on the batch size of persistence operations.
+	 * <p>In other words, persister implementations must not assume that the flush
+	 * threshold is a hard upper limit on the batch size of persistence operations.</p>
 	 */
 	public void setFlushThreshold(int flushThreshold) {
 		this.flushThreshold = flushThreshold;
+	}
+
+	/**
+	 * Configure a list of event types for which type-specific event data should
+	 * not be collected (or persisted).  By default all event types collect full data
+	 * (e.g. parameter values for method calls, SQL text for jdbc statements, and so on).
+	 */
+	public void setDataExcludes(Collection<String> excludes) {
+		if (!excludes.isEmpty()) {
+			HashMap<String,NullEventDataElement> map = new HashMap<String, NullEventDataElement>(excludes.size());
+			for (String type : excludes)
+				map.put(type, NullEventDataElement.INSTANCE);
+			this.dataExcludes = map;
+		}
 	}
 	
 	public void afterPropertiesSet() throws Exception {
 		if (sessionContext == null) {
 			log.info("No sessionContext specified, using default implementation " + SpringSessionContext.class.getName());
-			sessionContext = new SpringSessionContext();
+			setSessionContext(new SpringSessionContext());
 		}
+		if (dataExcludes == null)
+			this.dataExcludes = Collections.emptyMap();
 	}
 
 	protected class FlushEvent extends BehaviorEvent {
@@ -342,7 +365,7 @@ public class BehaviorTrackingManagerImpl implements BehaviorTrackingManager, Ini
 		private static final long serialVersionUID = 3182195013219330932L;
 
 		protected FlushEvent(BehaviorEvent parent) {
-			super(parent, "behavior-tracking", "flush", application, sessionContext.getContextUserId(), sessionContext.getContextSessionId());
+			super(parent, "behavior-tracking", "flush", application, sessionContext.getContextUserId(), sessionContext.getContextSessionId(), null);
 		}
 		
 	}
