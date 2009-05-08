@@ -230,11 +230,12 @@ public class XmlBehaviorEventPersisterImpl
 				StAXDocumentSerializer sds = new StAXDocumentSerializer();
 				sds.setOutputStream(stream);
 				writer = sds;
-				writer.writeStartDocument();
-				writer.writeStartElement("event-log");
 			} else {
 				writer = XMLOutputFactory.newInstance().createXMLStreamWriter(stream);
 			}
+
+			writer.writeStartDocument();
+			writer.writeStartElement("event-log");
 		}
 		return msg.toString();
 	}
@@ -258,8 +259,7 @@ public class XmlBehaviorEventPersisterImpl
 		if (writer != null) {
 			//finish writing XML document.
 			try {
-				if (binary)
-					writer.writeEndDocument();
+				writer.writeEndDocument();
 				writer.flush();
 			} catch (XMLStreamException xse) {
 				log.error("Error flushing log for rotation", xse);

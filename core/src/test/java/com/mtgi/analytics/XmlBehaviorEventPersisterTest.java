@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
+import javax.xml.stream.XMLStreamException;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
@@ -68,15 +70,15 @@ public class XmlBehaviorEventPersisterTest {
 	}
 	
 	@Test
-	public void testEmptyQueue() {
+	public void testEmptyQueue() throws IOException {
 		persister.persist(new LinkedList<BehaviorEvent>());
-		assertEquals("no events written to log", 0, file.length());
-		assertEquals(0, persister.getFileSize());
+		assertEquals("empty event-log declaration written", "<?xml version=\"1.0\" ?><event-log", FileUtils.readFileToString(file));
+		assertEquals(file.length(), persister.getFileSize());
 		assertFalse("persister defaults to plain text format", persister.isBinary());
 	}
 	
 	@Test @SuppressWarnings("unchecked")
-	public void testNestedEvents() throws InterruptedException, IOException {
+	public void testNestedEvents() throws InterruptedException, IOException, XMLStreamException {
 		//we reuse the test event creation code from jdbc persister test to get ourselves an interesting dataset.
 		ArrayList<BehaviorEvent> events = new ArrayList<BehaviorEvent>();
 		int[] counter = { 0 };
@@ -89,8 +91,8 @@ public class XmlBehaviorEventPersisterTest {
 		assertEquals("persister reports correct file size", file.length(), persister.getFileSize());
 		
 		//now perform verification of log data against the expected results.
-		List<String> actualLines = (List<String>)FileUtils.readLines(file);
-		assertEquals("every event was written", 39, actualLines.size());
+		String fileName = persister.rotateLog();
+		List<String> actualLines = (List<String>)FileUtils.readLines(new File(fileName));
 
 		//read up the expected results for comparison.
 		InputStream expectedData = XmlBehaviorEventPersisterTest.class.getResourceAsStream("XmlBehaviorEventPersisterTest.testNestedEvents-result.xml");
@@ -98,9 +100,15 @@ public class XmlBehaviorEventPersisterTest {
 		List<String> expectedLines = (List<String>)readLines(expectedData);
 		expectedData.close();
 
+		assertEquals("every event was written", expectedLines.size(), actualLines.size());
+		final String expectedOpen = "<?xml version=\"1.0\" ?><event-log>";
+		assertEquals("well-formed open", 
+					 expectedOpen, actualLines.get(0).substring(0, expectedOpen.length()));
+		assertEquals("well-formed close", "</event-log>", actualLines.get(actualLines.size() - 1));
+		
 		//compare the logged data line by line.
 		assertEquals("expected log count matches actual", expectedLines.size(), actualLines.size());
-		for (int i = 0; i < expectedLines.size(); ++i) {
+		for (int i = 0; i < expectedLines.size() - 1; ++i) {
 			
 			String actual = actualLines.get(i);
 			//we have to strip data that varies from test run to test run out before comparing.
@@ -177,7 +185,7 @@ public class XmlBehaviorEventPersisterTest {
 
 		//compare the logged data line by line.
 		assertEquals("expected log count matches actual", expectedLines.size(), actualLines.size());
-		for (int i = 0; i < expectedLines.size(); ++i) {
+		for (int i = 0; i < expectedLines.size() - 1; ++i) {
 			
 			String actual = actualLines.get(i);
 			//we have to strip data that varies from test run to test run out before comparing.
@@ -185,22 +193,19 @@ public class XmlBehaviorEventPersisterTest {
 			String actualStripped = stripVariableData(actual);
 			assertEquals("log line[" + i + "] matches expected", expectedStripped, actualStripped);
 
-			//last line is log close and doesn't correspond to an event.
-			if (i < expectedLines.size() - 1) {
-				//now check data against source event so that time-sensitive info is checked.
-				BehaviorEvent evt = events.get(i);
-				assertNotNull("event was given an id", evt.getId());
-				assertTrue("log contains id", actual.contains("id=\"" + evt.getId() + "\""));
-				
-				BehaviorEvent parent = evt.getParent();
-				if (parent == null)
-					assertFalse("log does not contain parent id", actual.contains("parent-id"));
-				else
-					assertTrue("log contains parent reference", actual.contains("parent-id=\"" + parent.getId() + "\""));
-				
-				assertTrue("log records time correctly", DATE_PATTERN.matcher(actual).find());
-				assertTrue("log records duration correctly", actual.contains("<duration-ms>" + evt.getDuration() + "</duration-ms>"));
-			}
+			//now check data against source event so that time-sensitive info is checked.
+			BehaviorEvent evt = events.get(i);
+			assertNotNull("event was given an id", evt.getId());
+			assertTrue("log contains id", actual.contains("id=\"" + evt.getId() + "\""));
+			
+			BehaviorEvent parent = evt.getParent();
+			if (parent == null)
+				assertFalse("log does not contain parent id", actual.contains("parent-id"));
+			else
+				assertTrue("log contains parent reference", actual.contains("parent-id=\"" + parent.getId() + "\""));
+			
+			assertTrue("log records time correctly", DATE_PATTERN.matcher(actual).find());
+			assertTrue("log records duration correctly", actual.contains("<duration-ms>" + evt.getDuration() + "</duration-ms>"));
 		}
 	}
 	
