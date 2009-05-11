@@ -64,9 +64,9 @@ public class JdbcPersisterConfigurationTest {
 
 		//test the state of the global scheduler configuration.
 		SchedulerFactory factory = new StdSchedulerFactory();
-		Scheduler sched = factory.getScheduler("BehaviorTrackingScheduler");
+		Scheduler sched = factory.getScheduler("BeetScheduler");
 		
-		List<String> triggers = Arrays.asList(sched.getTriggerNames("BehaviorTracking"));
+		List<String> triggers = Arrays.asList(sched.getTriggerNames("beet"));
 		assertEquals("flush job scheduled", 1, triggers.size());
 		assertTrue("flush job scheduled", triggers.contains("defaultTrackingManager_flush_trigger"));
 		

@@ -79,7 +79,7 @@ public class XmlPersisterConfigurationTest {
 		TaskExecutor executor = xmlTracking.getExecutor();
 		assertSame("application executor is used", testExecutor, executor);
 
-		List<String> triggers = Arrays.asList(testScheduler.getTriggerNames("BehaviorTracking"));
+		List<String> triggers = Arrays.asList(testScheduler.getTriggerNames("beet"));
 		assertEquals("flush and rotate jobs scheduled in application scheduler", 2, triggers.size());
 		assertTrue("flush job scheduled", triggers.contains("xmlTracking_flush_trigger"));
 		assertTrue("rotate job scheduled", triggers.contains("org.springframework.scheduling.quartz.CronTriggerBean_rotate_trigger"));

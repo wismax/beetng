@@ -84,7 +84,7 @@ public class WebContextConfigurationTest {
 		XmlBehaviorEventPersisterImpl persister = (XmlBehaviorEventPersisterImpl)defaultTrackingManager.getPersister();
 		assertTrue(persister.isBinary());
 		assertTrue(persister.isCompress());
-		assertTrue("default file name [" + persister.getFile() + "]", new File(persister.getFile()).getName().startsWith("behavior-tracking"));
+		assertTrue("default file name [" + persister.getFile() + "]", new File(persister.getFile()).getName().startsWith("beet"));
 
 		//verify proper configuration of log flush and rotation using private task executor and scheduler instances
 		TaskExecutor executor = defaultTrackingManager.getExecutor();
@@ -100,10 +100,10 @@ public class WebContextConfigurationTest {
 
 		//test the state of the global scheduler configuration.
 		SchedulerFactory factory = new StdSchedulerFactory();
-		Scheduler sched = factory.getScheduler("BehaviorTrackingScheduler");
+		Scheduler sched = factory.getScheduler("BeetScheduler");
 		assertNotSame("private scheduler instance initialized", testScheduler, sched);
 		
-		List<String> triggers = Arrays.asList(sched.getTriggerNames("BehaviorTracking"));
+		List<String> triggers = Arrays.asList(sched.getTriggerNames("beet"));
 		assertEquals("flush and rotate jobs scheduled", 2, triggers.size());
 		assertTrue("flush job scheduled", triggers.contains("defaultTrackingManager_flush_trigger"));
 		assertTrue("rotate job scheduled", triggers.contains("org.springframework.scheduling.quartz.CronTriggerBean_rotate_trigger"));

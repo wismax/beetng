@@ -65,9 +65,9 @@ public class CustomPersisterConfigurationTest {
 
 		//test the state of the global scheduler configuration.
 		Scheduler sched = (Scheduler)persister.beanFactory.getBean(ConfigurationConstants.CONFIG_SCHEDULER);
-		assertEquals("scheduler has expected name", "BehaviorTrackingScheduler", sched.getSchedulerName());
+		assertEquals("scheduler has expected name", "BeetScheduler", sched.getSchedulerName());
 		
-		List<String> triggers = Arrays.asList(sched.getTriggerNames("BehaviorTracking"));
+		List<String> triggers = Arrays.asList(sched.getTriggerNames("beet"));
 		assertEquals("flush job scheduled", 1, triggers.size());
 		assertTrue("flush job scheduled", triggers.contains("defaultTrackingManager_flush_trigger"));
 

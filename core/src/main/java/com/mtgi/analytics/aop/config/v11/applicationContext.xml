@@ -33,12 +33,12 @@
 		  if we are in a servlet environment, otherwise defaults to JAASSessionContext.</description>
 	</bean>
 		  
-	<bean id="com.mtgi.analytics.btPersister" 
+	<bean id="com.mtgi.analytics.btPersister"
 		  class="com.mtgi.analytics.XmlBehaviorEventPersisterImpl">
 		<description>Default configuration values for a bt:persister tag.  This definition is
 		loaded by BtXmlPersisterBeanDefinitionParser, and then manipulated to suit the attributes
 		and sub-elements provided at runtime.</description>
-		<property name="file" value="behavior-tracking.xml"/>
+		<property name="file" value="beet.xml"/>
 		<property name="binary" value="true"/>
 		<property name="compress" value="true"/>
 	</bean>
@@ -53,7 +53,7 @@
 			<bean class="org.springframework.scheduling.concurrent.CustomizableThreadFactory">
 				<!-- one below normal priority.  we stay out of the way of http request threads, but get an equal share with other background tasks. -->
 				<property name="threadPriority" value="4"/>
-				<property name="threadNamePrefix" value="BehaviorTracking-"/>
+				<property name="threadNamePrefix" value="beet-"/>
 			</bean>
 		</property>
 	</bean>
@@ -63,10 +63,10 @@
 		<description>Quartz Trigger to flush the behavior tracking manager every five minutes.  Modified
 		and registered with the scheduler by BtManagerBeanDefinitionParser</description>
 		<property name="cronExpression" value="0 0/5 * * * ?"/>
-		<property name="group" value="BehaviorTracking"/>
+		<property name="group" value="beet"/>
 		<property name="jobDetail">
 			<bean class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
-				<property name="group" value="BehaviorTracking"/>
+				<property name="group" value="beet"/>
 				<property name="targetBeanName" value="com.mtgi.analytics.btManager"/>
 				<property name="targetMethod" value="flush"/>
 			</bean>
@@ -77,10 +77,10 @@
 		<description>Quartz Trigger to rotate the behavior tracking xml log every day at midnight.  Modified
 		and registered with the scheduler by BtXmlPersisterBeanDefinitionParser</description>
 		<property name="cronExpression" value="0 0 0 * * ?"/>
-		<property name="group" value="BehaviorTracking"/>
+		<property name="group" value="beet"/>
 		<property name="jobDetail">
 			<bean class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
-				<property name="group" value="BehaviorTracking"/>
+				<property name="group" value="beet"/>
 				<property name="targetBeanName" value="com.mtgi.analytics.btPersister"/>
 				<property name="targetMethod" value="rotateLog"/>
 			</bean>
@@ -91,7 +91,7 @@
 		  class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
 		<description>Private scheduler used for asynchronous behavior tracking operations,
 		unless the user specifies an application scheduler.</description>
-		<property name="schedulerName" value="BehaviorTrackingScheduler"/>
+		<property name="schedulerName" value="BeetScheduler"/>
 		<property name="taskExecutor">
 			<ref local="com.mtgi.analytics.btExecutor"/>
 		</property>
