@@ -13,17 +13,22 @@
  
 package com.mtgi.analytics.aop.config.v11;
 
+import static com.mtgi.analytics.aop.config.TemplateBeanDefinitionParser.findEnclosingTemplateFactory;
+
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
+import org.springframework.beans.factory.xml.NamespaceHandler;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.mtgi.analytics.ChainingEventPersisterImpl;
+import com.mtgi.analytics.aop.config.TemplateBeanDefinitionParser.TemplateComponentDefinition;
 
 /** 
  * Parses the <code>bt:persister-chain</code> tag to produce a {@link ChainingEventPersisterImpl} bean,
@@ -34,19 +39,36 @@ public class BtPersisterChainBeanDefinitionParser extends AbstractSingleBeanDefi
 	@Override @SuppressWarnings("unchecked")
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 
-		//parse delegate persister definitions
-		ManagedList persisters = new ManagedList();
-		persisters.setSource(element);
-		NodeList nodes = element.getChildNodes();
-		for (int i = 0; i < nodes.getLength(); ++i) {
-			Node node = nodes.item(i);
-			if (node.getNodeType() == Node.ELEMENT_NODE) {
-				Object def = parserContext.getDelegate().parsePropertySubElement((Element)node, builder.getRawBeanDefinition());
-				persisters.add(def);
+		//propagate shared template factory into sub-components if necessary.  this would not be
+		//necessary if parserContext gave us access to the entire component stack instead of just the
+		//top.  In that case, deeply nested children could search up the stack until they found
+		//the template.  perhaps a future version of the Spring API will support this.
+		DefaultListableBeanFactory template = findEnclosingTemplateFactory(parserContext);
+		if (template != null)
+			parserContext.pushContainingComponent(new TemplateComponentDefinition(element.getNodeName(), parserContext.extractSource(element), template));
+
+		try {
+			//parse delegate persister definitions
+			ManagedList persisters = new ManagedList();
+			persisters.setSource(element);
+			
+			NodeList nodes = element.getChildNodes();
+			for (int i = 0; i < nodes.getLength(); ++i) {
+				Node node = nodes.item(i);
+				if (node.getNodeType() == Node.ELEMENT_NODE) {
+					String namespaceUri = node.getNamespaceURI();
+					NamespaceHandler handler = parserContext.getReaderContext().getNamespaceHandlerResolver().resolve(namespaceUri);
+					Object def = handler == null ? parserContext.getDelegate().parsePropertySubElement((Element)node, builder.getRawBeanDefinition()) 
+												 : handler.parse((Element)node, parserContext);
+					persisters.add(def);
+				}
 			}
+			builder.addPropertyValue("delegates", persisters);
+		} finally {
+			if (template != null)
+				parserContext.popContainingComponent();
 		}
-		builder.addPropertyValue("delegates", persisters);
-		
+			
 		//register persister implementation with parent.
 		if (parserContext.isNested()) {
 			AbstractBeanDefinition def = builder.getBeanDefinition();

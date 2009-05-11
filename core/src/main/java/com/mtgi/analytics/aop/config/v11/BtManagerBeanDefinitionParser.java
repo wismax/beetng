@@ -13,7 +13,6 @@
  
 package com.mtgi.analytics.aop.config.v11;
 
-import static com.mtgi.analytics.aop.config.v11.BtXmlPersisterBeanDefinitionParser.CONFIG_PERSISTER;
 import static com.mtgi.analytics.aop.config.v11.ConfigurationConstants.*;
 
 import java.lang.reflect.Method;
@@ -174,10 +173,12 @@ public class BtManagerBeanDefinitionParser extends TemplateBeanDefinitionParser 
 		if (element.hasAttribute(ATT_TASK_EXECUTOR))
 			factory.registerAlias(element.getAttribute(ATT_TASK_EXECUTOR), CONFIG_EXECUTOR);
 		
+		//make note of external persister element so that we don't activate log rotation.
 		if (element.hasAttribute(ATT_PERSISTER)) {
-			//override default persister definition with reference
 			def.addNestedProperty(ATT_PERSISTER);
-			factory.registerAlias(element.getAttribute(ATT_PERSISTER), CONFIG_PERSISTER);
+			MutablePropertyValues props = template.getPropertyValues();
+			props.removePropertyValue(ATT_PERSISTER);
+			props.addPropertyValue(ATT_PERSISTER, new RuntimeBeanReference(element.getAttribute(ATT_PERSISTER)));
 		}
 		
 		if (element.hasAttribute(ATT_SESSION_CONTEXT)) {
@@ -238,7 +239,7 @@ public class BtManagerBeanDefinitionParser extends TemplateBeanDefinitionParser 
 		}
 		
 		if (!def.nestedProperties.contains(ATT_PERSISTER)) {
-			//custom persister not registered.  schedule default log rotation trigger.
+			//no persister registered.  schedule default log rotation trigger.
 			BtXmlPersisterBeanDefinitionParser.configureLogRotation(parserContext, factory, null);
 		}
 		
@@ -298,8 +299,6 @@ public class BtManagerBeanDefinitionParser extends TemplateBeanDefinitionParser 
 						//the nested definition is the same as the default definition
 						//by reference, so we don't need to make it an inner bean definition.
 						innerBean = false;
-					} else {
-						mcd.getTemplateFactory().registerAlias(nested.getBeanName(), ref);
 					}
 				}
 			}

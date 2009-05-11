@@ -111,7 +111,6 @@ public class TemplateBeanDefinitionParser extends AbstractSingleBeanDefinitionPa
 			//nested bean definitions.
 			tcd = newComponentDefinition(element.getNodeName(), parserContext.extractSource(element), templateFactory);
 			parserContext.pushContainingComponent(tcd);
-			
 		}
 
 		try {
@@ -219,8 +218,9 @@ public class TemplateBeanDefinitionParser extends AbstractSingleBeanDefinitionPa
 	 * If the given parse operation is nested inside an instance of {@link TemplateComponentDefinition}, return
 	 * the template bean configuration associated with that component.  Otherwise return null.
 	 */
-	private static DefaultListableBeanFactory findEnclosingTemplateFactory(ParserContext context) {
+	public static DefaultListableBeanFactory findEnclosingTemplateFactory(ParserContext context) {
 		if (context.isNested()) {
+			//TODO: support deeper nesting.  this logic breaks completely with bt:persister-chain.
 			CompositeComponentDefinition parent = context.getContainingComponent();
 			if (parent instanceof TemplateComponentDefinition)
 				return ((TemplateComponentDefinition)parent).getTemplateFactory();
@@ -245,5 +245,4 @@ public class TemplateBeanDefinitionParser extends AbstractSingleBeanDefinitionPa
 			return templateFactory;
 		}
 	}
-
 }
