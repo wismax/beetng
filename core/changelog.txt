@@ -1,21 +1,37 @@
 since 1.4.0_b2
 
  new features:
-  * beet-core: new persister type bt:mbean-persister which allows aggregate
-               behavior tracking statistics to be tracked from a JMX console  	           
+  * beet-core: new persister type <bt:mbean-persister> which allows aggregate
+               statistics to be tracked from a JMX console  	           
 
-  * beet-core: new persister type bt:persister-chain allowing multiple 
+  * beet-core: new persister type <bt:persister-chain> allowing multiple 
   	           persisters to be registered on a single bt:manager
   	           
-  * beet-core: new attribute <bt:http-requests name-parameters="..."/>, allowing
-               HTTP parameter values to be appended to event names for more
-               useful statistical groupings
+  * beet-core: new attribute <bt:http-requests name-parameters="..."/>, 
+               allowing HTTP parameter values on event names for more useful
+               statistical groupings
+               
+  * beet-core: ability to target a non-default MBean server for JMX 
+               registrations
+  
+  * user-guide: JMX administration chapter added
+  
+  * user-guide: dependency compatibility matrix added to programmer reference
+ 
+ bugfixes:
+ 
+  * beet-core 2789141: missing root element when using plain-text XML
+                       logger (fix identified by Frederic Chopard)
+  							 
+  * beet-core 2790196: naming inconsistencies with thread and scheduler
+                       groups
   	           
+
 since 1.4.0_b1
 
  new features:
-  * beet-core: new configuration attribute <bt:manager register-mbeans="true"/>, 
-               in response to issue 2780646
+  * beet-core: new configuration attribute 
+               <bt:manager register-mbeans="true"/>, in response to 2780646
 
  bugfixes:
   * beet-core issue 2780646: xml-persister mbean not registered
