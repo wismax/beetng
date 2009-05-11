@@ -128,6 +128,13 @@
             </seg>
          </seglistitem>
          <seglistitem>
+            <seg>mbean-server</seg>
+            <seg>optional</seg>
+            <seg>
+               <para>When register-mbeans="true", specify a reference to the MBeanServer instance on which mbeans should be registered. Defaults to the platform MBeanServer if unspecified.</para>
+            </seg>
+         </seglistitem>
+         <seglistitem>
             <seg>scheduler</seg>
             <seg>optional</seg>
             <seg>
@@ -265,7 +272,7 @@
          <section id="elt_uri_pattern">
             <title id="elt_uri_pattern_title">&lt;bt:uri-pattern&gt;</title>
             <para>A regular expression identifying URIs that should be logged to the behavior event persister. The value of HttpServletRequest.getServletURI() will be matched against this expression.</para>
-            <para>This element has equivalent behavior to the uri-pattern attribute, but can appear multiple time.</para>
+            <para>This element has equivalent behavior to the uri-pattern attribute, but can appear multiple times.</para>
          </section>
       </section>
    </section>
@@ -457,6 +464,18 @@
       <emphasis role="bold">Java Bean Type:</emphasis>
       <ulink url="../../api/com/mtgi/analytics/jmx/StatisticsMBeanEventPersisterImpl.html">com.mtgi.analytics.jmx.StatisticsMBeanEventPersisterImpl</ulink>
       <para>Stores aggregate event statistics in memory, for access from a JMX console. Generally this element will appear as a child of <xref linkend="elt_manager" endterm="elt_manager_title" /> without an "id", though it is possible to declare it as a top-level bean if you want to inject it into other application beans.</para>
+      <segmentedlist><?dbhtml list-presentation="table"?><title>&lt;bt:mbean-persister&gt; Attributes</title>
+         <segtitle>Attribute</segtitle>
+         <segtitle>Use</segtitle>
+         <segtitle>Description</segtitle>
+         <seglistitem>
+            <seg>server</seg>
+            <seg>optional</seg>
+            <seg>
+               <para>Specify a reference to the MBeanServer instance on which mbeans should be registered. Defaults to the MBeanServer used by any enclosing <xref linkend="elt_manager" endterm="elt_manager_title" /> tag, or the platform MBeanServer if not enclosed in a <xref linkend="elt_manager" endterm="elt_manager_title" /> tag.</para>
+            </seg>
+         </seglistitem>
+      </segmentedlist>
    </section>
    <section id="elt_custom_persister">
       <title id="elt_custom_persister_title">&lt;bt:custom-persister&gt;</title>

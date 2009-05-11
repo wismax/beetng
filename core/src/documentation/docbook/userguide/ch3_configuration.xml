@@ -39,6 +39,32 @@
 		</example>
 		
 		<example>
+			<title>Monitor application performance from a JMX console</title>
+			<programlisting><![CDATA[<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:bt="http://www.mantis-tgi.com/schema/bt/1.1"
+       xsi:schemaLocation="
+          http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+          http://www.mantis-tgi.com/schema/bt/1.1        http://www.mantis-tgi.com/schema/bt/mtgi-bt-1.1.xsd">
+
+   <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>]]><co id="placeholder"/><![CDATA[
+   
+   <bt:manager application="myapp">
+      <bt:persister-chain>
+         <bt:xml-persister/>]]><co id="otherPersister"/><![CDATA[
+         <bt:mbean-persister/>]]><co id="mbeanPersister"/><![CDATA[
+      </bt:persister-chain>
+   </bt:manager>]]></programlisting>
+			<calloutlist>
+				<callout arearefs="otherPersister"><para>You can use mbean-persister by itself,
+				but we recommend using it in combination with another persister that actually
+				stores the data for later analysis.</para></callout>
+				<callout arearefs="mbeanPersister"><para><xref linkend="elt_mbean_persister" endterm="elt_mbean_persister_title"/> 
+				enables export of basic statistics mbeans to a JMX server.</para></callout>
+			</calloutlist>
+		</example>
+
+		<example>
 			<title>Use a custom SessionContext implementation to specify user IDs</title>
 			<programlisting><![CDATA[<beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
