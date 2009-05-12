@@ -31,16 +31,6 @@
 			</rule>
 			<rule>
 				<fromsystem>
-					<src org="org.aspectj" />
-					<dest org="aspectj" />
-				</fromsystem>
-				<tosystem>
-					<src org="aspectj" />
-					<dest org="org.aspectj" />
-				</tosystem>
-			</rule>
-			<rule>
-				<fromsystem>
 					<src org="cglib" module="cglib" rev="2.1_3" />
 					<dest org="cglib" module="cglib" rev="2.1.3" />
 				</fromsystem>
