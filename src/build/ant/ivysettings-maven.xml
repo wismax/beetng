@@ -15,8 +15,8 @@
 					<dest org="mtgi" module="$m0" />
 				</fromsystem>
 				<tosystem>
-					<src org="mtgi" module="beet.*" revision="(.*?)(?:-SNAPSHOT)?"/>
-					<dest org="net.sourceforge.beet" module="$m0" revision="$m1"/>
+					<src org="mtgi" module="beet.*"/>
+					<dest org="net.sourceforge.beet" module="$m0"/>
 				</tosystem>
 			</rule>
 			<rule>
