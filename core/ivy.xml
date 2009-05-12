@@ -27,7 +27,8 @@
 	<dependencies defaultconfmapping="1.5->1.5(default);1.6->1.6(default);default,compile,test->default">
 
 		<dependency org="apache" name="commons-logging" rev="1.1.1"/>
-		<dependency org="aspectj" name="aspectj" rev="1.5.3"/>
+		<dependency org="aspectj" name="aspectjrt" rev="1.5.3"/>
+		<dependency org="aspectj" name="aspectjweaver" rev="1.5.3"/>
 		<dependency org="cglib" name="cglib" rev="2.1.3"/>
 		<dependency org="opensymphony" name="quartz" rev="1.6.0"/>
 		<dependency org="sun" name="FastInfoset" rev="1.2.2"/>
