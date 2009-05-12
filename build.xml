@@ -5,6 +5,7 @@
 
 	<fileset id="licenses" dir="${basedir}">
 		<include name="notice.txt"/>
+		<include name="changelog.txt"/>
 		<include name="licenses/*.txt"/>
 	</fileset>
 	
@@ -186,7 +187,8 @@
 				<!-- generate pom -->
 				<var name="maven.artifact.dir" value="repository/maven/net/sourceforge/beet/@{module.name}/${ivy.revision}"/>
 				<var name="pom.file" value="${maven.artifact.dir}/@{module.name}-${ivy.revision}.pom"/>
-				<ivy:makepom pomfile="${pom.file}" ivyfile="${maven.artifact.dir}/ivy-${ivy.revision}.xml">
+				<ivy:makepom pomfile="${pom.file}" ivyfile="${maven.artifact.dir}/ivy-${ivy.revision}.xml"
+							 headerfile="${scripts.dir}/license-header.txt">
 					<mapping conf="1.5, 1.6, default" scope="runtime" />
 				</ivy:makepom>
 

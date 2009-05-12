@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <ivy-module version="2.0">
     <info organisation="mtgi" module="beet-utils" status="release" revision="1.2.0_b3">
+    	<license name="Mozilla Public License, version 1.1" 
+    			 url="http://www.mozilla.org/MPL/MPL-1.1.html"/>
+    	<ivyauthor name="Beet Project" url="http://beet.sourceforge.net"/>
+    	<repository name="Beet Ivyrep" url="http://beet.sourceforge.net/ivyrep"
+    				pattern="[organisation]/[module]/[revision]/[type]s/[artifact].[ext]"/>
     	<description>
     	Utilities for working with behavior tracking log files.
     	</description>
