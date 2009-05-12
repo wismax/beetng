@@ -24,7 +24,7 @@ since 1.4.0_b2
  bugfixes:
  
   * beet-core 2789141: missing root element when using plain-text XML
-                       logger (fix identified by Frederic Chopard)
+                       logger (fix identified by Frédéric Chopard)
   							 
   * beet-core 2790196: naming inconsistencies with thread and scheduler
                        groups

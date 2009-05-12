@@ -29,17 +29,17 @@
 		Here is a more practical summary of libraries required by beet-core and beet-utils at runtime:
 			<segmentedlist><?dbhtml list-presentation="table"?>
 				<title>Beet Third-Party Dependencies</title>
-				<segtitle>Project Name</segtitle>
-				<segtitle>File(s)</segtitle>
+				<segtitle>Project</segtitle>
 				<segtitle>Required By</segtitle>
-				<segtitle>Included with Beet?</segtitle>
+				<segtitle>Included?</segtitle>
 				<segtitle>Description</segtitle>
 				<segtitle>License</segtitle>
-				<segtitle>Project Home Page</segtitle>
-				<segtitle>Supported Versions</segtitle>
+				<segtitle>Home Page</segtitle>
+				<segtitle>Supported</segtitle>
 				<seglistitem>
-					<seg>Spring Framework</seg>
-					<seg>spring.jar</seg>
+					<seg><?dbhtml term-width="30ex"?>
+						<para>Spring Framework</para><para>file(s): spring.jar</para>
+					</seg>
 					<seg>Beet Core</seg>
 					<seg>No</seg>
 					<seg>At present, Beet is foremost an add-on tool for Spring applications.
@@ -50,8 +50,10 @@
 					<seg>2.0.*, 2.5.*</seg>
 				</seglistitem>
 				<seglistitem>
-					<seg>Quartz</seg>
-					<seg>quartz-all.jar</seg>
+					<seg>
+						<para>Quartz</para>
+						<para>file(s): quartz-all.jar</para>
+					</seg>
 					<seg>Beet Core</seg>
 					<seg>Yes</seg>
 					<seg>Beet uses the Quartz scheduler to periodically flush events and rotate log files.  Spring
@@ -62,8 +64,7 @@
 					<seg>1.6.0</seg>
 				</seglistitem>
 				<seglistitem>
-					<seg>AspectJ</seg>
-					<seg>aspectjrt.jar, aspectjweaver.jar</seg>
+					<seg><para>AspectJ</para><para>file(s): aspectjrt.jar, aspectjweaver.jar</para></seg>
 					<seg>Beet Core</seg>
 					<seg>Yes</seg>
 					<seg>Beet uses AspectJ pointcuts to implement Java method monitoring.</seg>
@@ -72,8 +73,7 @@
 					<seg>1.5.3</seg>
 				</seglistitem>
 				<seglistitem>
-					<seg>Code Generation Library</seg>
-					<seg>cglib.jar</seg>
+					<seg><para>Code Generation Library</para><para>file(s): cglib.jar</para></seg>
 					<seg>Beet Core</seg>
 					<seg>Yes</seg>
 					<seg>CGLib is a dependency of Spring AOP, required if you want to monitor the execution times of
@@ -85,8 +85,7 @@
 					<seg>2.1.3</seg>
 				</seglistitem>
 				<seglistitem>
-					<seg>ASM</seg>
-					<seg>asm.jar</seg>
+					<seg><para>ASM</para><para>file(s): asm.jar</para></seg>
 					<seg>Beet Core</seg>
 					<seg>Yes</seg>
 					<seg>ASM is a requirement of cglib.  If you don't use cglib, you can also remove ASM.</seg>
@@ -95,8 +94,7 @@
 					<seg>1.5.3</seg>
 				</seglistitem>
 				<seglistitem>
-					<seg>Apache Commons Logging</seg>
-					<seg>commons-logging.jar</seg>
+					<seg><para>Apache Commons Logging</para><para>file(s): commons-logging.jar</para></seg>
 					<seg>Beet Core, Beet Utils</seg>
 					<seg>Yes</seg>
 					<seg>Beet classes use the commons-logging framework to log diagnostic and information messages.
@@ -106,8 +104,7 @@
 					<seg>1.1.1</seg>
 				</seglistitem>
 				<seglistitem>
-					<seg>FastInfoset Implementation</seg>
-					<seg>FastInfoset.jar</seg>
+					<seg><para>FastInfoset</para><para>file(s): FastInfoset.jar</para></seg>
 					<seg>Beet Core, Beet Utils</seg>
 					<seg>Yes</seg>
 					<seg>The Beet XML persister and beet-utils use the FastInfoset encoding when Binary XML logging
@@ -117,8 +114,7 @@
 					<seg>1.2.2</seg>
 				</seglistitem>
 				<seglistitem>
-					<seg>StAX API</seg>
-					<seg>stax-api.jar</seg>
+					<seg><para>StAX API</para><para>file(s): stax-api.jar</para></seg>
 					<seg>Beet Core, Beet Utils, <emphasis role="bold">Java 5 only</emphasis></seg>
 					<seg>Yes</seg>
 					<seg>The Beet XML persister and beet-utils use the XML streaming API for reading
@@ -129,8 +125,7 @@
 					<seg>1.0.1</seg>
 				</seglistitem>
 				<seglistitem>
-					<seg>StAX Implementation</seg>
-					<seg>stax-impl.jar</seg>
+					<seg><para>StAX Implementation</para><para>file(s): stax-impl.jar</para></seg>
 					<seg>Beet Core, Beet Utils, <emphasis role="bold">Java 5 only</emphasis></seg>
 					<seg>Yes</seg>
 					<seg>The Beet XML persister and beet-utils use the XML streaming API for reading
@@ -141,8 +136,7 @@
 					<seg>1.2.0</seg>
 				</seglistitem>
 				<seglistitem>
-					<seg>SAXON</seg>
-					<seg>saxon.jar, saxon-dom.jar</seg>
+					<seg><para>SAXON</para><para>file(s): saxon.jar, saxon-dom.jar</para></seg>
 					<seg>Beet Utils</seg>
 					<seg>Yes</seg>
 					<seg>The beet-utils XSLT tool uses saxon to execute stylesheet transformations.  We require
@@ -152,8 +146,7 @@
 					<seg>8.8</seg>
 				</seglistitem>
 				<seglistitem>
-					<seg>xerces</seg>
-					<seg>xercesImpl.jar</seg>
+					<seg><para>xerces</para><para>file(s): xercesImpl.jar</para></seg>
 					<seg>Beet Utils</seg>
 					<seg>Yes</seg>
 					<seg>beet-utils uses some xerces-specific XML APIs to process log files.</seg>
