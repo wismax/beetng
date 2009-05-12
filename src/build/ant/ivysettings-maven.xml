@@ -1,0 +1,118 @@
+<ivysettings>
+
+    <settings defaultResolver="local-maven-src" validate="false"/>
+
+    <caches checkUpToDate="false" useOrigin="true" lockStrategy="artifact-lock"
+    		default="default-cache" resolutionCacheDir="${integration.dir}/maven-resolution">
+    	<cache name="default-cache" basedir="${integration.dir}/maven-cache"/>
+    </caches>
+
+	<namespaces>
+		<namespace name="maven" chainrules="true">
+			<rule>
+				<fromsystem>
+					<src org="net.sourceforge.beet" module="beet.*" />
+					<dest org="mtgi" module="$m0" />
+				</fromsystem>
+				<tosystem>
+					<src org="mtgi" module="beet.*" revision="(.*?)(?:-SNAPSHOT)?"/>
+					<dest org="net.sourceforge.beet" module="$m0" revision="$m1"/>
+				</tosystem>
+			</rule>
+			<rule>
+				<fromsystem>
+					<src org="org.springframework" />
+					<dest org="springframework" />
+				</fromsystem>
+				<tosystem>
+					<src org="springframework"/>
+					<dest org="org.springframework"/>
+				</tosystem>
+			</rule>
+			<rule>
+				<fromsystem>
+					<src org="org.aspectj" />
+					<dest org="aspectj" />
+				</fromsystem>
+				<tosystem>
+					<src org="aspectj" />
+					<dest org="org.aspectj" />
+				</tosystem>
+			</rule>
+			<rule>
+				<fromsystem>
+					<src org="cglib" module="cglib" rev="2.1_3" />
+					<dest org="cglib" module="cglib" rev="2.1.3" />
+				</fromsystem>
+				<tosystem>
+					<src org="cglib" module="cglib" rev="2.1.3" />
+					<dest org="cglib" module="cglib" rev="2.1_3" />
+				</tosystem>
+			</rule>
+			<rule>
+				<fromsystem>
+					<src org="commons-logging" module="commons-logging" />
+					<dest org="apache" module="commons-logging" />
+				</fromsystem>
+				<tosystem>
+					<src org="apache" module="commons-logging" />
+					<dest org="commons-logging" module="commons-logging" />
+				</tosystem>
+			</rule>
+			<rule>
+				<fromsystem>
+					<src org="xerces" module="xercesImpl" />
+					<dest org="apache" module="xerces" />
+				</fromsystem>
+				<tosystem>
+					<src org="apache" module="xerces" />
+					<dest org="xerces" module="xercesImpl" />
+				</tosystem>
+			</rule>
+			<rule>
+				<fromsystem>
+					<src org="opensymphony" module="quartz-all" />
+					<dest org="opensymphony" module="quartz" />
+				</fromsystem>
+				<tosystem>
+					<src org="opensymphony" module="quartz" />
+					<dest org="opensymphony" module="quartz-all" />
+				</tosystem>
+			</rule>
+			<rule>
+				<fromsystem>
+					<src org="com.sun.xml.fastinfoset" module="FastInfoset" />
+					<dest org="sun" module="FastInfoset" />
+				</fromsystem>
+				<tosystem>
+					<src org="sun" module="FastInfoset" />
+					<dest org="com.sun.xml.fastinfoset" module="FastInfoset" />
+				</tosystem>
+			</rule>
+			<rule>
+				<fromsystem>
+					<src org="stax" module="stax-impl" />
+					<dest org="bea" module="stax-impl" />
+				</fromsystem>
+				<tosystem>
+					<src org="bea" module="stax-impl" />
+					<dest org="stax" module="stax-impl" />
+				</tosystem>
+			</rule>
+		</namespace>
+	</namespaces>
+
+    <resolvers>
+
+       	<filesystem name="local-maven-src" namespace="maven" checkmodified="false">
+	        <ivy pattern="${basedir}/repository/ivyrep/[organisation]/[module]/[revision]/[type]s/[artifact].[ext]"/>
+            <artifact pattern="${basedir}/repository/ivyrep/[organisation]/[module]/[revision]/[type]s/[artifact].[ext]"/>
+       	</filesystem>
+
+       	<filesystem name="local-maven-dest" m2compatible="true" checkmodified="false">
+            <artifact pattern="${basedir}/repository/maven/[organisation]/[module]/[revision]/[artifact]-[revision].[ext]"/>
+       	</filesystem>
+
+    </resolvers>
+    
+</ivysettings>

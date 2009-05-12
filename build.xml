@@ -140,19 +140,63 @@
 		
 	</target>
 
-	<target name="repository" description="build a functioning local Ivy repository containing beet and all of its dependencies">
+	<target name="repository" 
+			description="build a functioning local Ivy repository containing beet and all of its dependencies, and
+						 generate maven artifacts">
+
 		<ivy:resolve file="${scripts.dir}/ivy-tasks.xml"/>
-		<ivy:retrieve pattern="${basedir}/repository/[organisation]/[module]/[revision]/[type]s/[artifact].[ext]" 
-					  ivypattern="${basedir}/repository/[organisation]/[module]/[revision]/[type]s/[artifact].[ext]"/>
-		<ivy:install from="online" to="local" transitive="true"
-					 organisation="mtgi" module="beet" revision="latest.integration"
-					 overwrite="true"/>
+		<ivy:retrieve pattern="${basedir}/repository/ivyrep/[organisation]/[module]/[revision]/[type]s/[artifact].[ext]" 
+					  ivypattern="${basedir}/repository/ivyrep/[organisation]/[module]/[revision]/[type]s/[artifact].[ext]"/>
+
+		<ivy:install from="online" to="local" transitive="true" overwrite="true"
+					 organisation="mtgi" module="beet" revision="latest.integration"/>
 		<ivy:install from="online" to="local" transitive="true"
 					 organisation="mtgi" module="beet-utils" revision="latest.integration"
 					 overwrite="true"/>
 		<ivy:install from="online" to="local" transitive="true"
 					 organisation="mtgi" module="beet-hello" revision="latest.integration"
 					 overwrite="true"/>
+		
+	</target>
+	
+	<target name="maven-repository" description="generate maven packaging artifacts from the local ivy repository" depends="repository">
+
+		<!-- publish ivy descriptors stripped down to just runtime deps -->
+		<for list="core,utils" param="module.dir">
+			<sequential>
+				<ivy:resolve file="@{module.dir}/ivy.xml"/>
+				<ivy:publish resolver="local" conf="default,1.5,1.6" overwrite="true" update="true">
+					<artifacts pattern="build/@{module.dir}/dist/[type]s/[artifact].[ext]"/>
+				</ivy:publish>
+			</sequential>
+		</for>
+		
+		<!-- load ivy settings that uses maven naming conventions -->
+		<ivy:settings id="maven.settings" file="${scripts.dir}/ivysettings-maven.xml"/>
+		<for list="beet,beet-utils" param="module.name">
+			<sequential>
+				
+				<!-- transfer ivy descriptor into maven repository folder, applying name changes -->
+				<ivy:findrevision settingsRef="maven.settings" organisation="net.sourceforge.beet" 
+								  module="@{module.name}" revision="latest.integration"/>
+				<ivy:install settingsRef="maven.settings" from="local-maven-src" to="local-maven-dest" 
+							 organisation="net.sourceforge.beet" module="@{module.name}" 
+							 revision="${ivy.revision}" overwrite="true"/>
+
+				<!-- generate pom -->
+				<var name="maven.artifact.dir" value="repository/maven/net/sourceforge/beet/@{module.name}/${ivy.revision}"/>
+				<var name="pom.file" value="${maven.artifact.dir}/@{module.name}-${ivy.revision}.pom"/>
+				<ivy:makepom pomfile="${pom.file}" ivyfile="${maven.artifact.dir}/ivy-${ivy.revision}.xml">
+					<mapping conf="1.5, 1.6, default" scope="runtime" />
+				</ivy:makepom>
+
+				<!-- generate hashes -->
+				<checksum file="${pom.file}" todir="${maven.artifact.dir}" algorithm="MD5" fileext=".md5"/>
+				<checksum file="${pom.file}" todir="${maven.artifact.dir}" algorithm="SHA" fileext=".sha1"/>
+
+			</sequential>
+		</for>
+			
 	</target>
 	
 	<target name="release">

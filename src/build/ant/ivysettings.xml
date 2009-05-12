@@ -42,7 +42,7 @@
         
        	<filesystem name="local" alwaysCheckExactRevision="false"
 			 		cache="temp-cache" checkmodified="false">
-            <artifact pattern="${basedir}/repository/[organisation]/[module]/[revision]/[type]s/[artifact].[ext]"/>
+            <artifact pattern="${basedir}/repository/ivyrep/[organisation]/[module]/[revision]/[type]s/[artifact].[ext]"/>
        	</filesystem>
        	
     </resolvers>
