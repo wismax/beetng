@@ -59,16 +59,16 @@ public abstract class AbstractPerformanceTestCase {
 		double delta = test.getAverageMillis() - basis.getAverageMillis();
 		double overhead = delta / calls;
 
-		assertTrue("Average overhead per method cannot exceed .1 ms [ " + overhead + " ]",
-					 overhead < 0.1);
+		assertTrue("Average overhead per method cannot exceed 10^5 ns [ " + overhead + " ]",
+					 overhead < 100000);
 		System.out.println("Average overhead: " + overhead);
 		
 		//deltaWorst, my favorite sausage.  mmmmmm, dellltttaaaWwwwooorrsstt.
 		double deltaWorst = test.getWorstMillis() - basis.getWorstMillis();
 		overhead = deltaWorst / calls;
 		
-		assertTrue("Worst case per method overhead cannot exceed .5ms [ " + overhead + " ]",
-				  overhead < .5);
+		assertTrue("Worst case per method overhead cannot exceed 5 * 10^5 ns [ " + overhead + " ]",
+				  overhead < 500000);
 		System.out.println("Worst case overhead: " + overhead);
 	}
 	
@@ -118,13 +118,13 @@ public abstract class AbstractPerformanceTestCase {
 		}
 		
 		public void start() {
-			this.start = System.currentTimeMillis();
+			this.start = System.nanoTime();
 		}
 		
 		public void stop() {
-			long delta = System.currentTimeMillis() - start;
+			long delta = System.nanoTime() - start;
 			worstCase = Math.max(delta, worstCase);
-			average = ((average * count) + delta) / (double)++count;
+			average = average + (delta - average) / (double)++count;
 		}
 	}
 	
