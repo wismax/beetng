@@ -466,10 +466,26 @@
 								<xsd:attributeGroup ref="beans:beanAttributes"/>
 							</xsd:complexType>
 						</xsd:element>
-						<xsd:element name="id-sql" type="xsd:string" minOccurs="0" maxOccurs="1">
+						<xsd:element name="id-sql" minOccurs="0" maxOccurs="1">
 							<xsd:annotation>
 								<xsd:documentation>Overrides the default SQL statement used to retrieve new event IDs.</xsd:documentation>
 							</xsd:annotation>
+							<xsd:complexType>
+								<xsd:simpleContent>
+									<xsd:extension base="xsd:string">
+										<xsd:attribute name="increment" type="xsd:long" default="1">
+											<xsd:annotation>
+												<xsd:documentation>Increment between consecutive values returned by the
+												ID SQL statement.  If greater than 1, it is assumed that the application can
+												interpolate ID values in between calls.  For example, if increment=25 and 
+												the ID SQL returns 15, the application will use all integers from 15 to 39 
+												as unique IDs before executing the ID SQL again.
+												</xsd:documentation>
+											</xsd:annotation>
+										</xsd:attribute>
+									</xsd:extension>
+								</xsd:simpleContent>
+							</xsd:complexType>
 						</xsd:element>
 					</xsd:sequence>
 					<xsd:attribute name="batch-size" default="25" type="xsd:long">

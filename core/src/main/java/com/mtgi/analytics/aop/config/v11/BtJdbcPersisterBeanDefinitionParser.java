@@ -13,14 +13,15 @@
  
 package com.mtgi.analytics.aop.config.v11;
 
-import static com.mtgi.analytics.aop.config.TemplateBeanDefinitionParser.overrideProperty;
-
+import org.springframework.beans.MutablePropertyValues;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionReaderUtils;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
@@ -32,9 +33,28 @@ import com.mtgi.analytics.JdbcBehaviorEventPersisterImpl;
  */
 public class BtJdbcPersisterBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 
+	private static final String ATT_INCREMENT = "increment";
+	private static final String ELT_ID_SQL = "id-sql";
+
 	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
-		overrideProperty("id-sql", builder.getRawBeanDefinition(), element, false);
+		
+		//configure ID generator settings
+		NodeList children = element.getElementsByTagNameNS("*", ELT_ID_SQL);
+		if (children.getLength() == 1) {
+			BeanDefinition def = builder.getRawBeanDefinition();
+			MutablePropertyValues props = def.getPropertyValues();
+			
+			Element child = (Element)children.item(0);
+			String sql = child.getTextContent();
+			if (StringUtils.hasText(sql))
+				props.addPropertyValue("idSql", sql);
+			
+			if (child.hasAttribute(ATT_INCREMENT))
+				props.addPropertyValue("idIncrement", child.getAttribute(ATT_INCREMENT));
+		}
+		
+		//configure nested dataSource
 		NodeList nodes = element.getElementsByTagNameNS("*", "data-source");
 		if (nodes.getLength() == 1) {
 			Element ds = (Element)nodes.item(0);
@@ -42,6 +62,7 @@ public class BtJdbcPersisterBeanDefinitionParser extends AbstractSingleBeanDefin
 			parserContext.getDelegate().parsePropertyElement(ds, builder.getRawBeanDefinition());
 		}
 		
+		//push persister into parent manager bean, if applicable
 		if (parserContext.isNested()) {
 			AbstractBeanDefinition def = builder.getBeanDefinition();
 			String id = element.hasAttribute("id") ? element.getAttribute("id")

@@ -25,23 +25,23 @@
 		EVENT_DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data uri=&quot;/app/foo.ext&quot; protocol=&quot;HTTP/1.1&quot; method=&quot;GET&quot; remote-address=&quot;127.0.0.1&quot; remote-host=&quot;127.0.0.1&quot; response-status=&quot;403&quot; response-message=&quot;Authorized personnel only&quot;&gt;&lt;parameters&gt;&lt;param name=&quot;param1&quot;&gt;&lt;value&gt;secret&lt;/value&gt;&lt;/param&gt;&lt;/parameters&gt;&lt;/event-data&gt;"
 		ERROR="403: Authorized personnel only"
 		USER_ID="testUser" SESSION_ID="ABCDEF123" />
-	<BEHAVIOR_TRACKING_EVENT EVENT_ID="2" APPLICATION="testBT"
+	<BEHAVIOR_TRACKING_EVENT EVENT_ID="1" APPLICATION="testBT"
 		EVENT_TYPE="http-request" EVENT_NAME="/app/foo.ext"
 		EVENT_START="2008-06-26 16:34:25.681" DURATION_MS="100"
 		EVENT_DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data uri=&quot;/app/foo.ext&quot; protocol=&quot;HTTP/1.1&quot; method=&quot;GET&quot; remote-address=&quot;127.0.0.1&quot; remote-host=&quot;127.0.0.1&quot; response-status=&quot;401&quot;&gt;&lt;parameters&gt;&lt;param name=&quot;param1&quot;&gt;&lt;value&gt;secret&lt;/value&gt;&lt;/param&gt;&lt;/parameters&gt;&lt;/event-data&gt;"
 		ERROR="401: null"
 		USER_ID="testUser" SESSION_ID="ABCDEF123" />
-	<BEHAVIOR_TRACKING_EVENT EVENT_ID="4" APPLICATION="testBT"
+	<BEHAVIOR_TRACKING_EVENT EVENT_ID="2" APPLICATION="testBT"
 		EVENT_TYPE="http-request" EVENT_NAME="/app/redirect.ext"
 		EVENT_START="2008-06-26 16:34:25.681" DURATION_MS="100"
 		EVENT_DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data uri=&quot;/app/redirect.ext&quot; protocol=&quot;HTTP/1.1&quot; method=&quot;GET&quot; remote-address=&quot;127.0.0.1&quot; remote-host=&quot;127.0.0.1&quot; response-status=&quot;301&quot;&gt;&lt;parameters/&gt;&lt;/event-data&gt;"
 		USER_ID="testUser" SESSION_ID="ABCDEF123" />
-	<BEHAVIOR_TRACKING_EVENT EVENT_ID="6" APPLICATION="testBT"
+	<BEHAVIOR_TRACKING_EVENT EVENT_ID="3" APPLICATION="testBT"
 		EVENT_TYPE="http-request" EVENT_NAME="/app/status.ext"
 		EVENT_START="2008-06-26 16:34:25.681" DURATION_MS="100"
 		EVENT_DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data uri=&quot;/app/status.ext&quot; protocol=&quot;HTTP/1.1&quot; method=&quot;GET&quot; remote-address=&quot;127.0.0.1&quot; remote-host=&quot;127.0.0.1&quot; response-status=&quot;302&quot; response-message=&quot;I don't remember what 302 means exactly&quot;&gt;&lt;parameters/&gt;&lt;/event-data&gt;"
 		USER_ID="testUser" SESSION_ID="ABCDEF123" />
-	<BEHAVIOR_TRACKING_EVENT EVENT_ID="8" APPLICATION="testBT"
+	<BEHAVIOR_TRACKING_EVENT EVENT_ID="4" APPLICATION="testBT"
 		EVENT_TYPE="behavior-tracking" EVENT_NAME="flush" 
 		EVENT_START="2008-06-26 16:34:25.681" DURATION_MS="100" 
 		EVENT_DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data count=&quot;4&quot;&gt;&lt;/event-data&gt;" 

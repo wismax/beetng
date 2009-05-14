@@ -42,7 +42,8 @@ import com.mtgi.analytics.sql.BehaviorTrackingConnectionProxy;
 public class JdbcBehaviorEventPersisterImpl extends JdbcDaoSupport
 	implements BehaviorEventPersister {
 
-	private static final String DEFAULT_ID_SQL = "select SEQ_BEHAVIOR_TRACKING_EVENT.nextval from dual";
+	private static final String DEFAULT_ID_SQL = 
+		"select SEQ_BEHAVIOR_TRACKING_EVENT.nextval from dual";
 	private static final String DEFAULT_INSERT_SQL = 
 		"insert into BEHAVIOR_TRACKING_EVENT " +
 			"(EVENT_ID, PARENT_EVENT_ID, APPLICATION, EVENT_TYPE, EVENT_NAME, EVENT_START, DURATION_MS, USER_ID, SESSION_ID, ERROR, EVENT_DATA) values " +
@@ -51,6 +52,11 @@ public class JdbcBehaviorEventPersisterImpl extends JdbcDaoSupport
 	private int batchSize = 25;
 	private String insertSql = DEFAULT_INSERT_SQL;
 	private String idSql = DEFAULT_ID_SQL;
+	
+	//support sequence batching
+	private long idIncrement = 1;
+	private Long currentId = null;
+	private Long nextId = null;
 	
 	private XMLOutputFactory xmlFactory;
 
@@ -75,7 +81,16 @@ public class JdbcBehaviorEventPersisterImpl extends JdbcDaoSupport
 	public String getIdSql() {
 		return idSql;
 	}
-	
+
+	/**
+	 * Set the increment value between numbers returned by {@link #getIdSql()}, allowing
+	 * for effective batch fetching of ID numbers.  Default is 1 if unspecified (disabling
+	 * ID batching).
+	 */
+	public void setIdIncrement(long idIncrement) {
+		this.idIncrement = idIncrement;
+	}
+
 	/**
 	 * Set the SQL statement used to insert a new behavior event record into the database.
 	 * The SQL statement must take exactly 11 parameters, which must accept the following 
@@ -134,64 +149,59 @@ public class JdbcBehaviorEventPersisterImpl extends JdbcDaoSupport
 					boolean doBatch = supportsBatchUpdates(con);
 					EventDataElementSerializer dataSerializer = new EventDataElementSerializer(xmlFactory);
 
+					PreparedStatement[] idStmt = { null };
 					PreparedStatement insert = con.prepareStatement(insertSql);
 					try {
 						
-						PreparedStatement idQuery = con.prepareStatement(idSql);
-						try {
+						//keep track of statements added to the batch so that we can time our
+						//flushes.
+						int batchCount = 0;
+						
+						for (BehaviorEvent next : events) {
 							
-							//keep track of statements added to the batch so that we can time our
-							//flushes.
-							int batchCount = 0;
+							//event may already have an ID assigned if any
+							//of its child events has been persisted.
+							assignIds(next, con, idStmt);
+
+							//populate identifying information for the event into the insert statement.
+							insert.setLong(1, (Long)next.getId());
 							
-							for (BehaviorEvent next : events) {
-								
-								//event may already have an ID assigned if any
-								//of its child events has been persisted.
-								assignIds(next, idQuery);
+							BehaviorEvent parent = next.getParent();
+							nullSafeSet(insert, 2, parent == null ? null : parent.getId(), Types.BIGINT);
 
-								//populate identifying information for the event into the insert statement.
-								insert.setLong(1, (Long)next.getId());
-								
-								BehaviorEvent parent = next.getParent();
-								nullSafeSet(insert, 2, parent == null ? null : parent.getId(), Types.BIGINT);
+							insert.setString(3, next.getApplication());
+							insert.setString(4, next.getType());
+							insert.setString(5, next.getName());
+							insert.setTimestamp(6, new java.sql.Timestamp(next.getStart().getTime()));
+							insert.setLong(7, next.getDuration());
 
-								insert.setString(3, next.getApplication());
-								insert.setString(4, next.getType());
-								insert.setString(5, next.getName());
-								insert.setTimestamp(6, new java.sql.Timestamp(next.getStart().getTime()));
-								insert.setLong(7, next.getDuration());
+							//set optional context information on the event.
+							nullSafeSet(insert, 8, next.getUserId(), Types.VARCHAR);
+							nullSafeSet(insert, 9, next.getSessionId(), Types.VARCHAR);
+							nullSafeSet(insert, 10, next.getError(), Types.VARCHAR);
 
-								//set optional context information on the event.
-								nullSafeSet(insert, 8, next.getUserId(), Types.VARCHAR);
-								nullSafeSet(insert, 9, next.getSessionId(), Types.VARCHAR);
-								nullSafeSet(insert, 10, next.getError(), Types.VARCHAR);
-	
-								//convert event data to XML
-								String data = dataSerializer.serialize(next.getData(), true);
-								nullSafeSet(insert, 11, data, Types.VARCHAR);
+							//convert event data to XML
+							String data = dataSerializer.serialize(next.getData(), true);
+							nullSafeSet(insert, 11, data, Types.VARCHAR);
 
-								if (doBatch) {
-									insert.addBatch();
-									if (++batchCount >= batchSize) {
-										insert.executeBatch();
-										batchCount = 0;
-									}
-								} else {
-									insert.executeUpdate();
+							if (doBatch) {
+								insert.addBatch();
+								if (++batchCount >= batchSize) {
+									insert.executeBatch();
+									batchCount = 0;
 								}
+							} else {
+								insert.executeUpdate();
 							}
-
-							//flush any lingering batch inserts through to the server.
-							if (batchCount > 0)
-								insert.executeBatch();
-							
-						} finally {
-							closeStatement(idQuery);
 						}
+
+						//flush any lingering batch inserts through to the server.
+						if (batchCount > 0)
+							insert.executeBatch();
 						
 					} finally {
 						closeStatement(insert);
+						closeStatement(idStmt[0]);
 					}
 					
 					return null;
@@ -205,26 +215,32 @@ public class JdbcBehaviorEventPersisterImpl extends JdbcDaoSupport
 		});
 	}
 	
-	private void assignIds(BehaviorEvent event, PreparedStatement idQuery) throws SQLException {
+	private void assignIds(BehaviorEvent event, Connection conn, PreparedStatement[] ptr) throws SQLException {
 		if (event.getId() != null)
 			return;
 		
 		BehaviorEvent parent = event.getParent();
 		if (parent != null && parent.getId() == null)
-			assignIds(parent, idQuery);
+			assignIds(parent, conn, ptr);
 		
 		if (event.getId() == null)
-			event.setId(nextId(idQuery));
+			event.setId(nextId(conn, ptr));
 	}
 	
-	protected Long nextId(PreparedStatement idQuery) throws SQLException {
-		ResultSet rs = idQuery.executeQuery();
-		try {
-			rs.next();
-			return rs.getLong(1);
-		} finally {
-			closeResultSet(rs);
+	protected synchronized Long nextId(Connection conn, PreparedStatement[] ptr) throws SQLException {
+		if (currentId == nextId) {
+			if (ptr[0] == null)
+				ptr[0] = conn.prepareStatement(idSql);
+			ResultSet rs = ptr[0].executeQuery();
+			try {
+				rs.next();
+				currentId = rs.getLong(1);
+				nextId = currentId + idIncrement;
+			} finally {
+				closeResultSet(rs);
+			}
 		}
+		return currentId++;
 	}
 	
 	protected void nullSafeSet(PreparedStatement stmt, int index, Object value, int sqlType) 

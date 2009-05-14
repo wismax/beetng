@@ -45,8 +45,9 @@
 		<property name="dataSource" ref="dataSource"/>
 		<!-- accommodate HSQL seq syntax for tests -->
 		<property name="idSql">
-			<value>select next value for SEQ_BEHAVIOR_TRACKING_EVENT from INFORMATION_SCHEMA.SYSTEM_SEQUENCES</value>
+			<value>call next value for SEQ_BEHAVIOR_TRACKING_EVENT</value>
 		</property>
+		<property name="idIncrement" value="25"/>
 	</bean>
 
 	<!-- task queue for async persistence operations -->	

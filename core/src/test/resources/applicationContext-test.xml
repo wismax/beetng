@@ -1,22 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
-    "http://www.springframework.org/dtd/spring-beans.dtd">
-<beans>
+
+<beans xmlns:bt="http://www.mantis-tgi.com/schema/bt/1.1" 
+	   xmlns="http://www.springframework.org/schema/beans" 
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	   xsi:schemaLocation="
+	   		http://www.springframework.org/schema/beans		http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+			http://www.mantis-tgi.com/schema/bt/1.1			http://www.mantis-tgi.com/schema/bt/mtgi-bt-1.1.xsd">
+
 	<!-- check required annotations on test beans -->
 	<bean class="org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor"/>
 
 	<!-- use unitils hsqldb datasource for test persistence ops -->
 	<bean id="dataSource" class="org.unitils.database.UnitilsDataSourceFactoryBean" />
 
-	<!-- create jdbc persistence manager for testing. -->	
-	<bean id="jdbcPersistenceManager" class="com.mtgi.analytics.JdbcBehaviorEventPersisterImpl">
-		<property name="dataSource" ref="dataSource"/>
-		<!-- accommodate HSQL seq syntax for tests -->
-		<property name="idSql">
-			<value>select next value for SEQ_BEHAVIOR_TRACKING_EVENT from INFORMATION_SCHEMA.SYSTEM_SEQUENCES</value>
-		</property>
-	</bean>
-
+  	<bt:jdbc-persister id="jdbcPersistenceManager">
+  		<bt:data-source ref="dataSource"/>
+  		<bt:id-sql increment="25">call next value for SEQ_BEHAVIOR_TRACKING_EVENT</bt:id-sql>
+  	</bt:jdbc-persister>
+	  	
 	<!-- task queue for async persistence operations -->	
 	<bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
 		<property name="corePoolSize" value="1"/>
