@@ -455,6 +455,18 @@
       <section id="elt_id_sql">
          <title id="elt_id_sql_title">&lt;bt:id-sql&gt;</title>
          <para>Overrides the default SQL statement used to retrieve new event IDs.</para>
+         <segmentedlist><?dbhtml list-presentation="table"?><title>&lt;bt:id-sql&gt; Attributes</title>
+            <segtitle>Attribute</segtitle>
+            <segtitle>Use</segtitle>
+            <segtitle>Description</segtitle>
+            <seglistitem>
+               <seg>increment</seg>
+               <seg>optional</seg>
+               <seg>
+                  <para>Increment between consecutive values returned by the ID SQL statement. If greater than 1, it is assumed that the application can interpolate ID values in between calls. For example, if increment=25 and the ID SQL returns 15, the application will use all integers from 15 to 39 as unique IDs before executing the ID SQL again.</para>
+               </seg>
+            </seglistitem>
+         </segmentedlist>
       </section>
    </section>
    <section id="elt_mbean_persister">

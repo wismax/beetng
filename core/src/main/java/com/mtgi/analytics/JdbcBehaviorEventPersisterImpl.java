@@ -223,8 +223,7 @@ public class JdbcBehaviorEventPersisterImpl extends JdbcDaoSupport
 		if (parent != null && parent.getId() == null)
 			assignIds(parent, conn, ptr);
 		
-		if (event.getId() == null)
-			event.setId(nextId(conn, ptr));
+		event.setId(nextId(conn, ptr));
 	}
 	
 	protected synchronized Long nextId(Connection conn, PreparedStatement[] ptr) throws SQLException {
