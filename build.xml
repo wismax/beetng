@@ -106,6 +106,7 @@
 					<fileset dir="${build.root}/core/dist/jars"
 		                     includes="**/*.jar" excludes="**/*test*"/>
 					<fileset refid="licenses"/>
+					<fileset dir="core/src/main" includes="sql/**"/>
 				</copy>
 
 				<copy todir="${release.dir}/docs" failonerror="false">
