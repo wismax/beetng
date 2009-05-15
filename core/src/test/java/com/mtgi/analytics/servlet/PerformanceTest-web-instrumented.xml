@@ -5,9 +5,13 @@
 
 	<description>test web application used by BehaviorTrackingFilterTest</description>
 
+	<!-- test spring context initialization.  this context includes the necessary configuration for behavior tracking. -->
 	<context-param>
 		<param-name>contextConfigLocation</param-name>
-		<param-value>classpath:com/mtgi/analytics/aop/PerformanceTest-basis.xml</param-value>
+		<param-value>
+			classpath:com/mtgi/analytics/aop/PerformanceTest-basis.xml,
+			classpath:com/mtgi/analytics/aop/PerformanceTest-tracking.xml
+		</param-value>
 	</context-param>
 	
 	<listener>
@@ -21,7 +25,6 @@
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 
-	<!-- two path mappings, one that is tracked, and one that isn't, so that we can compare performance -->
 	<servlet-mapping>
 		<servlet-name>ping</servlet-name>
 		<url-pattern>/ping</url-pattern>
@@ -39,4 +42,16 @@
 		<dispatcher>REQUEST</dispatcher>
 	</filter-mapping>
 
+	<filter>
+		<description>Logs HTTP requests as Behavior Tracking events.</description>
+		<filter-name>tracking</filter-name>
+		<filter-class>com.mtgi.analytics.servlet.BehaviorTrackingFilter</filter-class>
+	</filter>
+	
+	<filter-mapping>
+		<filter-name>tracking</filter-name>
+		<servlet-name>ping</servlet-name>
+		<dispatcher>REQUEST</dispatcher>
+	</filter-mapping>
+	
 </web-app>

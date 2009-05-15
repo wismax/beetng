@@ -15,6 +15,8 @@ package com.mtgi.analytics;
 
 import static org.junit.Assert.*;
 
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadMXBean;
 import java.util.concurrent.Semaphore;
 
 /**
@@ -28,78 +30,83 @@ public abstract class AbstractPerformanceTestCase {
 	private int testLoop;
 	private int testThreads;
 	private int eventsPerJob;
+	private long averageOverhead;
+	private long maxOverhead;
 	
-	protected AbstractPerformanceTestCase(int eventsPerJob) {
-		this(eventsPerJob, 10, 50);
-	}
-
-	protected AbstractPerformanceTestCase(int eventsPerJob, int testThreads, int testLoop) {
+	protected AbstractPerformanceTestCase(int eventsPerJob, int testThreads, int testLoop, long averageOverhead, long maxOverhead) {
 		this.testThreads = testThreads;
 		this.eventsPerJob = eventsPerJob;
 		this.testLoop = testLoop;
+		this.averageOverhead = averageOverhead;
+		this.maxOverhead = maxOverhead;
 	}
 	
 	protected void testPerformance(Runnable basisJob, Runnable testJob) throws Throwable {
 
+		ThreadMXBean mxb = ManagementFactory.getThreadMXBean();
+		assertTrue("performance tests can only be run on a platform that supports per-thread resource measurement",
+					mxb.isCurrentThreadCpuTimeSupported());
+		
 		TestStats basis = new TestStats(),
 				  test  = new TestStats();
+
+		runTest(new TestStats(), testJob);
+		runTest(new TestStats(), basisJob);
 		
 		//run several iterations of the test, alternating between instrumented and not
 		//to absorb the affects of garbage collection.
 		for (int i = 0; i < TEST_ITERATIONS; ++i) {
 			System.out.println("iteration " + i);
-			
 			runTest(basis, basisJob);
 			runTest(test, testJob);
 		}
 		
 		//compute the overhead as the difference between instrumented and uninstrumented
 		//runs.  we want the per-event overhead to be less than .5 ms.
-		double calls = testLoop * TEST_ITERATIONS * eventsPerJob;
-		double delta = test.getAverageMillis() - basis.getAverageMillis();
-		double overhead = delta / calls;
-
-		assertTrue("Average overhead per method cannot exceed 10^5 ns [ " + overhead + " ]",
-					 overhead < 100000);
-		System.out.println("Average overhead: " + overhead);
-		
+		double delta = test.getAverageNanos() - basis.getAverageNanos();
+		double overhead = delta / eventsPerJob;
 		//deltaWorst, my favorite sausage.  mmmmmm, dellltttaaaWwwwooorrsstt.
-		double deltaWorst = test.getWorstMillis() - basis.getWorstMillis();
-		overhead = deltaWorst / calls;
+		double deltaWorst = test.getWorstNanos() - basis.getWorstNanos();
+		double worstOverhead = deltaWorst / eventsPerJob;
+
+		System.out.println("Average overhead: " + overhead);
+		System.out.println("Worst case overhead: " + worstOverhead);
 		
-		assertTrue("Worst case per method overhead cannot exceed 5 * 10^5 ns [ " + overhead + " ]",
-				  overhead < 500000);
-		System.out.println("Worst case overhead: " + overhead);
+		assertTrue("Average overhead per method cannot exceed " + averageOverhead + "ns [ " + overhead + " ]",
+					 overhead <= averageOverhead);
+		
+		assertTrue("Worst case per method overhead cannot exceed " + maxOverhead + "ns [ " + worstOverhead + " ]",
+					worstOverhead <= maxOverhead);
 	}
 	
 	private void runTest(TestStats stats, Runnable job) throws Throwable {
+		
+		//try to prevent accumulating GC from prior test runs from polluting our
+		//numbers.  eventually we need to move the basis and test executions into
+		//their own process space.
+		System.gc();
 		
 		//set up the test iteration.
 		Semaphore in = new Semaphore(0),
 				  out = new Semaphore(0);
 		TestThread[] threads = new TestThread[testThreads];
 		for (int t = 0; t < testThreads; ++t) {
-			threads[t] = new TestThread(in, out, job, testLoop);
+			threads[t] = new TestThread(stats, in, out, job, testLoop);
 			threads[t].start();
 		}
 		
-		//start the timer
-		stats.start();
-		try {
-			//turn 'em loose.
-			in.release(testThreads);
-			//wait for finish.
-			out.acquire(testThreads);
+		//turn 'em loose.
+		in.release(testThreads);
+		//wait for finish.
+		out.acquire(testThreads);
 
-			//verify that all of the test threads are actually finished
-			for (TestThread t : threads) {
-				t.join(100);
-				t.assertDone();
-			}
-		} finally {
-			//update stats.
-			stats.stop();
+		//verify that all of the test threads are actually finished
+		for (TestThread t : threads) {
+			t.join(600000);
+			t.assertDone();
 		}
+		
+		System.gc();
 	}
 	
 	public static class TestStats {
@@ -107,42 +114,78 @@ public abstract class AbstractPerformanceTestCase {
 		private long worstCase = -1;
 
 		private int count;
-		private long start;
 		
-		public double getAverageMillis() {
+		public double getAverageNanos() {
 			return average;
 		}
 		
-		public long getWorstMillis() {
+		public long getWorstNanos() {
 			return worstCase;
 		}
 		
-		public void start() {
-			this.start = System.nanoTime();
-		}
-		
-		public void stop() {
-			long delta = System.nanoTime() - start;
+		public synchronized void update(long delta) {
 			worstCase = Math.max(delta, worstCase);
 			average = average + (delta - average) / (double)++count;
 		}
 	}
 	
+	/**
+	 * If subclasses need to implement their own CPU time measurement, they can provide
+	 * test jobs that implement this interface.
+	 */
+	public static interface InstrumentedRunnable extends Runnable {
+		/** get the total CPU time required for the last invocation of {@link #run()}. */
+		public long getLastRuntimeNanos();
+	}
+	
+	public static class InstrumentedRunnableDecorator implements InstrumentedRunnable {
+
+		private Runnable delegate;
+		private volatile Long runtime;
+
+		public static InstrumentedRunnable instrument(Runnable job) {
+			return job instanceof InstrumentedRunnable ? (InstrumentedRunnable)job : new InstrumentedRunnableDecorator(job);
+		}
+		
+		public InstrumentedRunnableDecorator(Runnable delegate) {
+			this.delegate = delegate;
+		}
+
+		public long getLastRuntimeNanos() {
+			return runtime;
+		}
+
+		public void run() {
+			runtime = null;
+			ThreadMXBean mxb = ManagementFactory.getThreadMXBean();
+			assertTrue(mxb.isCurrentThreadCpuTimeSupported());
+			long start = mxb.getCurrentThreadCpuTime();
+			try {
+				delegate.run();
+			} finally {
+				runtime = mxb.getCurrentThreadCpuTime() - start;
+			}
+		}
+		
+	}
+	
 	public static class TestThread extends Thread {
 		
+		private TestStats stats;
 		private Throwable error;
 		private Semaphore in, out;
-		private Runnable job;
+		private InstrumentedRunnable job;
 		private int testLoop;
 		
-		public TestThread(Semaphore in, Semaphore out, Runnable job, int testLoop) {
+		public TestThread(TestStats stats, Semaphore in, Semaphore out, Runnable job, int testLoop) {
+			this.stats = stats;
 			this.in = in;
 			this.out = out;
-			this.job = job;
+			this.job = InstrumentedRunnableDecorator.instrument(job);
 			this.testLoop = testLoop;
 		}
 
-		public void assertDone() throws Throwable{
+		public void assertDone() throws Throwable {
 			if (error != null)
 				throw error;
 			assertFalse("thread " + getName() + " complete", isAlive());
@@ -152,8 +195,15 @@ public abstract class AbstractPerformanceTestCase {
 		public void run() {
 			try {
 				in.acquire(1);
-				for (int i = 0; i < testLoop; ++i)
-					job.run();
+				for (int i = 0; i < testLoop; ++i) {
+					try {
+						job.run();
+					} finally {
+						stats.update(job.getLastRuntimeNanos());
+					}
+					if ((i + 1) % 10 == 0)
+						System.gc();
+				}
 			} catch (Throwable e) {
 				error = e;
 			} finally {

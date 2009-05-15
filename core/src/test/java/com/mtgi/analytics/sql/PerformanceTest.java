@@ -37,8 +37,11 @@ import com.mtgi.analytics.AbstractPerformanceTestCase;
 @RunWith(UnitilsJUnit4TestClassRunner.class)
 public class PerformanceTest extends AbstractPerformanceTestCase {
 
+	private static final long AVERAGE_OVERHEAD_NS = 100000;
+	private static final long WORST_OVERHEAD_NS = 100000;
+	
 	public PerformanceTest() {
-		super(5); //each test job generates five BT events.
+		super(6, 10, 50, AVERAGE_OVERHEAD_NS, WORST_OVERHEAD_NS); //each test job generates 6 BT events.
 	}
 	
 	@TestDataSource

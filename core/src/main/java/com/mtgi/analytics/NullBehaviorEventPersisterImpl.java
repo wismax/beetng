@@ -27,7 +27,7 @@ public class NullBehaviorEventPersisterImpl implements BehaviorEventPersister {
 	private static final Log log = LogFactory.getLog(NullBehaviorEventPersisterImpl.class);
 	
 	public void persist(Queue<BehaviorEvent> events) {
-		log.info("Discarded " + events.size() + " events");
+		if (log.isDebugEnabled()) log.debug("Discarded " + events.size() + " events");
 	}
 
 }

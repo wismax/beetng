@@ -17,10 +17,17 @@ import static org.junit.Assert.*;
 import static java.util.Arrays.asList;
 
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadMXBean;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -39,6 +46,7 @@ import com.gargoylesoftware.htmlunit.WebRequestSettings;
 import com.mtgi.analytics.AbstractPerformanceTestCase;
 import com.mtgi.test.unitils.tomcat.EmbeddedTomcatServer;
 import com.mtgi.test.unitils.tomcat.annotations.EmbeddedDeploy;
+import com.mtgi.test.unitils.tomcat.annotations.EmbeddedDeployments;
 import com.mtgi.test.unitils.tomcat.annotations.EmbeddedTomcat;
 
 /**
@@ -46,15 +54,23 @@ import com.mtgi.test.unitils.tomcat.annotations.EmbeddedTomcat;
  * interfere too much with application performance.
  */
 @EmbeddedTomcat(start=true)
-@EmbeddedDeploy(contextRoot="/app", value="com/mtgi/analytics/servlet/PerformanceTest-web.xml")
+@EmbeddedDeployments({
+	@EmbeddedDeploy(contextRoot="/basis", value="com/mtgi/analytics/servlet/PerformanceTest-web.xml"),
+	@EmbeddedDeploy(contextRoot="/test", value="com/mtgi/analytics/servlet/PerformanceTest-web-instrumented.xml")
+})
 @RunWith(UnitilsJUnit4TestClassRunner.class)
 public class PerformanceTest extends AbstractPerformanceTestCase {
 
+	//we allow slightly greater overhead on servlet measurements than on method measurements, since
+	//these events should be comparatively fewer in number (by an order of magnitude or so)
+	private static final long AVERAGE_OVERHEAD_NS = 100000;
+	private static final long WORST_OVERHEAD_NS = 100000;
+	
 	@EmbeddedTomcat
 	protected EmbeddedTomcatServer server;
 	
 	public PerformanceTest() {
-		super(1, 1, 100); //each test job generates one BT event.
+		super(1, 1, 100, AVERAGE_OVERHEAD_NS, WORST_OVERHEAD_NS); //each test job generates one BT event.
 	}
 	
 	@After
@@ -82,17 +98,39 @@ public class PerformanceTest extends AbstractPerformanceTestCase {
 		
 	}
 	
-	public static class TestJob implements Runnable {
+	/** record CPU time for request processing and send back to the client */
+	public static class TimingFilter implements Filter {
+
+		public void destroy() {}
+		public void init(FilterConfig cfg) {}
+
+		public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
+			ThreadMXBean mxb = ManagementFactory.getThreadMXBean();
+			assertTrue(mxb.isCurrentThreadCpuTimeSupported());
+			long start = mxb.getCurrentThreadCpuTime();
+			try {
+				chain.doFilter(req, res);
+			} finally {
+				long runtime = mxb.getCurrentThreadCpuTime() - start;
+				((HttpServletResponse)res).addHeader("beet-runtime", String.valueOf(runtime));
+			}
+		}
+		
+	}
+	
+	public static class TestJob implements InstrumentedRunnable {
 		
 		private volatile int iteration = 0;
 		private URL url;
 		private WebClient webClient;
 		private WebRequestSettings request;
 		private NameValuePair countParam;
+		private Long runtime;
 		
 		public TestJob(String servletPath) throws MalformedURLException {
-			url = new URL("http://localhost:8888/app" + servletPath);
+			url = new URL("http://localhost:8888" + servletPath);
 			webClient = new WebClient();
+			webClient.setJavaScriptEnabled(false);
 			request = new WebRequestSettings(url);
 			request.setEncodingType(FormEncodingType.URL_ENCODED);
 			request.setSubmitMethod(SubmitMethod.POST);
@@ -106,12 +144,22 @@ public class PerformanceTest extends AbstractPerformanceTestCase {
 			request.setRequestParameters(asList(parameters));
 		}
 
+		public long getLastRuntimeNanos() {
+			return runtime;
+		}
+		
 		public void run() {
+			runtime = null;
 			String count = String.valueOf(++iteration);
 			countParam.setValue(count);
 			try {
 				TextPage result = (TextPage)webClient.getPage(request);
 				assertEquals("servlet loaded successfully", "success[" + count + "]", result.getContent());
+
+				String runtime = result.getWebResponse().getResponseHeaderValue("beet-runtime");
+				assertNotNull("timing filter was activated", runtime);
+				this.runtime = Long.parseLong(runtime);
+				
 			} catch (Throwable e) {
 				throw new RuntimeException(e.getMessage(), e);
 			}

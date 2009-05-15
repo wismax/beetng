@@ -28,11 +28,17 @@ import com.mtgi.analytics.aop.BehaviorAdviceTest.ServiceA;
 public class PerformanceTest extends AbstractPerformanceTestCase {
 
 	private static final int METHOD_DELAY = 10;
+	//this is CPU clock overhead, so we're being fairly strict here.  while ideally we
+	//anticipate fewer than 10 monitored method calls per user request, complicated, abusive,
+	//or misconfigured client applications might push this boundary out by a factor of 10.
+	private static final long AVERAGE_OVERHEAD_NS = 10000;
+	private static final long WORST_OVERHEAD_NS = 10000;
+	
 	private ClassPathXmlApplicationContext basisContext;
 	private ClassPathXmlApplicationContext testContext;
 	
 	public PerformanceTest() {
-		super(2); //each test job generates two BT events.
+		super(2, 10, 100, AVERAGE_OVERHEAD_NS, WORST_OVERHEAD_NS); //each test job generates two BT events.
 	}
 	
 	@Before
