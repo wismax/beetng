@@ -27,18 +27,19 @@ import com.mtgi.analytics.aop.BehaviorAdviceTest.ServiceA;
  */
 public class PerformanceTest extends AbstractPerformanceTestCase {
 
-	private static final int METHOD_DELAY = 10;
 	//this is CPU clock overhead, so we're being fairly strict here.  while ideally we
 	//anticipate fewer than 10 monitored method calls per user request, complicated, abusive,
 	//or misconfigured client applications might push this boundary out by a factor of 10.
-	private static final long AVERAGE_OVERHEAD_NS = 10000;
+	private static final long AVERAGE_OVERHEAD_NS = 100000;
 	private static final long WORST_OVERHEAD_NS = 10000;
-	
+
+	private static final long TIME_BASIS = 100000;
+
 	private ClassPathXmlApplicationContext basisContext;
 	private ClassPathXmlApplicationContext testContext;
 	
 	public PerformanceTest() {
-		super(2, 10, 100, AVERAGE_OVERHEAD_NS, WORST_OVERHEAD_NS); //each test job generates two BT events.
+		super(5, 50, TIME_BASIS, AVERAGE_OVERHEAD_NS, WORST_OVERHEAD_NS); //each test job generates two BT events.
 	}
 	
 	@Before
@@ -71,14 +72,15 @@ public class PerformanceTest extends AbstractPerformanceTestCase {
 			this.service = service;
 		}
 
+		public int fib(int n) {
+			if (n == 0 || n == 1)
+				return 1;
+			return fib(n - 1) + fib(n - 2);
+		}
+		
 		public void run() {
-			try {
-				Thread.sleep(METHOD_DELAY);
-				//method call results in two events logged.
-				service.getTracked("sleepy");
-			} catch (InterruptedException e) {
-				throw new RuntimeException(e);
-			}
+			fib(20);
+			service.getTracked("sleepy");
 		}
 	}
 }

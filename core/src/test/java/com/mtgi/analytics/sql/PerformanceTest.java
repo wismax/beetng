@@ -40,8 +40,10 @@ public class PerformanceTest extends AbstractPerformanceTestCase {
 	private static final long AVERAGE_OVERHEAD_NS = 100000;
 	private static final long WORST_OVERHEAD_NS = 100000;
 	
+	private static final long TIME_BASIS = 4000000;
+	
 	public PerformanceTest() {
-		super(6, 10, 50, AVERAGE_OVERHEAD_NS, WORST_OVERHEAD_NS); //each test job generates 6 BT events.
+		super(10, 50, TIME_BASIS, AVERAGE_OVERHEAD_NS, WORST_OVERHEAD_NS); //each test job generates 6 BT events.
 	}
 	
 	@TestDataSource

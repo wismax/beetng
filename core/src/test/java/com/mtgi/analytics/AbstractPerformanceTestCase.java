@@ -19,26 +19,40 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
 import java.util.concurrent.Semaphore;
 
+import com.mtgi.analytics.jmx.StatisticsMBean;
+
 /**
- * Performs some timed tests to verify that behavior tracking doesn't
+ * Performs some instrumented tests to verify that behavior tracking doesn't
  * interfere too much with application performance.
  */
 public abstract class AbstractPerformanceTestCase {
 
-	private static final int TEST_ITERATIONS = 10;
+	private static final int TEST_ITERATIONS = 20;
 
 	private int testLoop;
 	private int testThreads;
-	private int eventsPerJob;
 	private long averageOverhead;
 	private long maxOverhead;
+	private long expectedBasis;
 	
-	protected AbstractPerformanceTestCase(int eventsPerJob, int testThreads, int testLoop, long averageOverhead, long maxOverhead) {
+	/**
+	 * @param testThreads the number of normal priority threads to concurrently execute test runnables.
+	 * @param testLoop the number of times each test thread invokes the test runnable before exiting
+	 * @param expectedBasis <span>the benchmark CPU time against which <code>averageOverhead</code> was established.
+	 * 	                    <code>averageOverhead</code> and <code>maxOverhead</code> will be scaled by the ratio of this time to
+	 * 						actual measured time during control runs, to account for the processing power available on the system that
+	 * 						is actually running the test.</span>
+	 * @param averageOverhead <span>the average overhead in CPU nanoseconds expected for each measurement taken.  this figure is scaled
+	 * 						  according to <code>expectedBasis</code> before being compared to test run times.</span>
+	 * @param maxOverhead <span>the maximum overhead in CPU nanoseconds allowed for each measurement taken.  this figure is scaled
+	 * 					  according to <code>expectedBasis</code> before being compared to test run times.</span>
+	 */
+	protected AbstractPerformanceTestCase(int testThreads, int testLoop, long expectedBasis, long averageOverhead, long maxOverhead) {
 		this.testThreads = testThreads;
-		this.eventsPerJob = eventsPerJob;
 		this.testLoop = testLoop;
 		this.averageOverhead = averageOverhead;
 		this.maxOverhead = maxOverhead;
+		this.expectedBasis = expectedBasis;
 	}
 	
 	protected void testPerformance(Runnable basisJob, Runnable testJob) throws Throwable {
@@ -47,43 +61,65 @@ public abstract class AbstractPerformanceTestCase {
 		assertTrue("performance tests can only be run on a platform that supports per-thread resource measurement",
 					mxb.isCurrentThreadCpuTimeSupported());
 		
-		TestStats basis = new TestStats(),
-				  test  = new TestStats();
+		StatisticsMBean basis = new StatisticsMBean(),
+				  test  = new StatisticsMBean();
 
-		runTest(new TestStats(), testJob);
-		runTest(new TestStats(), basisJob);
-		
+		runTest(new StatisticsMBean(), testJob);
+		runTest(new StatisticsMBean(), basisJob);
+
+		System.gc();
+		System.gc();
+		Thread.sleep(100);
+
 		//run several iterations of the test, alternating between instrumented and not
 		//to absorb the affects of garbage collection.
 		for (int i = 0; i < TEST_ITERATIONS; ++i) {
 			System.out.println("iteration " + i);
-			runTest(basis, basisJob);
-			runTest(test, testJob);
+			//switch the order of test / control runs during iteration to reduce any
+			//bias that order might cause
+			if (i % 2 == 0) {
+				runTest(basis, basisJob);
+				runTest(test, testJob);
+			} else {
+				runTest(test, testJob);
+				runTest(basis, basisJob);
+			}
 		}
+		
+		assertEquals("basis and test have same sample size", basis.getCount(), test.getCount());
+		
+		double basisNanos = basis.getAverageTime();
+		double cpuCoefficient = basisNanos / expectedBasis;
+		
+		double expectedAverage = cpuCoefficient * averageOverhead;
+		double expectedMax = cpuCoefficient * maxOverhead;
+		
+		System.out.println("control:\n" + basis);
+		System.out.println("test:\n" + test);
+		System.out.println("CPU Coefficient: " + cpuCoefficient);
 		
 		//compute the overhead as the difference between instrumented and uninstrumented
 		//runs.  we want the per-event overhead to be less than .5 ms.
-		double delta = test.getAverageNanos() - basis.getAverageNanos();
-		double overhead = delta / eventsPerJob;
+		double delta = test.getAverageTime() - basisNanos;
 		//deltaWorst, my favorite sausage.  mmmmmm, dellltttaaaWwwwooorrsstt.
-		double deltaWorst = test.getWorstNanos() - basis.getWorstNanos();
-		double worstOverhead = deltaWorst / eventsPerJob;
+		double deltaWorst = test.getMaxTime() - basis.getMaxTime();
 
-		System.out.println("Average overhead: " + overhead);
-		System.out.println("Worst case overhead: " + worstOverhead);
+		System.out.println("Average overhead: " + delta);
+		System.out.println("Worst case overhead: " + deltaWorst);
 		
-		assertTrue("Average overhead per method cannot exceed " + averageOverhead + "ns [ " + overhead + " ]",
-					 overhead <= averageOverhead);
+		assertTrue("Average overhead per method cannot exceed " + expectedAverage + "ns [ " + delta + " ]",
+					 delta <= expectedAverage);
 		
-		assertTrue("Worst case per method overhead cannot exceed " + maxOverhead + "ns [ " + worstOverhead + " ]",
-					worstOverhead <= maxOverhead);
+		assertTrue("Worst case per method overhead cannot exceed " + expectedMax + "ns [ " + deltaWorst + " ]",
+					deltaWorst <= expectedMax);
 	}
 	
-	private void runTest(TestStats stats, Runnable job) throws Throwable {
+	private void runTest(StatisticsMBean stats, Runnable job) throws Throwable {
 		
 		//try to prevent accumulating GC from prior test runs from polluting our
 		//numbers.  eventually we need to move the basis and test executions into
 		//their own process space.
+		System.gc();
 		System.gc();
 		
 		//set up the test iteration.
@@ -109,26 +145,6 @@ public abstract class AbstractPerformanceTestCase {
 		System.gc();
 	}
 	
-	public static class TestStats {
-		private double average = 0;
-		private long worstCase = -1;
-
-		private int count;
-		
-		public double getAverageNanos() {
-			return average;
-		}
-		
-		public long getWorstNanos() {
-			return worstCase;
-		}
-		
-		public synchronized void update(long delta) {
-			worstCase = Math.max(delta, worstCase);
-			average = average + (delta - average) / (double)++count;
-		}
-	}
-	
 	/**
 	 * If subclasses need to implement their own CPU time measurement, they can provide
 	 * test jobs that implement this interface.
@@ -151,19 +167,23 @@ public abstract class AbstractPerformanceTestCase {
 			this.delegate = delegate;
 		}
 
-		public long getLastRuntimeNanos() {
+		public synchronized long getLastRuntimeNanos() {
 			return runtime;
 		}
 
 		public void run() {
-			runtime = null;
+			synchronized (this) {
+				runtime = null;
+			}
 			ThreadMXBean mxb = ManagementFactory.getThreadMXBean();
 			assertTrue(mxb.isCurrentThreadCpuTimeSupported());
 			long start = mxb.getCurrentThreadCpuTime();
 			try {
 				delegate.run();
 			} finally {
-				runtime = mxb.getCurrentThreadCpuTime() - start;
+				synchronized (this) {
+					runtime = mxb.getCurrentThreadCpuTime() - start;
+				}
 			}
 		}
 		
@@ -171,13 +191,13 @@ public abstract class AbstractPerformanceTestCase {
 	
 	public static class TestThread extends Thread {
 		
-		private TestStats stats;
+		private StatisticsMBean stats;
 		private Throwable error;
 		private Semaphore in, out;
 		private InstrumentedRunnable job;
 		private int testLoop;
 		
-		public TestThread(TestStats stats, Semaphore in, Semaphore out, Runnable job, int testLoop) {
+		public TestThread(StatisticsMBean stats, Semaphore in, Semaphore out, Runnable job, int testLoop) {
 			this.stats = stats;
 			this.in = in;
 			this.out = out;
@@ -199,10 +219,13 @@ public abstract class AbstractPerformanceTestCase {
 					try {
 						job.run();
 					} finally {
-						stats.update(job.getLastRuntimeNanos());
+						stats.add(job.getLastRuntimeNanos());
 					}
-					if ((i + 1) % 10 == 0)
+					if ((i + 1) % 10 == 0) {
 						System.gc();
+						System.gc();
+						Thread.yield();
+					}
 				}
 			} catch (Throwable e) {
 				error = e;

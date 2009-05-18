@@ -66,11 +66,13 @@ public class PerformanceTest extends AbstractPerformanceTestCase {
 	private static final long AVERAGE_OVERHEAD_NS = 100000;
 	private static final long WORST_OVERHEAD_NS = 100000;
 	
+	private static final long TIME_BASIS = 200000;
+	
 	@EmbeddedTomcat
 	protected EmbeddedTomcatServer server;
 	
 	public PerformanceTest() {
-		super(1, 1, 100, AVERAGE_OVERHEAD_NS, WORST_OVERHEAD_NS); //each test job generates one BT event.
+		super(1, 50, TIME_BASIS, AVERAGE_OVERHEAD_NS, WORST_OVERHEAD_NS);
 	}
 	
 	@After

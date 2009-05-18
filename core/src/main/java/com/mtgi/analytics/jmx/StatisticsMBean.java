@@ -1,5 +1,7 @@
 package com.mtgi.analytics.jmx;
 
+import static java.text.MessageFormat.format;
+
 import java.util.Date;
 
 import org.springframework.jmx.export.annotation.ManagedAttribute;
@@ -81,7 +83,13 @@ public class StatisticsMBean {
 		if (lastInvocation == null || lastInvocation.before(start))
 			lastInvocation = start;
 		
-		long duration = event.getDuration();
+		if (event.getError() != null)
+			++errorCount;
+		
+		add(event.getDuration());
+	}
+	
+	public synchronized void add(long duration) {
 		maxTime = Math.max(maxTime, duration);
 		if (count == 0) {
 			minTime = duration;
@@ -96,9 +104,11 @@ public class StatisticsMBean {
 			standardDeviation = Math.sqrt(nVariance / (double)count);
 			averageTime = averageTime + (duration - averageTime) / count;
 		}
-		
-		if (event.getError() != null)
-			++errorCount;
 	}
 	
+	@Override
+	public String toString() {
+		return format("[average:\t{0}\n max:\t\t{1}\n min:\t\t{2}\n dev:\t\t{3}\n count:\t\t{4}]", 
+				averageTime, maxTime, minTime, standardDeviation, count);
+	}
 }
