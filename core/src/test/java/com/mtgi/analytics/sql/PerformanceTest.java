@@ -20,86 +20,71 @@ import java.sql.Statement;
 
 import javax.sql.DataSource;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.unitils.UnitilsJUnit4TestClassRunner;
-import org.unitils.database.annotations.TestDataSource;
 
-import com.mtgi.analytics.AbstractPerformanceTestCase;
+import com.mtgi.analytics.test.AbstractPerformanceTestCase;
+import com.mtgi.analytics.test.AbstractSpringTestCase;
 
 /**
  * Performs some timed tests to verify that behavior tracking doesn't
  * interfere too much with application performance.
  */
-@RunWith(UnitilsJUnit4TestClassRunner.class)
 public class PerformanceTest extends AbstractPerformanceTestCase {
 
-	private static final long AVERAGE_OVERHEAD_NS = 100000;
+	//our test case actually generates 5 events, so the cumulative overhead
+	//is somewhat higher than what is allowed in the AOP perf test.
+	private static final long AVERAGE_OVERHEAD_NS = 400000;
 	private static final long WORST_OVERHEAD_NS = 100000;
 	
-	private static final long TIME_BASIS = 4000000;
+	private static final long TIME_BASIS = 450000;
+	
+	private static final String[] BASIS_CONFIG = { 
+		"com/mtgi/analytics/sql/PerformanceTest-basis.xml" 
+	};
+	private static final String[] TEST_CONFIG = { 
+		"com/mtgi/analytics/sql/PerformanceTest-basis.xml",
+		"com/mtgi/analytics/sql/PerformanceTest-tracking.xml"
+	};
 	
 	public PerformanceTest() {
 		super(10, 50, TIME_BASIS, AVERAGE_OVERHEAD_NS, WORST_OVERHEAD_NS); //each test job generates 6 BT events.
 	}
 	
-	@TestDataSource
-	private DataSource dataSource;
-	
-	private ClassPathXmlApplicationContext context;
-	
-	@Before
-	public void initTestTable() throws SQLException{
-		context = new ClassPathXmlApplicationContext("com/mtgi/analytics/sql/PerformanceTest-tracking.xml");
-		
-		Connection conn = dataSource.getConnection();
-		Statement stmt = conn.createStatement();
-		stmt.execute("create table TEST_TRACKING (" +
-				"	ID			IDENTITY," +
-				"	NUM			NUMERIC(16)		NOT NULL," +
-				"	NAME		VARCHAR(16)		NOT NULL," +
-				"	DESCRIPTION	VARCHAR(32) 	NULL" +
-				")");
-		stmt.close();
-		conn.close();
-	}
-
-	@After
-	public void dropTestTable() throws SQLException {
-		Connection conn = dataSource.getConnection();
-		Statement stmt = conn.createStatement();
-		stmt.execute("drop table TEST_TRACKING");
-		stmt.close();
-		conn.close();
-		
-		context.destroy();
-		context = null;
-	}
-	
 	@Test
 	public void testPerformance() throws Throwable {
-		TestJob basisJob = new TestJob((DataSource)context.getBean("dataSource"));
-		TestJob testJob = new TestJob((DataSource)context.getBean("instrumentedDataSource"));
-
+		TestJob basisJob = new TestJob("dataSource", BASIS_CONFIG);
+		TestJob testJob = new TestJob("instrumentedDataSource", TEST_CONFIG);
 		testPerformance(basisJob, testJob);
 	}
 	
-	public static class TestJob implements Runnable {
+	public static class TestJob extends AbstractSpringTestCase<DataSource> {
 
+		private static final long serialVersionUID = 930701941418132948L;
 		private static volatile long SEQ = 0;
-		private DataSource ds;
 		
-		public TestJob(DataSource service) {
-			this.ds = service;
+		public TestJob(String beanName, String[] configFiles) {
+			super(beanName, DataSource.class, configFiles);
+		}
+
+		@Override
+		public void setUp() throws Throwable {
+			super.setUp();
+			Connection conn = bean.getConnection();
+			Statement stmt = conn.createStatement();
+			stmt.execute("create table TEST_TRACKING (" +
+					"	ID			IDENTITY," +
+					"	NUM			NUMERIC(16)		NOT NULL," +
+					"	NAME		VARCHAR(16)		NOT NULL," +
+					"	DESCRIPTION	VARCHAR(32) 	NULL" +
+					")");
+			stmt.close();
+			conn.close();
 		}
 
 		public void run() {
 			try {
 				//method call results in two events logged.
-				Connection conn = ds.getConnection();
+				Connection conn = bean.getConnection();
 				try {
 					PreparedStatement ps = conn.prepareStatement("insert into TEST_TRACKING (NUM, NAME, DESCRIPTION) values (?, ?, ?)");
 					long s1 = ++SEQ, s2 = ++SEQ, s3 = ++SEQ, s4 = ++SEQ;

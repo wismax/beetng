@@ -14,8 +14,10 @@
 package com.mtgi.analytics.servlet;
 
 import static org.junit.Assert.*;
+import static com.mtgi.test.unitils.tomcat.EmbeddedTomcatManager.getDeployableResource;
 import static java.util.Arrays.asList;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
@@ -33,57 +35,38 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.httpclient.NameValuePair;
-import org.junit.After;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.unitils.UnitilsJUnit4TestClassRunner;
 
 import com.gargoylesoftware.htmlunit.FormEncodingType;
 import com.gargoylesoftware.htmlunit.SubmitMethod;
 import com.gargoylesoftware.htmlunit.TextPage;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.WebRequestSettings;
-import com.mtgi.analytics.AbstractPerformanceTestCase;
+import com.mtgi.analytics.test.AbstractPerformanceTestCase;
+import com.mtgi.analytics.test.InstrumentedTestCase;
 import com.mtgi.test.unitils.tomcat.EmbeddedTomcatServer;
-import com.mtgi.test.unitils.tomcat.annotations.EmbeddedDeploy;
-import com.mtgi.test.unitils.tomcat.annotations.EmbeddedDeployments;
-import com.mtgi.test.unitils.tomcat.annotations.EmbeddedTomcat;
 
 /**
  * Performs some timed tests to verify that behavior tracking doesn't
  * interfere too much with application performance.
  */
-@EmbeddedTomcat(start=true)
-@EmbeddedDeployments({
-	@EmbeddedDeploy(contextRoot="/basis", value="com/mtgi/analytics/servlet/PerformanceTest-web.xml"),
-	@EmbeddedDeploy(contextRoot="/test", value="com/mtgi/analytics/servlet/PerformanceTest-web-instrumented.xml")
-})
-@RunWith(UnitilsJUnit4TestClassRunner.class)
 public class PerformanceTest extends AbstractPerformanceTestCase {
 
 	//we allow slightly greater overhead on servlet measurements than on method measurements, since
 	//these events should be comparatively fewer in number (by an order of magnitude or so)
-	private static final long AVERAGE_OVERHEAD_NS = 100000;
+	private static final long AVERAGE_OVERHEAD_NS = 200000;
 	private static final long WORST_OVERHEAD_NS = 100000;
 	
-	private static final long TIME_BASIS = 200000;
-	
-	@EmbeddedTomcat
-	protected EmbeddedTomcatServer server;
+	private static final long TIME_BASIS = 400000;
 	
 	public PerformanceTest() {
-		super(1, 50, TIME_BASIS, AVERAGE_OVERHEAD_NS, WORST_OVERHEAD_NS);
-	}
-	
-	@After
-	public void destroyContext() {
-		server = null;
+		super(1, 200, TIME_BASIS, AVERAGE_OVERHEAD_NS, WORST_OVERHEAD_NS);
 	}
 	
 	@Test
 	public void testPerformance() throws Throwable {
-		TestJob basisJob = new TestJob("/basis/ping");
-		TestJob testJob = new TestJob("/test/ping");
+		TestJob basisJob = new TestJob("/basis", "com/mtgi/analytics/servlet/PerformanceTest-web.xml");
+		TestJob testJob = new TestJob("/test", "com/mtgi/analytics/servlet/PerformanceTest-web-instrumented.xml");
 		testPerformance(basisJob, testJob);
 	}
 	
@@ -120,17 +103,37 @@ public class PerformanceTest extends AbstractPerformanceTestCase {
 		
 	}
 	
-	public static class TestJob implements InstrumentedRunnable {
+	public static class TestJob implements InstrumentedTestCase {
 		
-		private volatile int iteration = 0;
-		private URL url;
-		private WebClient webClient;
-		private WebRequestSettings request;
-		private NameValuePair countParam;
-		private Long runtime;
+		private static final long serialVersionUID = 3130490842011512211L;
+
+		private String deploymentDir;
+		private String contextPath;
+
+		private transient URL url;
+		private transient EmbeddedTomcatServer tomcat;
 		
-		public TestJob(String servletPath) throws MalformedURLException {
-			url = new URL("http://localhost:8888" + servletPath);
+		private transient volatile int iteration = 0;
+		private transient WebClient webClient;
+		private transient WebRequestSettings request;
+		private transient NameValuePair countParam;
+		private transient Long runtime;
+		
+		public TestJob(String contextPath, String deploymentDir) throws MalformedURLException {
+			this.contextPath = contextPath;
+			this.deploymentDir = deploymentDir;
+		}
+
+		public void setUp() throws Exception {
+			url = new URL("http://localhost:8888" + contextPath + "/ping");
+			
+			//startup embedded tomcat server with test application
+			File dir = getDeployableResource(deploymentDir);
+			tomcat = new EmbeddedTomcatServer(null, false);
+			tomcat.deployDescriptor(contextPath, dir);
+			tomcat.start();
+
+			//configure client to send ping requests to server
 			webClient = new WebClient();
 			webClient.setJavaScriptEnabled(false);
 			request = new WebRequestSettings(url);
@@ -145,6 +148,18 @@ public class PerformanceTest extends AbstractPerformanceTestCase {
 			};
 			request.setRequestParameters(asList(parameters));
 		}
+		
+		public void tearDown() throws Exception {
+			try {
+				tomcat.destroy();
+			} finally {
+				tomcat = null;
+				url = null;
+				webClient = null;
+				request = null;
+				runtime = null;
+			}
+		}
 
 		public long getLastRuntimeNanos() {
 			return runtime;
@@ -155,6 +170,8 @@ public class PerformanceTest extends AbstractPerformanceTestCase {
 			String count = String.valueOf(++iteration);
 			countParam.setValue(count);
 			try {
+				//send ping request, retrieving the measured CPU time from filter response
+				//header
 				TextPage result = (TextPage)webClient.getPage(request);
 				assertEquals("servlet loaded successfully", "success[" + count + "]", result.getContent());
 

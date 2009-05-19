@@ -7,13 +7,7 @@
 	     http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
 	     http://www.mantis-tgi.com/schema/bt/1.1 com/mtgi/analytics/aop/mtgi-bt-1.1.xsd">
 
-	<!-- check required annotations on test beans -->
-	<bean class="org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor"/>
-
-	<!-- used to establish performance baseline -->
-	<bean id="dataSource" class="org.unitils.database.UnitilsDataSourceFactoryBean" />
-
-	<!-- used to measure affects of behavior tracking -->
+	<!-- used to measure affects of behavior tracking.  target is defined in PerformanceTest-basis.xml. -->
 	<bean id="instrumentedDataSource" class="com.mtgi.analytics.sql.BehaviorTrackingDataSource">
 		<property name="trackingManager" ref="trackingManager"/>
 		<property name="targetDataSource" ref="dataSource"/>

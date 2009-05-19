@@ -13,13 +13,11 @@
  
 package com.mtgi.analytics.aop;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import com.mtgi.analytics.AbstractPerformanceTestCase;
 import com.mtgi.analytics.aop.BehaviorAdviceTest.ServiceA;
+import com.mtgi.analytics.test.AbstractPerformanceTestCase;
+import com.mtgi.analytics.test.AbstractSpringTestCase;
 
 /**
  * Performs some timed tests to verify that behavior tracking doesn't
@@ -35,52 +33,45 @@ public class PerformanceTest extends AbstractPerformanceTestCase {
 
 	private static final long TIME_BASIS = 100000;
 
-	private ClassPathXmlApplicationContext basisContext;
-	private ClassPathXmlApplicationContext testContext;
+	private static final String[] BASIS_CONFIG = { 
+		"com/mtgi/analytics/aop/PerformanceTest-basis.xml" 
+	};
+	private static final String[] TEST_CONFIG = { 
+		"com/mtgi/analytics/aop/PerformanceTest-basis.xml",
+		"com/mtgi/analytics/aop/PerformanceTest-tracking.xml"
+	};
 	
 	public PerformanceTest() {
-		super(5, 50, TIME_BASIS, AVERAGE_OVERHEAD_NS, WORST_OVERHEAD_NS); //each test job generates two BT events.
-	}
-	
-	@Before
-	public void initContext() {
-		basisContext = new ClassPathXmlApplicationContext("com/mtgi/analytics/aop/PerformanceTest-basis.xml");
-		testContext = new ClassPathXmlApplicationContext(new String[]{ 
-							"com/mtgi/analytics/aop/PerformanceTest-basis.xml",
-							"com/mtgi/analytics/aop/PerformanceTest-tracking.xml"
-					});
-	}
-	
-	@After
-	public void destroyContext() {
-		basisContext.destroy();
-		testContext.destroy();
+		super(5, 100, TIME_BASIS, AVERAGE_OVERHEAD_NS, WORST_OVERHEAD_NS); //each test job generates two BT events.
 	}
 	
 	@Test
 	public void testPerformance() throws Throwable {
-		TestJob basisJob = new TestJob((ServiceA)basisContext.getBean("serviceA"));
-		TestJob testJob = new TestJob((ServiceA)testContext.getBean("serviceA"));
+		TestJob basisJob = new TestJob(BASIS_CONFIG);
+		TestJob testJob = new TestJob(TEST_CONFIG);
 		testPerformance(basisJob, testJob);
 	}
 	
-	public static class TestJob implements Runnable {
-		
-		private ServiceA service;
-		
-		public TestJob(ServiceA service) {
-			this.service = service;
+	public static class TestJob extends AbstractSpringTestCase<ServiceA> {
+
+		private static final long serialVersionUID = 6599513817152651866L;
+
+		public TestJob(String[] configFiles) {
+			super("serviceA", ServiceA.class, configFiles);
 		}
 
+		public void run() {
+			//we need to do something that actually registers some CPU time, in order
+			//to effectively measure overhead.
+			fib(20);
+			bean.getTracked("sleepy");
+		}
+		
 		public int fib(int n) {
 			if (n == 0 || n == 1)
 				return 1;
 			return fib(n - 1) + fib(n - 2);
 		}
 		
-		public void run() {
-			fib(20);
-			service.getTracked("sleepy");
-		}
 	}
 }
