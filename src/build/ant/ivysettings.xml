@@ -1,6 +1,9 @@
 <ivysettings>
 
 	<!-- build.mode should be "online" or "offline" -->
+	<property name="build.mode" value="online"/>
+	<property name="integration.dir" value="${ivy.settings.dir}/../ide/ivyrep"/>
+	
     <settings defaultResolver="${build.mode}" validate="false"/>
 
     <caches checkUpToDate="false" useOrigin="true" lockStrategy="artifact-lock"
