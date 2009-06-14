@@ -29,10 +29,12 @@ import org.xml.sax.SAXException;
 public class EventDataElementSerializerTest {
 
 	private static EventDataElementSerializer serializer;
+	private static boolean isJava5;
 
 	@BeforeClass
 	public static void init() {
 		serializer = new EventDataElementSerializer(XMLOutputFactory.newInstance());
+		isJava5 = System.getProperty("java.version").startsWith("1.5");
 	}
 	
 	@AfterClass
@@ -57,9 +59,16 @@ public class EventDataElementSerializerTest {
 		root.add("---bar-7", "hello");
 		root.add("baz", null);
 		root.add("qux 8", "world&escaped\nmaybe?"); //newline value should be normalized.
-		assertXMLIdentical(new Diff("<?xml version='1.0'?><event-data foo=\"1.5\" bar-7=\"hello\" qux-8=\"world&amp;escaped maybe?\"></event-data>", 
-									serializer.serialize(root, true)), 
-						   true);
+
+		if (isJava5) {
+			assertXMLIdentical(new Diff("<?xml version='1.0'?><event-data foo=\"1.5\" bar-7=\"hello\" qux-8=\"world&amp;escaped&#10;maybe?\"></event-data>", 
+										serializer.serialize(root, true)), 
+								true);
+		} else {
+			assertXMLIdentical(new Diff("<?xml version='1.0'?><event-data foo=\"1.5\" bar-7=\"hello\" qux-8=\"world&amp;escaped maybe?\"></event-data>", 
+										serializer.serialize(root, true)), 
+							   true);
+		}
 	}
 	
 	@Test
@@ -74,9 +83,15 @@ public class EventDataElementSerializerTest {
 		root.add("baz", "updated");
 		root.add("baz", null);
 		root.add("foo", new Double(4.7));
-		assertXMLIdentical(new Diff("<?xml version='1.0'?><event-data foo=\"4.7\" bar-7=\"hello\" qux-8=\"world&amp;escaped maybe?\"></event-data>", 
-									serializer.serialize(root, true)), 
-						   true);
+		if (isJava5) {
+			assertXMLIdentical(new Diff("<?xml version='1.0'?><event-data foo=\"4.7\" bar-7=\"hello\" qux-8=\"world&amp;escaped&#10;maybe?\"></event-data>", 
+					serializer.serialize(root, true)), 
+		   true);
+		} else {
+			assertXMLIdentical(new Diff("<?xml version='1.0'?><event-data foo=\"4.7\" bar-7=\"hello\" qux-8=\"world&amp;escaped maybe?\"></event-data>", 
+										serializer.serialize(root, true)), 
+							   true);
+		}
 	}
 	
 	@Test

@@ -39,7 +39,7 @@ public class JdbcBehaviorEventPersisterTest extends JdbcEventTestCase {
 		assertEquals("no events in db", 0, rs.getInt(1));
 		rs.close();
 	}
-	
+
 	@Test
 	public void testNestedEvents() throws SQLException, Exception  {
 		//we construct a dataload with important properties for the implementation:

@@ -2,25 +2,17 @@
 
 	<!-- build.mode should be "online" or "offline" -->
 	<property name="build.mode" value="online"/>
-	<property name="integration.dir" value="${ivy.settings.dir}/../ide/ivyrep"/>
 	
     <settings defaultResolver="${build.mode}" validate="false"/>
 
-    <caches checkUpToDate="false" useOrigin="true" lockStrategy="artifact-lock"
-    		default="default-cache" resolutionCacheDir="${integration.dir}/resolution">
+    <caches checkUpToDate="false" useOrigin="true" lockStrategy="artifact-lock" default="default-cache">
     	<cache name="default-cache"/>
-    	<cache name="temp-cache" basedir="${integration.dir}/cache"/>
+    	<cache name="temp-cache" basedir="${java.io.tmpdir}/ivy2/cache"/>
     </caches>
 
     <resolvers>
 
 		<chain name="offline" returnFirst="true">
-	       	<!-- first we look into our local set of build products for unpublished versions of jars -->
-	       	<filesystem name="build" alwaysCheckExactRevision="false"
-				 		cache="temp-cache" checkmodified="false">
-	            <ivy pattern="${integration.dir}/[module]/ivys/ivy-[revision].xml"/>
-	            <artifact pattern="${integration.dir}/[module]/[type]s/[revision]/[artifact].[ext]"/>
-	       	</filesystem>
 			<!-- use the cache directly as a repository for builds in offline mode -->    	
 	       	<filesystem name="cache" cache="temp-cache" alwaysCheckExactRevision="false" checkmodified="false">
 	            <ivy pattern="${ivy.default.ivy.user.dir}/cache/[organisation]/[module](/[branch])/ivy-[revision].xml"/>
@@ -29,12 +21,6 @@
         </chain>
 		
         <chain name="online" returnFirst="true">
-	       	<!-- first we look into our local set of build products for unpublished versions of jars -->
-	       	<filesystem name="build" cache="temp-cache" alwaysCheckExactRevision="false"
-				 		changingPattern=".*-SNAPSHOT" checkmodified="true">
-	            <ivy pattern="${integration.dir}/[module]/ivys/ivy-[revision].xml"/>
-	            <artifact pattern="${integration.dir}/[module]/[type]s/[revision]/[artifact].[ext]"/>
-	       	</filesystem>
 	       	<!-- fall back to the beet repository for everything else -->
 			<url name="beet-repository" alwaysCheckExactRevision="false" 
 				 changingPattern=".*-SNAPSHOT" checkmodified="true">
@@ -45,9 +31,9 @@
         
        	<filesystem name="local" alwaysCheckExactRevision="false"
 			 		cache="temp-cache" checkmodified="false">
-            <artifact pattern="${basedir}/repository/ivyrep/[organisation]/[module]/[revision]/[type]s/[artifact].[ext]"/>
+            <artifact pattern="${user.dir}/repository/ivyrep/[organisation]/[module]/[revision]/[type]s/[artifact].[ext]"/>
        	</filesystem>
-       	
+
     </resolvers>
     
 </ivysettings>
