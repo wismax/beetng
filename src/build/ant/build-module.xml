@@ -292,7 +292,7 @@ once for each module in the project.
 		</ivy:publish>
 	</target>
 
-	<target name="jar" description="packages module jar archive">
+	<target name="jar" description="packages module jar archive" if="module.archive.file">
 
 		<mkdir dir="${conf.dir}"/>
 
@@ -311,7 +311,10 @@ once for each module in the project.
 		
 		<!-- also generate a source jar if requested -->
 		<if>
-			<equals arg1="${module.jar.include.source}" arg2="true"/>
+			<and>
+				<equals arg1="${module.jar.include.source}" arg2="true"/>
+				<available file="${src.dir}"/>
+			</and>
 			<then>
 				<jar destfile="${build.dist}/sources/${module.archive.file}" update="true">
 					<fileset dir="${src.dir}" includes="**/*"/>

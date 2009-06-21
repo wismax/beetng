@@ -25,9 +25,9 @@
 		<!-- for compatibility testing -->
 		<dependency org="junit" name="junit" rev="4.4"/>
 		<dependency org="org.easymock" name="easymock" rev="2.5"/>
-		<dependency org="org.springframework.security" name="spring-security-core" rev="2.0.2"/>
+		<dependency org="org.springframework.security" name="spring-security-core" rev="2.0.2" transitive="false"/>
 		<dependency org="org.springframework" name="spring" rev="2.5.5"/>
-		<dependency org="org.springframework" name="spring-test" rev="2.5.5"/>
+		<dependency org="org.springframework" name="spring-test" rev="2.5.5" transitive="false"/>
 		<dependency org="cglib" name="cglib" rev="2.1_3"/>
 		<dependency org="org.opensymphony.quartz" name="quartz" rev="1.6.1"/>
 		<dependency org="org.aspectj" name="aspectjrt" rev="1.6.5"/>
