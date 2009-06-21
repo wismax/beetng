@@ -14,6 +14,7 @@
 package com.mtgi.analytics;
 
 import static org.apache.commons.io.IOUtils.readLines;
+import static org.custommonkey.xmlunit.XMLUnit.buildTestDocument;
 import static org.junit.Assert.*;
 
 import java.io.File;
@@ -34,9 +35,18 @@ import javax.xml.stream.XMLStreamException;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.custommonkey.xmlunit.Diff;
+import org.custommonkey.xmlunit.Difference;
+import org.custommonkey.xmlunit.DifferenceListener;
+import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import com.mtgi.io.RelocatableFile;
 import com.sun.xml.fastinfoset.tools.FI_SAX_XML;
@@ -72,15 +82,17 @@ public class XmlBehaviorEventPersisterTest {
 	@Test
 	public void testEmptyQueue() throws IOException {
 		persister.persist(new LinkedList<BehaviorEvent>());
-		assertEquals("empty event-log declaration written", "<?xml version=\"1.0\" ?><event-log", FileUtils.readFileToString(file));
+		assertTrue("empty event-log declaration written", 
+					FileUtils.readFileToString(file)
+						.matches("<\\?xml .*?\\?><event-log"));
 		assertEquals(file.length(), persister.getFileSize());
 		assertFalse("persister defaults to plain text format", persister.isBinary());
 	}
 	
-	@Test @SuppressWarnings("unchecked")
-	public void testNestedEvents() throws InterruptedException, IOException, XMLStreamException {
+	@Test
+	public void testNestedEvents() throws InterruptedException, IOException, XMLStreamException, SAXException {
 		//we reuse the test event creation code from jdbc persister test to get ourselves an interesting dataset.
-		ArrayList<BehaviorEvent> events = new ArrayList<BehaviorEvent>();
+		final ArrayList<BehaviorEvent> events = new ArrayList<BehaviorEvent>();
 		int[] counter = { 0 };
 		for (int i = 0; i < 3; ++i)
 			JdbcBehaviorEventPersisterTest.createEvent(null, 1, 3, 3, counter, events);
@@ -92,44 +104,67 @@ public class XmlBehaviorEventPersisterTest {
 		
 		//now perform verification of log data against the expected results.
 		String fileName = persister.rotateLog();
-		List<String> actualLines = (List<String>)FileUtils.readLines(new File(fileName));
-
+		Document actualXML = buildTestDocument(FileUtils.readFileToString(new File(fileName)));
+		
 		//read up the expected results for comparison.
 		InputStream expectedData = XmlBehaviorEventPersisterTest.class.getResourceAsStream("XmlBehaviorEventPersisterTest.testNestedEvents-result.xml");
-		assertNotNull("expected results resource found in test environment", expectedData);
-		List<String> expectedLines = (List<String>)readLines(expectedData);
+		Document controlXML = buildTestDocument(new InputSource(expectedData));
 		expectedData.close();
-
-		assertEquals("every event was written", expectedLines.size(), actualLines.size());
-		final String expectedOpen = "<?xml version=\"1.0\" ?><event-log>";
-		assertEquals("well-formed open", 
-					 expectedOpen, actualLines.get(0).substring(0, expectedOpen.length()));
-		assertEquals("well-formed close", "</event-log>", actualLines.get(actualLines.size() - 1));
 		
-		//compare the logged data line by line.
-		assertEquals("expected log count matches actual", expectedLines.size(), actualLines.size());
-		for (int i = 0; i < expectedLines.size() - 1; ++i) {
+		XMLUnit.setIgnoreWhitespace(true);
+
+		//compare the logged data to our expectations, ignoring time-sensitive values.
+		Diff diff = new Diff(controlXML, actualXML);
+		diff.overrideDifferenceListener(new DifferenceListener() {
 			
-			String actual = actualLines.get(i);
-			//we have to strip data that varies from test run to test run out before comparing.
-			String expectedStripped = stripVariableData(expectedLines.get(i));
-			String actualStripped = stripVariableData(actual);
-			assertEquals("log line[" + i + "] matches expected", expectedStripped, actualStripped);
+			//filter out artificial differences in id, start time, duration
+			public int differenceFound(Difference diff) {
+				
+				Node cn = diff.getControlNodeDetail().getNode();
+				Node tn = diff.getTestNodeDetail().getNode();
+				
+				if (cn != null && tn != null) {
+					short ctype = cn.getNodeType();
+					short ttype = tn.getNodeType();
+					if (ctype == ttype) {
+						if (ctype == Node.ATTRIBUTE_NODE) {
+							if (cn.getNodeName().equals("id") || cn.getNodeName().equals("parent-id")) {
+								//we can at least verify that the logged ID matches the ID assigned to our data model.
+								int index = -1;
+								for (Node n = ((Attr)cn).getOwnerElement(); n != null; n = n.getPreviousSibling())
+									if (n.getNodeType() == Node.ELEMENT_NODE)
+										++index;
+								BehaviorEvent event = events.get(index);
+								if (cn.getNodeName().equals("id")) {
+									assertEquals("logged event has same id as data model", event.getId().toString(), tn.getNodeValue());
+								} else {
+									BehaviorEvent parent = event.getParent();
+									assertNotNull("node " + event.getId() + " has parent", parent);
+									assertEquals("logged event has same parent-id as data model", parent.getId().toString(), tn.getNodeValue());
+								}
+								return RETURN_IGNORE_DIFFERENCE_NODES_SIMILAR;
+							}
+						} else if (ctype == Node.TEXT_NODE) {
+							String cname = cn.getParentNode().getNodeName();
+							String tname = tn.getParentNode().getNodeName();
+							if (cname.equals(tname)) {
+								//TODO: sanity check values.
+								if ("duration-ms".equals(cname) || "start".equals(cname))
+									return RETURN_IGNORE_DIFFERENCE_NODES_SIMILAR;
+							}
+						}
+					}
+				}
+				
+				return RETURN_ACCEPT_DIFFERENCE;
+			}
+
+			public void skippedComparison(Node n0, Node n1) {}
 			
-			//now check data against source event so that time-sensitive info is checked.
-			BehaviorEvent evt = events.get(i);
-			assertNotNull("event was given an id", evt.getId());
-			assertTrue("log contains id", actual.contains("id=\"" + evt.getId() + "\""));
-			
-			BehaviorEvent parent = evt.getParent();
-			if (parent == null)
-				assertFalse("log does not contain parent id", actual.contains("parent-id"));
-			else
-				assertTrue("log contains parent reference", actual.contains("parent-id=\"" + parent.getId() + "\""));
-			
-			assertTrue("log records time correctly", DATE_PATTERN.matcher(actual).find());
-			assertTrue("log records duration correctly", actual.contains("<duration-ms>" + evt.getDuration() + "</duration-ms>"));
-		}
+		});
+		
+		if (!diff.similar())
+			fail(diff.appendMessage(new StringBuffer()).toString());
 	}
 	
 	@Test @SuppressWarnings("unchecked")
