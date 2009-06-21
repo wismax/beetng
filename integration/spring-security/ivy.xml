@@ -15,12 +15,15 @@
 		<conf name="source" description="source jar"/>
 		<conf name="compile" description="compile-time dependencies"/>
 		<conf name="test" description="dependencies used for junit testing"/>
-		<conf name="default" description="core module with runtime dependencies, for SDK 1.6 and higher"/>
+		
+		<conf name="1.5" extends="default" description="core module with dependencies, for SDK 1.5 and below"/>
+		<conf name="1.6" description="core module with runtime dependencies, for SDK 1.6 and higher"/>
+		<conf name="default" extends="1.6" description="alias for '1.6'" />
 	</configurations>
 
 	<publications/>
 	
-	<dependencies defaultconfmapping="test->default">
+	<dependencies defaultconfmapping="1.5,1.6,test->default">
 
 		<!-- for compatibility testing -->
 		<dependency org="junit" name="junit" rev="4.4"/>
@@ -28,11 +31,14 @@
 		<dependency org="org.springframework.security" name="spring-security-core" rev="2.0.2" transitive="false"/>
 		<dependency org="org.springframework" name="spring" rev="2.5.5"/>
 		<dependency org="org.springframework" name="spring-test" rev="2.5.5" transitive="false"/>
+		<dependency org="stax" name="stax" rev="1.2.0"/>
+		<dependency org="com.sun.xml.fastinfoset" name="FastInfoset" rev="1.2.2"/>
 		<dependency org="cglib" name="cglib" rev="2.1_3"/>
 		<dependency org="org.opensymphony.quartz" name="quartz" rev="1.6.1"/>
 		<dependency org="org.aspectj" name="aspectjrt" rev="1.6.5"/>
 		<dependency org="org.aspectj" name="aspectjweaver" rev="1.6.5"/>
 		<dependency org="commons-logging" name="commons-logging" rev="1.1"/>
+		<dependency org="commons-collections" name="commons-collections" rev="3.2"/>
 		
 		<dependency org="mtgi" name="beet" rev="latest.integration" transitive="false"/>
 

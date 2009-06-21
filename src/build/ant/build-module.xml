@@ -163,7 +163,7 @@ once for each module in the project.
 
 			<jvmarg line="${_test.debug.args}"/>
 			
-			<sysproperty key="net.sourceforge.cobertura.datafile" file="${build.dir}/cobertura.ser" />
+			<sysproperty key="net.sourceforge.cobertura.datafile" file="${test.coverage.data}" />
 			<!-- useful if unit tests include JSP compilation, to prevent cached JSP classes from interfering with future unit tests -->
 			<sysproperty key="java.io.tmpdir" file="${test.tmp}"/>
 
@@ -240,11 +240,16 @@ once for each module in the project.
 	</target>
 
 	<target name="coverage-report">
-		<cobertura-report destdir="${reports.coverage.html.dir}" datafile="${build.dir}/cobertura.ser">
-			<fileset dir="${src.dir}">
-				<include name="**/*.java"/>
-			</fileset>
-		</cobertura-report>
+		<if>
+			<available file="${test.coverage.src}"/>
+			<then>
+				<cobertura-report destdir="${reports.coverage.html.dir}" datafile="${build.dir}/cobertura.ser">
+					<fileset dir="${test.coverage.src}" >
+						<include name="**/*.java"/>
+					</fileset>
+				</cobertura-report>
+			</then>
+		</if>
 	</target>
 
 	<target name="depend-report" depends="depend"
