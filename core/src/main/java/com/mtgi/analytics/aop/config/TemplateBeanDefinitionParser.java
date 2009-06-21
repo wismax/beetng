@@ -15,6 +15,7 @@ package com.mtgi.analytics.aop.config;
 
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -91,7 +92,7 @@ public class TemplateBeanDefinitionParser extends AbstractSingleBeanDefinitionPa
 		if (templateFactory == null) {
 			
 			//no nesting -- load the template XML configuration from the classpath.
-			final ConfigurableListableBeanFactory parentFactory = (ConfigurableListableBeanFactory)parserContext.getRegistry();
+			final BeanFactory parentFactory = (BeanFactory)parserContext.getRegistry();
 			templateFactory = new DefaultListableBeanFactory(parentFactory);
 			
 			//load template bean definitions
