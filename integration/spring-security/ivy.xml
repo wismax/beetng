@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<ivy-module version="2.0">
+    <info organisation="mtgi" module="beet-spring-security" status="release" revision="1.0.0_rc1">
+    	<license name="Mozilla Public License, version 1.1" 
+    			 url="http://www.mozilla.org/MPL/MPL-1.1.html"/>
+    	<repository name="Beet Ivyrep" url="http://beet.sourceforge.net/ivyrep"
+    				pattern="[organisation]/[module]/[revision]/[type]s/[artifact].[ext]"/>
+    	<description homepage="http://beet.sourceforge.net">
+    	Integration tests for spring-security.
+    	</description>
+	</info>
+	
+	<configurations>
+		<conf name="base" description="core module without runtime dependencies"/>
+		<conf name="source" description="source jar"/>
+		<conf name="compile" description="compile-time dependencies"/>
+		<conf name="test" description="dependencies used for junit testing"/>
+		<conf name="default" description="core module with runtime dependencies, for SDK 1.6 and higher"/>
+	</configurations>
+
+	<publications/>
+	
+	<dependencies defaultconfmapping="test->default">
+
+		<!-- for compatibility testing -->
+		<dependency org="junit" name="junit" rev="4.4"/>
+		<dependency org="org.easymock" name="easymock" rev="2.5"/>
+		<dependency org="org.springframework.security" name="spring-security-core" rev="2.0.2"/>
+		<dependency org="org.springframework" name="spring" rev="2.5.5"/>
+		<dependency org="org.springframework" name="spring-test" rev="2.5.5"/>
+		<dependency org="org.opensymphony.quartz" name="quartz" rev="1.6.1"/>
+		<dependency org="org.aspectj" name="aspectjrt" rev="1.6.5"/>
+		<dependency org="commons-logging" name="commons-logging" rev="1.1"/>
+		
+		<dependency org="mtgi" name="beet" rev="latest.integration" transitive="false"/>
+
+	</dependencies>
+	
+</ivy-module>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns:bt="http://www.mantis-tgi.com/schema/bt/1.1" 
+	   xmlns="http://www.springframework.org/schema/beans" 
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	   xmlns:security="http://www.springframework.org/schema/security"
+	   xsi:schemaLocation="
+	   		http://www.springframework.org/schema/beans		http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+	   		http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-2.0.2.xsd
+			http://www.mantis-tgi.com/schema/bt/1.1			http://www.mantis-tgi.com/schema/bt/mtgi-bt-1.1.xsd">
+
+	<bt:config>
+	  <bt:manager application="testApp" 
+	  			  track-method-expression="execution(* com.mtgi.analytics.integration..*Tracked(..))"/>
+	</bt:config>
+	
+	<security:authentication-provider user-service-ref="mockUserService"/>
+	
+	<security:global-method-security>
+		<security:protect-pointcut expression="execution(public * com.mtgi.analytics.integration..*Tracked(..))" access="ROLE_USER" />
+	</security:global-method-security>
+
+	<bean id="mockUserService" class="com.mtgi.analytics.integration.SpringSecurityIntegrationTest$MockUserService"/>
+	<bean id="testBean" class="com.mtgi.analytics.integration.SpringSecurityIntegrationTest$TestBean"/>
+	
+</beans>

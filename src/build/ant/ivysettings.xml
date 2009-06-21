@@ -41,6 +41,9 @@
 				<ivy pattern="http://beet.sourceforge.net/ivyrep/[organisation]/[module]/[revision]/ivys/ivy.xml"/>
 				<artifact pattern="http://beet.sourceforge.net/ivyrep/[organisation]/[module]/[revision]/[type]s/[artifact].[ext]"/>
 			</url>
+			<url name="maven-central" m2compatible="true">
+				<artifact pattern="http://repo1.maven.org/maven2/[organisation]/[module]/[revision]/[artifact]-[revision].[ext]"/>
+			</url>
         </chain>
         
        	<filesystem name="local" alwaysCheckExactRevision="false"
