@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<ivy-module version="2.0">
+    <info organisation="net.sourceforge.beet" module="beet-test" status="release" revision="1.0.0_b3">
+    	<license name="Mozilla Public License, version 1.1" 
+    			 url="http://www.mozilla.org/MPL/MPL-1.1.html"/>
+    	<repository name="Beet Ivyrep" url="http://beet.sourceforge.net/ivyrep"
+    				pattern="[organisation]/[module]/[revision]/[type]s/[artifact].[ext]"/>
+    	<description homepage="http://beet.sourceforge.net">
+    	Unit testing utilities developed as a corollary of the beet project.
+    	</description>
+	</info>
+	
+	<configurations>
+		<conf name="base" description="core module without runtime dependencies"/>
+		<conf name="source" description="source jar"/>
+		<conf name="compile" description="compile-time dependencies"/>
+		<conf name="test" description="dependencies used for junit testing"/>
+		
+		<conf name="1.5" extends="default" description="core module with dependencies, for SDK 1.5 and below"/>
+		<conf name="1.6" description="core module with runtime dependencies, for SDK 1.6 and higher"/>
+		<conf name="default" extends="1.6" description="alias for '1.6'" />
+	</configurations>
+
+	<publications>
+		<artifact name="beet-test" type="jar" conf="base,default,test"/>
+		<artifact name="beet-test" type="source" ext="jar" conf="source"/>
+	</publications>
+	
+	<dependencies defaultconfmapping="1.5,1.6,default,compile,test->default">
+
+		<dependency org="org.unitils" name="unitils" rev="2.3"/>
+		<dependency org="org.springframework" name="spring-context" rev="2.0.+" conf="compile"/>
+		
+	</dependencies>
+	
+</ivy-module>
