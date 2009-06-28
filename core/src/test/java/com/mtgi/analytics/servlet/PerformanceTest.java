@@ -129,7 +129,6 @@ public class PerformanceTest extends AbstractPerformanceTestCase {
 			
 			//startup embedded tomcat server with test application
 			File dir = getDeployableResource(deploymentDir);
-			tomcat = new EmbeddedTomcatServer(null, false);
 			tomcat.deployDescriptor(contextPath, dir);
 			tomcat.start();
 

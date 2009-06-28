@@ -29,7 +29,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.unitils.UnitilsJUnit4TestClassRunner;
-import org.unitils.database.transaction.TransactionalDataSource;
 import org.unitils.spring.annotation.SpringApplicationContext;
 import org.unitils.spring.annotation.SpringBeanByName;
 
@@ -67,7 +66,7 @@ public class DataSourceDecoratorTest {
 	@Test
 	public void testTracking() throws Exception {
 		assertTrue("datasource has been wrapped in a proxy", unitilsDS instanceof BehaviorTrackingDataSource);
-		assertTrue("original datasource is wrapped", ((BehaviorTrackingDataSource)unitilsDS).getTargetDataSource() instanceof TransactionalDataSource);
+		assertTrue("original datasource is wrapped", ((BehaviorTrackingDataSource)unitilsDS).getTargetDataSource() instanceof DataSource);
 		assertSame("inner persister is promoted to global scope", testPersister, defaultTrackingManager.getPersister());
 		
 		int count = testPersister.count();
