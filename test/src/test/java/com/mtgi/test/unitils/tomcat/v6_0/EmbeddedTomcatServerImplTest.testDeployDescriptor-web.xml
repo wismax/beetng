@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<web-app>
+
+	<servlet>
+		<servlet-name>ping</servlet-name>
+		<servlet-class>com.mtgi.test.unitils.tomcat.v6_0.EmbeddedTomcatServerImplTest$PingServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>ping</servlet-name>
+		<url-pattern>/ping</url-pattern>
+	</servlet-mapping>	
+
+</web-app>

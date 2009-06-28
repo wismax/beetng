@@ -7,14 +7,11 @@ import org.unitils.core.TestListener;
 
 public class TomcatModule implements Module {
 
-	public void afterInit() {
-	}
+	public void init(Properties config) {}
+	public void afterInit() {}
 
 	public TestListener getTestListener() {
-		return null;
-	}
-
-	public void init(Properties config) {
+		return new Listener();
 	}
 
 	public static class Listener extends TestListener {
