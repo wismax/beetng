@@ -48,20 +48,18 @@ import com.mtgi.analytics.BehaviorTrackingManager;
 import com.mtgi.analytics.BehaviorTrackingManagerImpl;
 import com.mtgi.analytics.JdbcEventTestCase;
 import com.mtgi.analytics.MockSessionContext;
-import com.mtgi.test.unitils.tomcat.EmbeddedTomcatServer;
-import com.mtgi.test.unitils.tomcat.annotations.EmbeddedDeploy;
+import com.mtgi.test.unitils.tomcat.annotations.DeployDescriptor;
 import com.mtgi.test.unitils.tomcat.annotations.EmbeddedTomcat;
 
-@EmbeddedTomcat(start=true)
-@EmbeddedDeploy(contextRoot="/app", value="com/mtgi/analytics/servlet/web.xml")
+@DeployDescriptor(contextRoot="/app", webXml="com/mtgi/analytics/servlet/web.xml")
 public class BehaviorTrackingFilterTest extends JdbcEventTestCase {
 
 	private static TestServlet servlet;
 	private static BehaviorTrackingManagerImpl manager;
 	private WebClient webClient;
 	
-	@EmbeddedTomcat
-	protected EmbeddedTomcatServer server;
+	@EmbeddedTomcat(start=true)
+	private String baseUrl;
 
 	@Before
 	public void setUp() {
@@ -78,7 +76,7 @@ public class BehaviorTrackingFilterTest extends JdbcEventTestCase {
 	/** Test basic logging of a GET request */
 	@Test
 	public void testGetRequest() throws Exception {
-	    webClient.getPage("http://localhost:8888/app/test/path?param1=hello&param1=world&param2&param3=72%3C");
+	    webClient.getPage(baseUrl + "/app/test/path?param1=hello&param1=world&param2&param3=72%3C");
 	    assertNotNull("Servlet was hit", servlet);
 
 	    //make sure all events are written to database, and verify the db contents.
@@ -95,7 +93,7 @@ public class BehaviorTrackingFilterTest extends JdbcEventTestCase {
 			new NameValuePair("param2", ""),
 			new NameValuePair("param3", "72<")
 		};
-		WebRequestSettings request = new WebRequestSettings(new URL("http://localhost:8888/app/test/path"));
+		WebRequestSettings request = new WebRequestSettings(new URL(baseUrl + "/app/test/path"));
 		request.setEncodingType(FormEncodingType.URL_ENCODED);
 		request.setSubmitMethod(SubmitMethod.POST);
 		request.setRequestParameters(asList(parameters));
@@ -117,7 +115,7 @@ public class BehaviorTrackingFilterTest extends JdbcEventTestCase {
 			new NameValuePair("param3", "72<"),
 			new NameValuePair("dispatch2", "v1")
 		};
-		WebRequestSettings request = new WebRequestSettings(new URL("http://localhost:8888/app/test/path"));
+		WebRequestSettings request = new WebRequestSettings(new URL(baseUrl + "/app/test/path"));
 		request.setEncodingType(FormEncodingType.URL_ENCODED);
 		request.setSubmitMethod(SubmitMethod.POST);
 		request.setRequestParameters(asList(parameters));
@@ -131,7 +129,7 @@ public class BehaviorTrackingFilterTest extends JdbcEventTestCase {
 	/** Verify that tracking events are logged for extension-mapped servlet paths */
 	@Test
 	public void testExtensionMapping() throws Exception {
-	    webClient.getPage("http://localhost:8888/app/foo.ext?param1=hello&param1=world&param2&param3=72%3C");
+	    webClient.getPage(baseUrl + "/app/foo.ext?param1=hello&param1=world&param2&param3=72%3C");
 	    assertNotNull("Servlet was hit", servlet);
 
 	    manager.flush();
@@ -145,7 +143,7 @@ public class BehaviorTrackingFilterTest extends JdbcEventTestCase {
 		TestServlet.status = 403;
 		TestServlet.message = "Authorized personnel only";
 		try {
-			webClient.getPage("http://localhost:8888/app/foo.ext?param1=secret");
+			webClient.getPage(baseUrl + "/app/foo.ext?param1=secret");
 			fail("non-OK status should have been sent back by test servlet");
 		} catch (FailingHttpStatusCodeException expected) {
 			assertEquals("Server status code sent back", 403, expected.getStatusCode());
@@ -156,7 +154,7 @@ public class BehaviorTrackingFilterTest extends JdbcEventTestCase {
 		//now sendError(int)
 		TestServlet.status = 401;
 		try {
-			webClient.getPage("http://localhost:8888/app/foo.ext?param1=secret");
+			webClient.getPage(baseUrl + "/app/foo.ext?param1=secret");
 			fail("non-OK status should have been sent back by test servlet");
 		} catch (FailingHttpStatusCodeException expected) {
 			assertEquals("Server status code sent back", 401, expected.getStatusCode());
@@ -167,7 +165,7 @@ public class BehaviorTrackingFilterTest extends JdbcEventTestCase {
 		webClient.setRedirectEnabled(false);
 	    TestServlet.status = 301;
 		try {
-		    webClient.getPage("http://localhost:8888/app/redirect.ext");
+		    webClient.getPage(baseUrl + "/app/redirect.ext");
 			fail("non-OK status should have been sent back by test servlet");
 		} catch (FailingHttpStatusCodeException expected) {
 			assertEquals("Server status code sent back", 301, expected.getStatusCode());
@@ -178,7 +176,7 @@ public class BehaviorTrackingFilterTest extends JdbcEventTestCase {
 	    TestServlet.status = 302;
 	    TestServlet.message = "I don't remember what 302 means exactly";
 		try {
-		    webClient.getPage("http://localhost:8888/app/status.ext");
+		    webClient.getPage(baseUrl + "/app/status.ext");
 			fail("non-OK status should have been sent back by test servlet");
 		} catch (FailingHttpStatusCodeException expected) {
 			assertEquals("Server status code sent back", 302, expected.getStatusCode());
@@ -195,7 +193,7 @@ public class BehaviorTrackingFilterTest extends JdbcEventTestCase {
 	public void testExceptionHandling() throws Exception {
 		TestServlet.servletException = new ServletException("servlet boom");
 		try {
-			webClient.getPage("http://localhost:8888/app/foo.ext?param1=SE");
+			webClient.getPage(baseUrl + "/app/foo.ext?param1=SE");
 			fail("non-OK status should have been sent back by test servlet");
 		} catch (FailingHttpStatusCodeException expected) {
 		    assertNotNull("Servlet was hit", servlet);
@@ -204,7 +202,7 @@ public class BehaviorTrackingFilterTest extends JdbcEventTestCase {
 
 		TestServlet.ioException = new IOException("IO boom");
 		try {
-			webClient.getPage("http://localhost:8888/app/foo.ext?param1=IOE");
+			webClient.getPage(baseUrl + "/app/foo.ext?param1=IOE");
 			fail("non-OK status should have been sent back by test servlet");
 		} catch (FailingHttpStatusCodeException expected) {
 		    assertNotNull("Servlet was hit", servlet);
@@ -213,7 +211,7 @@ public class BehaviorTrackingFilterTest extends JdbcEventTestCase {
 
 		TestServlet.runtimeException = new NullPointerException("Should have written a unit test");
 		try {
-			webClient.getPage("http://localhost:8888/app/foo.ext?param1=RE");
+			webClient.getPage(baseUrl + "/app/foo.ext?param1=RE");
 			fail("non-OK status should have been sent back by test servlet");
 		} catch (FailingHttpStatusCodeException expected) {
 		    assertNotNull("Servlet was hit", servlet);
@@ -222,7 +220,7 @@ public class BehaviorTrackingFilterTest extends JdbcEventTestCase {
 
 		TestServlet.error = new AssertionFailedError("Might as well try to trap these");
 		try {
-			webClient.getPage("http://localhost:8888/app/foo.ext?param1=E");
+			webClient.getPage(baseUrl + "/app/foo.ext?param1=E");
 			fail("non-OK status should have been sent back by test servlet");
 		} catch (FailingHttpStatusCodeException expected) {
 		    assertNotNull("Servlet was hit", servlet);
@@ -236,12 +234,12 @@ public class BehaviorTrackingFilterTest extends JdbcEventTestCase {
 	
 	/** test filter init parameters for configuration */
 	@Test 
-	@EmbeddedDeploy(
+	@DeployDescriptor(
 		contextRoot="/configured", 
-		value="com/mtgi/analytics/servlet/BehaviorTrackingFilterTest.testConfiguration-web.xml"
+		webXml="com/mtgi/analytics/servlet/BehaviorTrackingFilterTest.testConfiguration-web.xml"
 	)
 	public void testConfiguration() throws Exception {
-	    webClient.getPage("http://localhost:8888/configured/test/path?param1=hello&param1=world&param2&param3=72%3C");
+	    webClient.getPage(baseUrl + "/configured/test/path?param1=hello&param1=world&param2&param3=72%3C");
 	    assertNotNull("Servlet was hit", servlet);
 	    manager.flush();
 	    assertEventDataMatches("BehaviorTrackingFilterTest.testConfiguration-result.xml");

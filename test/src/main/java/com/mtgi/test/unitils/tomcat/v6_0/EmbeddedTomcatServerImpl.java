@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
@@ -145,8 +146,13 @@ public class EmbeddedTomcatServerImpl implements EmbeddedTomcatServer {
 		if (started) {
 			server.stop();
 			sessions.clear();
+			Container[] contexts = host.findChildren();
+			for (Container c : contexts)
+				if (!"".equals(c.getName()))
+					host.removeChild(c);
 			started = false;
 			System.setProperties(savedProperties);
+
 		}
 	}
 

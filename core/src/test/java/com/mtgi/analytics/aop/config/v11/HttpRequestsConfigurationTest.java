@@ -13,9 +13,11 @@
  
 package com.mtgi.analytics.aop.config.v11;
 
+import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -30,6 +32,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import junit.framework.AssertionFailedError;
+
+import org.apache.commons.httpclient.NameValuePair;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,26 +44,28 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.unitils.UnitilsJUnit4TestClassRunner;
 
+import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
+import com.gargoylesoftware.htmlunit.FormEncodingType;
+import com.gargoylesoftware.htmlunit.SubmitMethod;
 import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.WebRequestSettings;
 import com.mtgi.analytics.BehaviorEvent;
 import com.mtgi.analytics.BehaviorTrackingManager;
 import com.mtgi.analytics.BehaviorTrackingManagerImpl;
 import com.mtgi.analytics.MockSessionContext;
-import com.mtgi.test.unitils.tomcat.EmbeddedTomcatServer;
-import com.mtgi.test.unitils.tomcat.annotations.EmbeddedDeploy;
+import com.mtgi.test.unitils.tomcat.annotations.DeployDescriptor;
 import com.mtgi.test.unitils.tomcat.annotations.EmbeddedTomcat;
 
-@EmbeddedTomcat(start=true)
-@EmbeddedDeploy(contextRoot="/app", value="com/mtgi/analytics/aop/config/v11/HttpRequestsConfigurationTest-web.xml")
+@DeployDescriptor(contextRoot="/app", webXml="com/mtgi/analytics/aop/config/v11/HttpRequestsConfigurationTest-web.xml")
 @RunWith(UnitilsJUnit4TestClassRunner.class)
 public class HttpRequestsConfigurationTest {
 
 	private static TestServlet servlet;
 	private WebClient webClient;
 	
-	@EmbeddedTomcat
-	protected EmbeddedTomcatServer server;
-
+	@EmbeddedTomcat(start=true)
+	private String baseUrl;
+	
 	@Before
 	public void setUp() {
 		webClient = new WebClient();
@@ -74,10 +81,10 @@ public class HttpRequestsConfigurationTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testGetRequest() throws Exception {
-	    webClient.getPage("http://localhost:8888/app/test/path?param1=hello&param1=world&param2&param3=72%3C");
+	    webClient.getPage(baseUrl + "/app/test/path?param1=hello&param1=world&param2&param3=72%3C");
 	    assertNotNull("Servlet was hit", servlet);
-	    webClient.getPage("http://localhost:8888/app/test/also.traq?param1=hello&param1=world&param2&param3=72%3C&dispatch=dang");
-	    webClient.getPage("http://localhost:8888/app/test/also.traq?param1=nodispatch&param1=world&param2&param3=72%3C");
+	    webClient.getPage(baseUrl + "/app/test/also.traq?param1=hello&param1=world&param2&param3=72%3C&dispatch=dang");
+	    webClient.getPage(baseUrl + "/app/test/also.traq?param1=nodispatch&param1=world&param2&param3=72%3C");
 
 	    Collection<BehaviorTrackingManagerImpl> managers = servlet.context.getBeansOfType(BehaviorTrackingManager.class).values();
 	    for (BehaviorTrackingManagerImpl m : managers)
@@ -108,130 +115,130 @@ public class HttpRequestsConfigurationTest {
 	    assertEquals("all receivedevents accounted for", 0, events.size());
 	}
 
-//	/** Same as testGetRequest, but with POST form parameters instead of URL query string */
-//	@Test
-//	public void testPostRequest() throws Exception {
-//		NameValuePair[] parameters = {
-//			new NameValuePair("param1", "hello"),
-//			new NameValuePair("param1", "world"),
-//			new NameValuePair("param2", ""),
-//			new NameValuePair("param3", "72<")
-//		};
-//		WebRequestSettings request = new WebRequestSettings(new URL("http://localhost:8888/app/test/path"));
-//		request.setEncodingType(FormEncodingType.URL_ENCODED);
-//		request.setSubmitMethod(SubmitMethod.POST);
-//		request.setRequestParameters(asList(parameters));
-//		
-//		webClient.getPage(request);
-//		assertNotNull("servlet was hit", servlet);
-//	}
-//	
-//	/** Verify that tracking events are logged for extension-mapped servlet paths */
-//	@Test
-//	public void testExtensionMapping() throws Exception {
-//	    webClient.getPage("http://localhost:8888/app/foo.ext?param1=hello&param1=world&param2&param3=72%3C");
-//	    assertNotNull("Servlet was hit", servlet);
-//	}
-//	
-//	/** verify that server error codes are logged in the event data */
-//	@Test
-//	public void testErrorStatus() throws Exception {
-//		//first test sendError(int, String)
-//		TestServlet.status = 403;
-//		TestServlet.message = "Authorized personnel only";
-//		try {
-//			webClient.getPage("http://localhost:8888/app/foo.ext?param1=secret");
-//			fail("non-OK status should have been sent back by test servlet");
-//		} catch (FailingHttpStatusCodeException expected) {
-//			assertEquals("Server status code sent back", 403, expected.getStatusCode());
-//			assertEquals("Authorized personnel only", expected.getStatusMessage());
-//		    assertNotNull("Servlet was hit", servlet);
-//		}
-//		
-//		//now sendError(int)
-//		TestServlet.status = 401;
-//		try {
-//			webClient.getPage("http://localhost:8888/app/foo.ext?param1=secret");
-//			fail("non-OK status should have been sent back by test servlet");
-//		} catch (FailingHttpStatusCodeException expected) {
-//			assertEquals("Server status code sent back", 401, expected.getStatusCode());
-//		    assertNotNull("Servlet was hit", servlet);
-//		}
-//
-//		//now setStatus(int);
-//		webClient.setRedirectEnabled(false);
-//	    TestServlet.status = 301;
-//		try {
-//		    webClient.getPage("http://localhost:8888/app/redirect.ext");
-//			fail("non-OK status should have been sent back by test servlet");
-//		} catch (FailingHttpStatusCodeException expected) {
-//			assertEquals("Server status code sent back", 301, expected.getStatusCode());
-//		    assertNotNull("Servlet was hit", servlet);
-//		}
-//
-//	    //finally setStatus(int,string)
-//	    TestServlet.status = 302;
-//	    TestServlet.message = "I don't remember what 302 means exactly";
-//		try {
-//		    webClient.getPage("http://localhost:8888/app/status.ext");
-//			fail("non-OK status should have been sent back by test servlet");
-//		} catch (FailingHttpStatusCodeException expected) {
-//			assertEquals("Server status code sent back", 302, expected.getStatusCode());
-//		    assertNotNull("Servlet was hit", servlet);
-//		}
-//	}
-//
-//	/** test the graceful handling of various runtime errors by the filter */
-//	@Test
-//	public void testExceptionHandling() throws Exception {
-//		TestServlet.servletException = new ServletException("servlet boom");
-//		try {
-//			webClient.getPage("http://localhost:8888/app/foo.ext?param1=SE");
-//			fail("non-OK status should have been sent back by test servlet");
-//		} catch (FailingHttpStatusCodeException expected) {
-//		    assertNotNull("Servlet was hit", servlet);
-//			assertEquals("Server status code sent back", 500, expected.getStatusCode());
-//		}
-//
-//		TestServlet.ioException = new IOException("IO boom");
-//		try {
-//			webClient.getPage("http://localhost:8888/app/foo.ext?param1=IOE");
-//			fail("non-OK status should have been sent back by test servlet");
-//		} catch (FailingHttpStatusCodeException expected) {
-//		    assertNotNull("Servlet was hit", servlet);
-//			assertEquals("Server status code sent back", 500, expected.getStatusCode());
-//		}
-//
-//		TestServlet.runtimeException = new NullPointerException("Should have written a unit test");
-//		try {
-//			webClient.getPage("http://localhost:8888/app/foo.ext?param1=RE");
-//			fail("non-OK status should have been sent back by test servlet");
-//		} catch (FailingHttpStatusCodeException expected) {
-//		    assertNotNull("Servlet was hit", servlet);
-//			assertEquals("Server status code sent back", 500, expected.getStatusCode());
-//		}
-//
-//		TestServlet.error = new AssertionFailedError("Might as well try to trap these");
-//		try {
-//			webClient.getPage("http://localhost:8888/app/foo.ext?param1=E");
-//			fail("non-OK status should have been sent back by test servlet");
-//		} catch (FailingHttpStatusCodeException expected) {
-//		    assertNotNull("Servlet was hit", servlet);
-//			assertEquals("Server status code sent back", 500, expected.getStatusCode());
-//		}
-//	}
-//	
-//	/** test filter init parameters for configuration */
-//	@Test 
-//	@EmbeddedDeploy(
-//		contextRoot="/configured", 
-//		value="com/mtgi/analytics/servlet/BehaviorTrackingFilterTest.testConfiguration-web.xml"
-//	)
-//	public void testConfiguration() throws Exception {
-//	    webClient.getPage("http://localhost:8888/configured/test/path?param1=hello&param1=world&param2&param3=72%3C");
-//	    assertNotNull("Servlet was hit", servlet);
-//	}
-//	
+	/** Same as testGetRequest, but with POST form parameters instead of URL query string */
+	@Test
+	public void testPostRequest() throws Exception {
+		NameValuePair[] parameters = {
+			new NameValuePair("param1", "hello"),
+			new NameValuePair("param1", "world"),
+			new NameValuePair("param2", ""),
+			new NameValuePair("param3", "72<")
+		};
+		WebRequestSettings request = new WebRequestSettings(new URL(baseUrl + "/app/test/path"));
+		request.setEncodingType(FormEncodingType.URL_ENCODED);
+		request.setSubmitMethod(SubmitMethod.POST);
+		request.setRequestParameters(asList(parameters));
+		
+		webClient.getPage(request);
+		assertNotNull("servlet was hit", servlet);
+	}
+	
+	/** Verify that tracking events are logged for extension-mapped servlet paths */
+	@Test
+	public void testExtensionMapping() throws Exception {
+	    webClient.getPage(baseUrl + "/app/foo.ext?param1=hello&param1=world&param2&param3=72%3C");
+	    assertNotNull("Servlet was hit", servlet);
+	}
+	
+	/** verify that server error codes are logged in the event data */
+	@Test
+	public void testErrorStatus() throws Exception {
+		//first test sendError(int, String)
+		TestServlet.status = 403;
+		TestServlet.message = "Authorized personnel only";
+		try {
+			webClient.getPage(baseUrl + "/app/foo.ext?param1=secret");
+			fail("non-OK status should have been sent back by test servlet");
+		} catch (FailingHttpStatusCodeException expected) {
+			assertEquals("Server status code sent back", 403, expected.getStatusCode());
+			assertEquals("Authorized personnel only", expected.getStatusMessage());
+		    assertNotNull("Servlet was hit", servlet);
+		}
+		
+		//now sendError(int)
+		TestServlet.status = 401;
+		try {
+			webClient.getPage(baseUrl + "/app/foo.ext?param1=secret");
+			fail("non-OK status should have been sent back by test servlet");
+		} catch (FailingHttpStatusCodeException expected) {
+			assertEquals("Server status code sent back", 401, expected.getStatusCode());
+		    assertNotNull("Servlet was hit", servlet);
+		}
+
+		//now setStatus(int);
+		webClient.setRedirectEnabled(false);
+	    TestServlet.status = 301;
+		try {
+		    webClient.getPage(baseUrl + "/app/redirect.ext");
+			fail("non-OK status should have been sent back by test servlet");
+		} catch (FailingHttpStatusCodeException expected) {
+			assertEquals("Server status code sent back", 301, expected.getStatusCode());
+		    assertNotNull("Servlet was hit", servlet);
+		}
+
+	    //finally setStatus(int,string)
+	    TestServlet.status = 302;
+	    TestServlet.message = "I don't remember what 302 means exactly";
+		try {
+		    webClient.getPage(baseUrl + "/app/status.ext");
+			fail("non-OK status should have been sent back by test servlet");
+		} catch (FailingHttpStatusCodeException expected) {
+			assertEquals("Server status code sent back", 302, expected.getStatusCode());
+		    assertNotNull("Servlet was hit", servlet);
+		}
+	}
+
+	/** test the graceful handling of various runtime errors by the filter */
+	@Test
+	public void testExceptionHandling() throws Exception {
+		TestServlet.servletException = new ServletException("servlet boom");
+		try {
+			webClient.getPage(baseUrl + "/app/foo.ext?param1=SE");
+			fail("non-OK status should have been sent back by test servlet");
+		} catch (FailingHttpStatusCodeException expected) {
+		    assertNotNull("Servlet was hit", servlet);
+			assertEquals("Server status code sent back", 500, expected.getStatusCode());
+		}
+
+		TestServlet.ioException = new IOException("IO boom");
+		try {
+			webClient.getPage(baseUrl + "/app/foo.ext?param1=IOE");
+			fail("non-OK status should have been sent back by test servlet");
+		} catch (FailingHttpStatusCodeException expected) {
+		    assertNotNull("Servlet was hit", servlet);
+			assertEquals("Server status code sent back", 500, expected.getStatusCode());
+		}
+
+		TestServlet.runtimeException = new NullPointerException("Should have written a unit test");
+		try {
+			webClient.getPage(baseUrl + "/app/foo.ext?param1=RE");
+			fail("non-OK status should have been sent back by test servlet");
+		} catch (FailingHttpStatusCodeException expected) {
+		    assertNotNull("Servlet was hit", servlet);
+			assertEquals("Server status code sent back", 500, expected.getStatusCode());
+		}
+
+		TestServlet.error = new AssertionFailedError("Might as well try to trap these");
+		try {
+			webClient.getPage(baseUrl + "/app/foo.ext?param1=E");
+			fail("non-OK status should have been sent back by test servlet");
+		} catch (FailingHttpStatusCodeException expected) {
+		    assertNotNull("Servlet was hit", servlet);
+			assertEquals("Server status code sent back", 500, expected.getStatusCode());
+		}
+	}
+	
+	/** test filter init parameters for configuration */
+	@Test 
+	@DeployDescriptor(
+		contextRoot="/configured", 
+		webXml="com/mtgi/analytics/servlet/BehaviorTrackingFilterTest.testConfiguration-web.xml"
+	)
+	public void testConfiguration() throws Exception {
+	    webClient.getPage(baseUrl + "/configured/test/path?param1=hello&param1=world&param2&param3=72%3C");
+	    assertNotNull("Servlet was hit", servlet);
+	}
+	
 	public static class ContextFilter implements Filter {
 
 		private ServletContext servletContext;

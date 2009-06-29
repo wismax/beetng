@@ -44,19 +44,17 @@ import org.unitils.database.annotations.TestDataSource;
 
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.WebClient;
-import com.mtgi.test.unitils.tomcat.EmbeddedTomcatServer;
-import com.mtgi.test.unitils.tomcat.annotations.EmbeddedDeploy;
+import com.mtgi.test.unitils.tomcat.annotations.DeployExploded;
 import com.mtgi.test.unitils.tomcat.annotations.EmbeddedTomcat;
 
-@EmbeddedTomcat(start=true)
-@EmbeddedDeploy(value="com/mtgi/analytics/jmx/testApp")
+@DeployExploded("com/mtgi/analytics/jmx/testApp")
 @RunWith(UnitilsJUnit4TestClassRunner.class)
 public class StatisticsMBeanEventPersisterTest {
 
 	private WebClient webClient;
 	
-	@EmbeddedTomcat
-	protected EmbeddedTomcatServer server;
+	@EmbeddedTomcat(start=true)
+	private String baseUrl;
 
 	@TestDataSource
 	private DataSource db;
@@ -97,7 +95,7 @@ public class StatisticsMBeanEventPersisterTest {
 			assertFalse("statistics mbean " + on + " is not yet registered", jmx.isRegistered(on));
 		
 		assertEquals("no data in test db yet", 0, countRecords());
-		webClient.getPage("http://localhost:8888/testApp/test/invoke.do?id=1&value=hello");
+		webClient.getPage(baseUrl + "/testApp/test/invoke.do?id=1&value=hello");
 		assertEquals("test service invoked", 1, countRecords());
 		
 		//verify that we receive updated statistics for each of our monitored events
@@ -105,7 +103,7 @@ public class StatisticsMBeanEventPersisterTest {
 			waitForCount(on, 1);
 		
 		//post again, and verify that the now-registered mbeans are updated.
-		webClient.getPage("http://localhost:8888/testApp/test/invoke.do?id=2&value=world");
+		webClient.getPage(baseUrl + "/testApp/test/invoke.do?id=2&value=world");
 		assertEquals("test service invoked", 2, countRecords());
 		for (ObjectName on : all)
 			waitForCount(on, 2);

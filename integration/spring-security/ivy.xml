@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <ivy-module version="2.0">
-    <info organisation="mtgi" module="beet-spring-security" status="release" revision="1.0.0_rc1">
+    <info organisation="net.sourceforge.beet" module="beet-spring-security" status="release" revision="1.0.0_rc1">
     	<license name="Mozilla Public License, version 1.1" 
     			 url="http://www.mozilla.org/MPL/MPL-1.1.html"/>
     	<repository name="Beet Ivyrep" url="http://beet.sourceforge.net/ivyrep"
@@ -40,7 +40,7 @@
 		<dependency org="commons-logging" name="commons-logging" rev="1.1"/>
 		<dependency org="commons-collections" name="commons-collections" rev="3.2"/>
 		
-		<dependency org="mtgi" name="beet" rev="latest.integration" transitive="false"/>
+		<dependency org="net.sourceforge.beet" name="beet" rev="latest.integration" transitive="false"/>
 
 	</dependencies>
 	

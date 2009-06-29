@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <ivy-module version="2.0">
-    <info organisation="mtgi" module="beet-hello" status="milestone" revision="1.0.0">
+    <info organisation="net.sourceforge.beet" module="beet-hello" status="milestone" revision="1.0.0">
     	<license name="Mozilla Public License, version 1.1" 
     			 url="http://www.mozilla.org/MPL/MPL-1.1.html"/>
     	<repository name="Beet Ivyrep" url="http://beet.sourceforge.net/ivyrep"
@@ -27,17 +27,21 @@
 	
 	<dependencies defaultconfmapping="1.5->1.5(default);1.6->1.6(default);default,compile,test->default">
 
-		<dependency org="springframework" name="spring" rev="2.5.+"/>
-		<dependency org="springframework" name="spring-webmvc" rev="2.5.+"/>
-		<dependency org="hibernate" name="hibernate" rev="3.2.+"/>
-		<dependency org="hibernate" name="hibernate-annotations" rev="3.3.0"/>
-		<dependency org="sun" name="persistence-api" rev="1.0"/>
-		<dependency org="mchange" name="c3p0" rev="0.9.+"/>
-		<dependency org="sun" name="jstl" rev="1.1"/>
-		<dependency org="sun" name="jta" rev="1.0"/>
-		<dependency org="hsqldb" name="hsqldb" rev="1.8.+"/>
+		<dependency org="org.springframework" name="spring-core" rev="2.5.6"/>
+		<dependency org="org.springframework" name="spring-beans" rev="2.5.6"/>
+		<dependency org="org.springframework" name="spring-context" rev="2.5.6"/>
+		<dependency org="org.springframework" name="spring-aop" rev="2.5.6"/>
+		<dependency org="org.springframework" name="spring-orm" rev="2.5.6"/>
+		<dependency org="org.springframework" name="spring-webmvc" rev="2.5.6"/>
+		<dependency org="org.hibernate" name="hibernate" rev="3.2.0.ga"/>
+		<dependency org="org.hibernate" name="hibernate-annotations" rev="3.3.0.ga"/>
+		<dependency org="javax.persistence" name="persistence-api" rev="1.0"/>
+		<dependency org="c3p0" name="c3p0" rev="0.9.1.2"/>
+		<dependency org="jstl" name="jstl" rev="1.1.2"/>
+		<dependency org="javax.transaction" name="jta" rev="1.1"/>
+		<dependency org="hsqldb" name="hsqldb" rev="1.8.0.10"/>
 		
-		<dependency org="sun" name="servlet-api" rev="2.4" conf="compile"/>
+		<dependency org="javax.servlet" name="servlet-api" rev="2.4" conf="compile"/>
 		
 	</dependencies>
 	

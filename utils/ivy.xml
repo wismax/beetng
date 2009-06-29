@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <ivy-module version="2.0">
-    <info organisation="mtgi" module="beet-utils" status="release" revision="1.2.0_b3">
+    <info organisation="net.sourceforge.beet" module="beet-utils" status="release" revision="1.2.0_b3">
     	<license name="Mozilla Public License, version 1.1" 
     			 url="http://www.mozilla.org/MPL/MPL-1.1.html"/>
     	<repository name="Beet Ivyrep" url="http://beet.sourceforge.net/ivyrep"
@@ -28,13 +28,15 @@
 	
 	<dependencies defaultconfmapping="1.5,1.6,default,compile,test->default">
 
-		<dependency org="mtgi" name="beet" rev="latest.integration" conf="*->base"/>
+		<dependency org="net.sourceforge.beet" name="beet" rev="latest.integration" conf="*->base"/>
 
-		<dependency org="saxon" name="saxon" rev="8.8"/>
-		<dependency org="apache" name="xerces" rev="2.8.1"/>
-		<dependency org="sun" name="FastInfoset" rev="1.2.2"/>
+		<dependency org="net.sf.saxon" name="saxon" rev="8.7"/>
+		<dependency org="net.sf.saxon" name="saxon-dom" rev="8.7"/>
+		
+		<dependency org="xerces" name="xercesImpl" rev="2.8.1"/>
+		<dependency org="com.sun.xml.fastinfoset" name="FastInfoset" rev="1.2.2"/>
 
-		<dependency org="bea" name="stax-impl" rev="1.2.0" conf="1.5,compile,test"/>
+		<dependency org="stax" name="stax" rev="1.2.0" conf="1.5,compile,test"/>
 		
 		<dependency org="junit" name="junit" rev="4.4" conf="test"/>
 		<dependency org="xmlunit" name="xmlunit" rev="1.2" conf="test"/>
