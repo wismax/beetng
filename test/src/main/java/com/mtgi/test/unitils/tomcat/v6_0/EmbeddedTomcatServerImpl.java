@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
@@ -41,13 +40,15 @@ public class EmbeddedTomcatServerImpl implements EmbeddedTomcatServer {
 	private Properties savedProperties;
 	
 	public EmbeddedTomcatServerImpl(File homeDir, boolean autoStart) throws Exception {
-
 		autostart = autoStart;
 		catalinaHome = initHome(homeDir);
+		initServer();
+	}
 
+	private void initServer() throws Exception {
 		//point catalina at the provided home directory
 		server = new Embedded();
-		server.setCatalinaHome(homeDir.getAbsolutePath());
+		server.setCatalinaHome(catalinaHome.getAbsolutePath());
 
 		Engine engine = server.createEngine();
 		engine.setName("embedded");
@@ -68,7 +69,7 @@ public class EmbeddedTomcatServerImpl implements EmbeddedTomcatServer {
 		sessionManager.setSaveOnRestart(false);
 		sessionManager.setStore(sessions);
 		
-		Context root = server.createContext("", new File(homeDir, "conf").getAbsolutePath());
+		Context root = server.createContext("", new File(catalinaHome, "conf").getAbsolutePath());
 		root.setManager(sessionManager);
 		host.addChild(root);
 	}
@@ -142,17 +143,13 @@ public class EmbeddedTomcatServerImpl implements EmbeddedTomcatServer {
 		}
 	}
 
-	public void destroy() throws LifecycleException {
+	public void destroy() throws Exception {
 		if (started) {
 			server.stop();
 			sessions.clear();
-			Container[] contexts = host.findChildren();
-			for (Container c : contexts)
-				if (!"".equals(c.getName()))
-					host.removeChild(c);
 			started = false;
 			System.setProperties(savedProperties);
-
+			initServer();
 		}
 	}
 
