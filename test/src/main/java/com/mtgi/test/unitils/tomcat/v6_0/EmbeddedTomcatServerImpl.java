@@ -29,11 +29,7 @@ public class EmbeddedTomcatServerImpl implements EmbeddedTomcatServer {
 
 	public EmbeddedTomcatServerImpl() throws Exception {
 		
-		catalinaHome = File.createTempFile("embeddedTomcat", ".dir");
-		if (!catalinaHome.delete())
-			throw new IOException("Unable to remove temp file " + catalinaHome.getAbsolutePath());
-		if (!catalinaHome.mkdirs())
-			throw new IOException("Unable to create home directory " + catalinaHome.getAbsolutePath());
+		catalinaHome = new File(".");
 		
 		server = new Embedded();
 		Engine engine = server.createEngine();
