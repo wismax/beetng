@@ -108,11 +108,12 @@ public class EmbeddedTomcatManagerTest {
 	public static class UnannotatedClass {}
 	
 	@EmbeddedTomcat(start=true)
+	//test both relative and absolute classpath specifications
 	@DeployDescriptor(contextRoot="/desc", webXml="com/mtgi/test/unitils/tomcat/web.xml")
-	@DeployExploded("com/mtgi/test/unitils/tomcat/exploded")
+	@DeployExploded("exploded")
 	public static class AnnotatedClass {
 
-		@DeployDescriptor(contextRoot="/desc2", webXml="com/mtgi/test/unitils/tomcat/web.xml")
+		@DeployDescriptor(contextRoot="/desc2", webXml="web.xml")
 		@DeployExploded("com/mtgi/test/unitils/tomcat/exploded2")
 		public void testMethod() {}
 	}

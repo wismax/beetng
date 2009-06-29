@@ -1,8 +1,7 @@
 package com.mtgi.test.unitils.tomcat.annotations;
 
 import static com.mtgi.test.unitils.tomcat.annotations.TomcatVersion.v6_0;
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.*;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 import java.lang.annotation.Documented;
@@ -12,16 +11,27 @@ import java.lang.annotation.Target;
 import com.mtgi.test.unitils.tomcat.EmbeddedTomcatServer;
 
 /**
- * <p>Mark a test class that requires an embedded Tomact server.  Requires that the
+ * <p>Mark a test that requires an embedded Tomact server.  Typically this will
+ * be used in conjunction with one or more {@link DeployDescriptor} or {@link DeployExploded}
+ * annotations to deploy test applications to the embedded server.  Requires that the
  * Unitils {@link TomcatModule} has been enabled.</p>
  * 
- * <p>This annotation can also be used to mark a field of a test class, which must be
- * of type {@link EmbeddedTomcatServer}.  In this case, an instance of {@link EmbeddedTomcatServer}
- * will be injected into that field prior to test runs.</p>
+ * <p>This annotation can occur in several places:
+ * <ul>
+ *   <li>On a class, enables the embedded server for all tests in the class</li>
+ *   <li>On a test method, enables the embedded server for that test method</li>
+ *   <li>On a field or setter of type {@link EmbeddedTomcatServer}, enables injection of 
+ *   	a {@link EmbeddedTomcatServer} instance into that field prior to test runs.</li>
+ *   <li>On a field or setter of type {@link String}, injects the base URL at which the
+ *      test server can be reached.  <emphasis>Only works if {@link #start() autostart}
+ *      has been enabled for the server</emphasis>.</li>
+ * </ul>
+ * </p>
  * 
  * @see DeployDescriptor
+ * @see DeployExploded
  */
-@Target({TYPE,FIELD}) @Retention(RUNTIME) @Documented
+@Target({TYPE,METHOD,FIELD}) @Retention(RUNTIME) @Documented
 public @interface EmbeddedTomcat {
 
 	/**

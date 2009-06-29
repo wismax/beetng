@@ -43,10 +43,12 @@ public class EmbeddedTomcatManager extends AnnotatedInstanceManager<EmbeddedTomc
 		return testObject != null && instances.containsKey(testObject.getClass());
 	}
 
-	public void configureDeployments(Object testObject, Method testMethod) throws Exception {
+	public EmbeddedTomcatServer configureDeployments(Object testObject, Method testMethod) throws Exception {
 
 		EmbeddedTomcatServer server = getInstance(testObject);
 		if (server != null) {
+			Class<?> testClass = testObject.getClass();
+			
 			ArrayList<DeployDescriptor> descs = new ArrayList<DeployDescriptor>();
 			DeployDescriptor ann = testObject.getClass().getAnnotation(DeployDescriptor.class);
 			if (ann != null)
@@ -57,7 +59,7 @@ public class EmbeddedTomcatManager extends AnnotatedInstanceManager<EmbeddedTomc
 			
 			if (!descs.isEmpty())
 				for (DeployDescriptor dep : descs)
-					server.deployDescriptor(dep.contextRoot(), getDeployableResource(dep.webXml()));
+					server.deployDescriptor(dep.contextRoot(), getDeployableResource(testClass, dep.webXml()));
 
 			ArrayList<DeployExploded> apps = new ArrayList<DeployExploded>();
 			DeployExploded app = testObject.getClass().getAnnotation(DeployExploded.class);
@@ -69,11 +71,12 @@ public class EmbeddedTomcatManager extends AnnotatedInstanceManager<EmbeddedTomc
 			
 			if (!apps.isEmpty())
 				for (DeployExploded dep : apps)
-					server.deployExploded(getDeployableResource(dep.value()));
+					server.deployExploded(getDeployableResource(testClass, dep.value()));
 
 			if (server.isAutostart())
 				server.start();
 		}
+		return server;
 	}
 	
 	@Override
@@ -135,6 +138,13 @@ public class EmbeddedTomcatManager extends AnnotatedInstanceManager<EmbeddedTomc
 		return ret;
 	}
 
+	public static File getDeployableResource(Class<?> testClass, String resourcePath) throws IOException {
+		URL url = testClass.getResource(resourcePath);
+		if (url == null)
+			return getDeployableResource(resourcePath);
+		return urlToFile(url);
+	}
+	
 	/**
 	 * Translate the given classpath resource name into a local File.
 	 */

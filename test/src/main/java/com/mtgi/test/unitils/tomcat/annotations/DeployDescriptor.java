@@ -21,7 +21,9 @@ public @interface DeployDescriptor {
 	public String contextRoot();
 	/**
 	 * The classpath resource location at which the web.xml descriptor can be found.
-	 * @return
+	 * The resource will attempt to be located relative to the package of the test
+	 * class; if it cannot be found there, it will be scanned relative to the
+	 * Thread context classloader.
 	 */
 	public String webXml();
 	
