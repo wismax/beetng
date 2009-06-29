@@ -32,14 +32,16 @@ public class EmbeddedTomcatServerImpl implements EmbeddedTomcatServer {
 	private Host host;
 	private File catalinaHome;
 	private boolean started;
+	private boolean autostart;
 	
 	private MemoryStore sessions;
 	private PersistentManager sessionManager;
 	
 	private Properties savedProperties;
 	
-	public EmbeddedTomcatServerImpl(File homeDir) throws Exception {
+	public EmbeddedTomcatServerImpl(File homeDir, boolean autoStart) throws Exception {
 
+		autostart = autoStart;
 		catalinaHome = initHome(homeDir);
 
 		//point catalina at the provided home directory
@@ -72,6 +74,10 @@ public class EmbeddedTomcatServerImpl implements EmbeddedTomcatServer {
 	
 	public File getCatalinaHome() {
 		return catalinaHome;
+	}
+	
+	public boolean isAutostart() {
+		return autostart;
 	}
 	
 	public void deployDescriptor(String contextRoot, File descriptorFile) {

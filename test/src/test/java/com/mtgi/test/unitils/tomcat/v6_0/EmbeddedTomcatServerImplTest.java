@@ -31,7 +31,7 @@ public class EmbeddedTomcatServerImplTest {
 	@Before
 	public void setUp() throws Exception {
 		homeDir = EmbeddedTomcatManager.createTempDir("EmbeddedTomcatServerImplTest");
-		server = new EmbeddedTomcatServerImpl(homeDir);
+		server = new EmbeddedTomcatServerImpl(homeDir, false);
 		webClient = new WebClient();
 	}
 	

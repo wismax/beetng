@@ -20,6 +20,11 @@ public interface EmbeddedTomcatServer {
 	 * @throws Exception if there was an error shutting the server down
 	 */
 	public void destroy() throws Exception;
+	
+	/**
+	 * @return true if this server starts automatically before tests
+	 */
+	public boolean isAutostart();
 	/**
 	 * @return true if the server has been started with a call to {@link #start()}, false otherwise
 	 */

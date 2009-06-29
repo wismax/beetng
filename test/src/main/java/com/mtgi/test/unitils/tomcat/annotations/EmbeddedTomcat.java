@@ -19,7 +19,7 @@ import com.mtgi.test.unitils.tomcat.EmbeddedTomcatServer;
  * of type {@link EmbeddedTomcatServer}.  In this case, an instance of {@link EmbeddedTomcatServer}
  * will be injected into that field prior to test runs.</p>
  * 
- * @see EmbeddedDeploy
+ * @see DeployDescriptor
  */
 @Target({TYPE,FIELD}) @Retention(RUNTIME) @Documented
 public @interface EmbeddedTomcat {

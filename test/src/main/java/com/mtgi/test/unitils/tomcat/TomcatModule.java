@@ -7,7 +7,11 @@ import org.unitils.core.TestListener;
 
 public class TomcatModule implements Module {
 
-	public void init(Properties config) {}
+	private EmbeddedTomcatManager manager;
+	
+	public void init(Properties config) {
+		manager = new EmbeddedTomcatManager();
+	}
 	public void afterInit() {}
 
 	public TestListener getTestListener() {

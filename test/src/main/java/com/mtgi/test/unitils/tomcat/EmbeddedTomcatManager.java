@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
@@ -16,6 +17,8 @@ import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.util.AnnotatedInstanceManager;
 
+import com.mtgi.test.unitils.tomcat.annotations.DeployDescriptor;
+import com.mtgi.test.unitils.tomcat.annotations.DeployExploded;
 import com.mtgi.test.unitils.tomcat.annotations.EmbeddedTomcat;
 
 public class EmbeddedTomcatManager extends AnnotatedInstanceManager<EmbeddedTomcatServer, EmbeddedTomcat> {
@@ -40,6 +43,39 @@ public class EmbeddedTomcatManager extends AnnotatedInstanceManager<EmbeddedTomc
 		return testObject != null && instances.containsKey(testObject.getClass());
 	}
 
+	public void configureDeployments(Object testObject, Method testMethod) throws Exception {
+
+		EmbeddedTomcatServer server = getInstance(testObject);
+		if (server != null) {
+			ArrayList<DeployDescriptor> descs = new ArrayList<DeployDescriptor>();
+			DeployDescriptor ann = testObject.getClass().getAnnotation(DeployDescriptor.class);
+			if (ann != null)
+				descs.add(ann);
+			ann = testMethod.getAnnotation(DeployDescriptor.class);
+			if (ann != null)
+				descs.add(ann);
+			
+			if (!descs.isEmpty())
+				for (DeployDescriptor dep : descs)
+					server.deployDescriptor(dep.contextRoot(), getDeployableResource(dep.webXml()));
+
+			ArrayList<DeployExploded> apps = new ArrayList<DeployExploded>();
+			DeployExploded app = testObject.getClass().getAnnotation(DeployExploded.class);
+			if (app != null)
+				apps.add(app);
+			app = testMethod.getAnnotation(DeployExploded.class);
+			if (app != null)
+				apps.add(app);
+			
+			if (!apps.isEmpty())
+				for (DeployExploded dep : apps)
+					server.deployExploded(getDeployableResource(dep.value()));
+
+			if (server.isAutostart())
+				server.start();
+		}
+	}
+	
 	@Override
 	public void invalidateInstance(Class<?>... testClasses) {
 		for (Class<?> t : testClasses) {
@@ -74,13 +110,15 @@ public class EmbeddedTomcatManager extends AnnotatedInstanceManager<EmbeddedTomc
 	protected EmbeddedTomcatServer createInstanceForValues(Object testObject, Class<?> testClass, List<String> values) {
 
 		String version = values.get(0);
+		boolean autoStart = Boolean.valueOf(values.get(1));
+
 		String implClassName = "com.mtgi.test.unitils.tomcat." + version + ".EmbeddedTomcatServerImpl";
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
-		Class<? extends EmbeddedTomcatServer> implClass = null;
+		
 		try {
-			implClass = (Class<? extends EmbeddedTomcatServer>) loader.loadClass(implClassName);
-			Constructor<? extends EmbeddedTomcatServer> con = implClass.getConstructor(File.class);
-			return con.newInstance(createTempDir("embeddedTomcat"));
+			Class<? extends EmbeddedTomcatServer> implClass = (Class<? extends EmbeddedTomcatServer>) loader.loadClass(implClassName);
+			Constructor<? extends EmbeddedTomcatServer> con = implClass.getConstructor(File.class, Boolean.TYPE);
+			return con.newInstance(createTempDir("embeddedTomcat"), autoStart);
 		} catch (ClassNotFoundException e) {
 			throw new UnitilsException("Unable to locate server class " + implClassName);
 		} catch (Exception e) {
@@ -93,6 +131,7 @@ public class EmbeddedTomcatManager extends AnnotatedInstanceManager<EmbeddedTomc
 	protected List<String> getAnnotationValues(EmbeddedTomcat annotation) {
 		ArrayList<String> ret = new ArrayList<String>();
 		ret.add(annotation.version().toString());
+		ret.add(String.valueOf(annotation.start()));
 		return ret;
 	}
 
