@@ -31,6 +31,8 @@
 		<dependency org="org.unitils" name="unitils" rev="2.3"/>
 		<dependency org="org.apache.tomcat" name="catalina" rev="6.0.18"/>
 		<dependency org="org.apache.tomcat" name="coyote" rev="6.0.18"/>
+		<dependency org="org.apache.tomcat" name="jsp-api" rev="6.0.18"/>
+		<dependency org="org.apache.tomcat" name="jasper" rev="6.0.18"/>
 		
 		<dependency org="org.springframework" name="spring-beans" rev="2.0.+" conf="compile"/>
 		<dependency org="org.springframework" name="spring-core" rev="2.0.+" conf="compile"/>

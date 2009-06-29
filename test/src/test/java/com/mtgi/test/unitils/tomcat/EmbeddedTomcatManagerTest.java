@@ -2,6 +2,8 @@ package com.mtgi.test.unitils.tomcat;
 
 import static org.junit.Assert.*;
 
+import java.io.File;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,7 +16,7 @@ public class EmbeddedTomcatManagerTest {
 
 	@Before
 	public void setUp() {
-		manager = new EmbeddedTomcatManager(EmbeddedTomcatServer.class, EmbeddedTomcat.class);
+		manager = new EmbeddedTomcatManager();
 	}
 	
 	@After
@@ -33,6 +35,10 @@ public class EmbeddedTomcatManagerTest {
 		assertTrue("instance has correct version", server instanceof com.mtgi.test.unitils.tomcat.v6_0.EmbeddedTomcatServerImpl);
 		assertFalse("instance not yet started", server.isStarted());
 		
+		File homeDir = server.getCatalinaHome();
+		assertTrue("server home directory assigned", homeDir.isDirectory());
+		assertEquals("home directory is in tmp", new File(System.getProperty("java.io.tmpdir")), homeDir.getParentFile());
+		
 		server.start();
 		assertTrue("instance is now started", server.isStarted());
 		
@@ -44,6 +50,8 @@ public class EmbeddedTomcatManagerTest {
 		
 		assertFalse("instance has been removed", manager.isServerInitialized(testCase));		
 		assertFalse("server has been shut down", server.isStarted());
+		
+		assertFalse("home directory has been deleted", homeDir.exists());
 	}
 	
 	@Test

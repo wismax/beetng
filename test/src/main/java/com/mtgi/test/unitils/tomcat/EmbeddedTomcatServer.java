@@ -24,6 +24,11 @@ public interface EmbeddedTomcatServer {
 	 * @return true if the server has been started with a call to {@link #start()}, false otherwise
 	 */
 	public boolean isStarted();
+	
+	/**
+	 * Get the home directory for this server.
+	 */
+	public File getCatalinaHome();
 
 	/**
 	 * Get the HTTP port for the server, if it is running.  It is invalid to call
