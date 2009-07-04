@@ -73,6 +73,7 @@ be included from a script in the project root directory.
 				<property name="module.status" value="${module.status}"/>
 				<property name="local.properties" value="${local.properties}"/>
 				<property name="working.repository" value="${working.repository}"/>
+				<property name="integration.dir" value="${integration.dir}"/>
 			</ant>
 		</sequential>
 	</macrodef>

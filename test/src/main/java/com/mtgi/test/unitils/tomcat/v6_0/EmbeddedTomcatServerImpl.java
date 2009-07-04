@@ -95,7 +95,7 @@ public class EmbeddedTomcatServerImpl implements EmbeddedTomcatServer {
 	
 	private Context newContext(String path, File docBase) {
 		Context context = server.createContext(path, docBase.getAbsolutePath());
-		context.setLoader(new WebappLoader());
+		context.setLoader(new WebappLoader(Thread.currentThread().getContextClassLoader()));
 		context.setManager(sessionManager);
 		return context;
 	}

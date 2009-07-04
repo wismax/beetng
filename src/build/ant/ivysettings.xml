@@ -1,8 +1,8 @@
 <ivysettings>
 
 	<!-- build.mode should be "online" or "offline" -->
-	<property name="build.mode" value="online"/>
-	<property name="integration.dir" value="${ivy.settings.dir}/../ide/ivyrep"/>
+	<property name="build.mode" value="online" override="false"/>
+	<property name="integration.dir" value="${ivy.settings.dir}/../ide/ivyrep" override="false"/>
 	
     <settings defaultResolver="${build.mode}" validate="false"/>
 

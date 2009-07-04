@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<ivy-module version="2.0">
+    <info organisation="net.sourceforge.beet" module="beet-web" status="release" revision="1.4.0_b3">
+    	<license name="Mozilla Public License, version 1.1" 
+    			 url="http://www.mozilla.org/MPL/MPL-1.1.html"/>
+    	<repository name="Beet Ivyrep" url="http://beet.sourceforge.net/ivyrep"
+    				pattern="[organisation]/[module]/[revision]/[type]s/[artifact].[ext]"/>
+    	<description homepage="http://beet.sourceforge.net">
+    	beet-web separates WAR-specific configuration from the core library, to support
+    	deployments where several applications share a single copy of the beet core library.
+    	
+    	For example, beet.jar can be deployed as a shared library in an EAR, and then beet-web.jar
+    	deployed in the WEB-INF/lib directory of each WAR included in that EAR.  See
+    	<a href="https://sourceforge.net/tracker/?func=detail&amp;aid=2794532&amp;group_id=258926&amp;atid=1127321">issue 2794532</a>
+    	for reference.
+    	</description>
+	</info>
+	
+	<configurations>
+		<conf name="base" description="core module without runtime dependencies"/>
+		<conf name="compile" description="compile-time dependencies"/>
+		<conf name="test" description="dependencies used for junit testing"/>
+		
+		<conf name="1.5" extends="default" description="core module with dependencies, for SDK 1.5 and below"/>
+		<conf name="1.6" description="core module with runtime dependencies, for SDK 1.6 and higher"/>
+		<conf name="default" extends="1.6" description="alias for '1.6'" />
+	</configurations>
+
+	<publications>
+		<artifact name="beet-web" type="jar" conf="base,default,test"/>
+	</publications>
+	
+	<dependencies defaultconfmapping="test->default">
+		<dependency org="net.sourceforge.beet" name="beet" rev="latest.integration" changing="true"/>
+		<dependency org="net.sourceforge.beet" name="beet-test" rev="latest.integration" changing="true"/>
+		<dependency org="org.unitils" name="unitils" rev="2.3"/>
+		<dependency org="junit" name="junit" rev="4.4"/>
+		<dependency org="org.springframework" name="spring-core" rev="2.0.+"/>
+		<dependency org="org.springframework" name="spring-dao" rev="2.0.+"/>
+		<dependency org="org.springframework" name="spring-aop" rev="2.0.+"/>
+		<dependency org="org.springframework" name="spring-web" rev="2.0.+"/>
+		<dependency org="org.springframework" name="spring-webmvc" rev="2.0.+"/>
+		<dependency org="org.springframework" name="spring-support" rev="2.0.+"/>
+		<dependency org="opensymphony" name="quartz-all" rev="1.6.0"/>
+		<dependency org="javax.transaction" name="jta" rev="1.1"/>
+		<dependency org="stax" name="stax" rev="1.2.0"/>
+		<dependency org="net.sourceforge.htmlunit" name="htmlunit" rev="2.5"/>
+	</dependencies>
+	
+</ivy-module>

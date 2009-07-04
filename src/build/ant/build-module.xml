@@ -28,11 +28,11 @@ once for each module in the project.
     <!-- if the module defines multiple publications, parse out the first one for packaging -->
     <propertyregex input="${ivy-module.publications.artifact.name}"
                     property="module.archive.name"
-                    regexp="^([^,]+),.*"
+                    regexp="^([^,]+).*?"
                     select="\1"/>
     <propertyregex input="${ivy-module.publications.artifact.type}"
                    property="module.archive.extension"
-                   regexp="^([^,]+),.*"
+                   regexp="^([^,]+).*?"
                    select="\1"/>
 	<property name="module.archive.file" value="${module.archive.name}.${module.archive.extension}"/>
 	
@@ -166,6 +166,7 @@ once for each module in the project.
 			<sysproperty key="net.sourceforge.cobertura.datafile" file="${test.coverage.data}" />
 			<!-- useful if unit tests include JSP compilation, to prevent cached JSP classes from interfering with future unit tests -->
 			<sysproperty key="java.io.tmpdir" file="${test.tmp}"/>
+			<sysproperty key="integration.dir" value="${integration.dir}"/>
 
 			<classpath>
 
