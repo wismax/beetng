@@ -47,6 +47,7 @@ import com.mtgi.analytics.BehaviorTrackingManagerImpl;
 import com.mtgi.analytics.SessionContext;
 import com.mtgi.analytics.XmlBehaviorEventPersisterImpl;
 import com.mtgi.analytics.aop.BehaviorTrackingAdvice;
+import com.mtgi.analytics.aop.config.DisabledBehaviorTrackingManager;
 import com.mtgi.analytics.aop.config.TemplateBeanDefinitionParser;
 import com.mtgi.analytics.servlet.SpringSessionContext;
 
@@ -115,6 +116,8 @@ public class BtManagerBeanDefinitionParser extends TemplateBeanDefinitionParser 
 	 * @see BehaviorTrackingManagerImpl#setSessionContext(SessionContext)
 	 */
 	public static final String ATT_SESSION_CONTEXT = "session-context";
+	
+	public static final String ATT_ENABLED = "enabled";
 
 	private static final String AOP_REGISTRATION = "registerAspectJAutoProxyCreatorIfNecessary";
 	
@@ -150,6 +153,18 @@ public class BtManagerBeanDefinitionParser extends TemplateBeanDefinitionParser 
 		if (managerId == null)
 			template.setAttribute(ATT_ID, managerId = "defaultTrackingManager");
 
+		if ("false".equals(element.getAttribute(ATT_ENABLED))) {
+			//manager is disabled.  replace definition with dummy instance.
+			template.setBeanClassName(DisabledBehaviorTrackingManager.class.getName());
+			//clear properties and attributes.
+			for (String att : template.attributeNames())
+				if (!ATT_ID.equals(att))
+					template.removeAttribute(att);
+			template.getPropertyValues().clear();
+			//terminate immediately, do not parse any nested definitions (persisters, AOP config, context beans, etc)
+			return;
+		}
+		
 		overrideProperty(ATT_APPLICATION, template, element, false);
 		overrideProperty(ATT_FLUSH_THRESHOLD, template, element, false);
 

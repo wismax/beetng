@@ -278,6 +278,13 @@
 							</xsd:appinfo>
 						</xsd:annotation>
 					</xsd:attribute>
+					<xsd:attribute name="enabled" type="xsd:boolean" default="true">
+						<xsd:annotation>
+							<xsd:documentation><![CDATA[If false, effectively disables all tracking through this manager, including
+							any runtime instrumentation.  Intended as an administrative convenience; e.g. allowing tracking to be
+							enabled/disabled via a simple boolean value in an external properties file.]]></xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
 				</xsd:extension>
 			</xsd:complexContent>
 		</xsd:complexType>
