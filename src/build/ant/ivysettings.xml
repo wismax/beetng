@@ -36,12 +36,6 @@
 	            <artifact pattern="${integration.dir}/[module]/[type]s/[revision]/[artifact].[ext]"/>
 	       	</filesystem>
 			<ibiblio name="maven-central" m2compatible="true"/>
-	       	<!-- fall back to the beet repository for everything else -->
-			<url name="beet-repository" alwaysCheckExactRevision="false" 
-				 changingPattern=".*-SNAPSHOT" checkmodified="true">
-				<ivy pattern="http://beet.sourceforge.net/ivyrep/[organisation]/[module]/[revision]/ivys/ivy.xml"/>
-				<artifact pattern="http://beet.sourceforge.net/ivyrep/[organisation]/[module]/[revision]/[type]s/[artifact].[ext]"/>
-			</url>
         </chain>
         
        	<filesystem name="local" alwaysCheckExactRevision="false"

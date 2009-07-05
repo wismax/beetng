@@ -17,10 +17,10 @@
 
 	<dependencies defaultconfmapping="build->default">
 
-		<dependency org="cobertura" name="cobertura" rev="1.9"/>
-		<dependency org="junit" name="junit" rev="4.1"/>
-		<dependency org="apache" name="ant-contrib" rev="1.0b3"/>
-		<dependency org="apache" name="log4j" rev="1.2.13"/>
+		<dependency org="net.sourceforge.cobertura" name="cobertura" rev="1.9.2"/>
+		<dependency org="junit" name="junit" rev="4.4"/>
+		<dependency org="ant-contrib" name="ant-contrib" rev="1.0b3"/>
+		<dependency org="log4j" name="log4j" rev="1.2.13"/>
 
 	</dependencies>
 

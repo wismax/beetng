@@ -129,25 +129,30 @@ once for each module in the project.
 	</target>
 
 	<target name="compile-tests" depends="depend,compile">
-		<javac srcdir="${test.src.dir}" debug="on" 
-			   target="${module.java.version}" 
-			   source="${module.java.version}" 
-			   destdir="${test.classes}">
-			<classpath>
-				<path refid="module.test.path"/>
-				<pathelement location="${build.classes}"/>
-				<!-- we need to have the depend task executed first for this to be set properly -->
-				<path refid="module.class.path"/>
-				<pathelement location="${conf.dir}"/>
-				<path refid="task.class.path"/>
-			</classpath>
-		</javac>
-		<copy todir="${test.classes}">
-			<fileset dir="${test.src.dir}" includes="**/*.properties,**/*.xml"/>
-		</copy>
-		<copy todir="${test.config}" failonerror="false">
-			<fileset dir="${test.conf.dir}" />			
-		</copy>
+		<if>
+			<available file="${test.src.dir}"/>
+			<then>
+				<javac srcdir="${test.src.dir}" debug="on" 
+					   target="${module.java.version}" 
+					   source="${module.java.version}" 
+					   destdir="${test.classes}">
+					<classpath>
+						<path refid="module.test.path"/>
+						<pathelement location="${build.classes}"/>
+						<!-- we need to have the depend task executed first for this to be set properly -->
+						<path refid="module.class.path"/>
+						<pathelement location="${conf.dir}"/>
+						<path refid="task.class.path"/>
+					</classpath>
+				</javac>
+				<copy todir="${test.classes}">
+					<fileset dir="${test.src.dir}" includes="**/*.properties,**/*.xml"/>
+				</copy>
+				<copy todir="${test.config}" failonerror="false">
+					<fileset dir="${test.conf.dir}" />			
+				</copy>
+			</then>
+		</if>
 	</target>
 
 	<target name="test" depends="compile-tests,instrument" description="runs unit tests">

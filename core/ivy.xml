@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<ivy-module version="2.0">
+<ivy-module version="2.0" xmlns:m="http://ant.apache.org/ivy/maven">
     <info organisation="net.sourceforge.beet" module="beet" status="release" revision="1.4.0_b3">
     	<license name="Mozilla Public License, version 1.1" 
     			 url="http://www.mozilla.org/MPL/MPL-1.1.html"/>
@@ -25,7 +25,7 @@
 
 	<publications>
 		<artifact name="beet" type="jar" conf="base,default,test"/>
-		<artifact name="beet" type="source" ext="jar" conf="source"/>
+		<artifact name="beet" type="source" ext="jar" conf="source" m:classifier="source"/>
 	</publications>
 
 	<dependencies defaultconfmapping="1.5->1.5(default);1.6->1.6(default);default,compile,test->default">
