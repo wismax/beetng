@@ -147,7 +147,6 @@ public class BehaviorTrackingFilterTest extends JdbcEventTestCase {
 			fail("non-OK status should have been sent back by test servlet");
 		} catch (FailingHttpStatusCodeException expected) {
 			assertEquals("Server status code sent back", 403, expected.getStatusCode());
-			assertEquals("Authorized personnel only", expected.getStatusMessage());
 		    assertNotNull("Servlet was hit", servlet);
 		}
 		

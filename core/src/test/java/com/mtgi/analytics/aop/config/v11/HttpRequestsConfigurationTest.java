@@ -151,7 +151,6 @@ public class HttpRequestsConfigurationTest {
 			fail("non-OK status should have been sent back by test servlet");
 		} catch (FailingHttpStatusCodeException expected) {
 			assertEquals("Server status code sent back", 403, expected.getStatusCode());
-			assertEquals("Authorized personnel only", expected.getStatusMessage());
 		    assertNotNull("Servlet was hit", servlet);
 		}
 		
@@ -226,17 +225,6 @@ public class HttpRequestsConfigurationTest {
 		    assertNotNull("Servlet was hit", servlet);
 			assertEquals("Server status code sent back", 500, expected.getStatusCode());
 		}
-	}
-	
-	/** test filter init parameters for configuration */
-	@Test 
-	@DeployDescriptor(
-		contextRoot="/configured", 
-		webXml="com/mtgi/analytics/servlet/BehaviorTrackingFilterTest.testConfiguration-web.xml"
-	)
-	public void testConfiguration() throws Exception {
-	    webClient.getPage(baseUrl + "/configured/test/path?param1=hello&param1=world&param2&param3=72%3C");
-	    assertNotNull("Servlet was hit", servlet);
 	}
 	
 	public static class ContextFilter implements Filter {
@@ -315,9 +303,9 @@ public class HttpRequestsConfigurationTest {
 						else
 							response.setStatus(status);
 					} else {
-						if (status >= 400)
+						if (status >= 400) {
 							response.sendError(status, message);
-						else
+						} else
 							response.setStatus(status, message);
 					}
 				}
