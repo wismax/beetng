@@ -15,6 +15,7 @@
 	<configurations>
 		<conf name="base" description="core module without runtime dependencies"/>
 		<conf name="source" description="source jar"/>
+		<conf name="javadoc" description="docs jar"/>
 		<conf name="compile" description="compile-time dependencies"/>
 		<conf name="test" description="dependencies used for junit testing"/>
 		
@@ -26,6 +27,7 @@
 	<publications>
 		<artifact name="beet" type="jar" conf="base,default,test"/>
 		<artifact name="beet" type="source" ext="jar" conf="source" m:classifier="source"/>
+		<artifact name="beet" type="javadoc" ext="jar" conf="javadoc" m:classifier="javadoc"/>
 	</publications>
 
 	<dependencies defaultconfmapping="1.5->1.5(default);1.6->1.6(default);default,compile,test->default">
@@ -41,14 +43,7 @@
 		<dependency org="stax" name="stax" rev="1.2.0" conf="1.5,compile,test"/>
 		
 		<!-- only needed for compile/test -->
-		<dependency org="org.springframework" name="spring-aop" rev="2.0.+" conf="compile,test"/>
-		<dependency org="org.springframework" name="spring-beans" rev="2.0.+" conf="compile,test"/>
-		<dependency org="org.springframework" name="spring-context" rev="2.0.+" conf="compile,test"/>
-		<dependency org="org.springframework" name="spring-core" rev="2.0.+" conf="compile,test"/>
-		<dependency org="org.springframework" name="spring-hibernate3" rev="2.0.+" conf="compile,test" transitive="false"/>
-		<dependency org="org.springframework" name="spring-jdbc" rev="2.0.+" conf="compile,test"/>
-		<dependency org="org.springframework" name="spring-jmx" rev="2.0.+" conf="compile,test"/>
-		<dependency org="org.springframework" name="spring-webmvc" rev="2.0.+" conf="compile,test"/>
+		<dependency org="org.springframework" name="spring" rev="2.0.+" conf="compile,test"/>
 		<dependency org="javax.servlet" name="servlet-api" rev="2.4" conf="compile,test"/>
 
 		<!-- only needed for test -->

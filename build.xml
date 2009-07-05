@@ -163,11 +163,11 @@
 	
 	<target name="maven-repository" description="generate maven packaging artifacts from the local ivy repository" depends="repository">
 
-		<!-- publish ivy descriptors stripped down to just runtime deps -->
+		<!-- publish ivy descriptors, stripping out test/compile time dependencies -->
 		<for list="core,utils" param="module.dir">
 			<sequential>
 				<ivy:resolve file="@{module.dir}/ivy.xml"/>
-				<ivy:publish resolver="local" conf="source,default,1.5,1.6" overwrite="true" update="true">
+				<ivy:publish resolver="local" conf="source,javadoc,default,1.5,1.6" overwrite="true" update="true">
 					<artifacts pattern="build/@{module.dir}/dist/[type]s/[artifact].[ext]"/>
 				</ivy:publish>
 			</sequential>

@@ -13,6 +13,7 @@
 	<configurations>
 		<conf name="base" description="core module without runtime dependencies"/>
 		<conf name="source" description="source jar"/>
+		<conf name="javadoc" description="docs jar"/>
 		<conf name="compile" description="compile-time dependencies"/>
 		<conf name="test" description="dependencies used for junit testing"/>
 		
@@ -24,6 +25,7 @@
 	<publications>
 		<artifact name="beet-utils" type="jar" conf="base,default,test"/>
 		<artifact name="beet-utils" type="source" ext="jar" conf="source" m:classifier="source"/>
+		<artifact name="beet-utils" type="javadoc" ext="jar" conf="javadoc" m:classifier="javadoc"/>
 	</publications>
 	
 	<dependencies defaultconfmapping="1.5,1.6,default,compile,test->default">

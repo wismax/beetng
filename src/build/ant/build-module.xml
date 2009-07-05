@@ -45,7 +45,7 @@ once for each module in the project.
 	<path id="module.test.path"/>
 
 	<target name="all" 
-			depends="init,depend,compile,package,compile-tests,test,report,-assert-success"
+			depends="init,depend,compile,document,package,compile-tests,test,report,-assert-success"
 			description="resolves dependencies, compiles, tests, and packages the project">
 	</target>
 
@@ -76,6 +76,7 @@ once for each module in the project.
 		<mkdir dir="${build.classes}"/>
 		<mkdir dir="${build.dist}/jars"/>
 		<mkdir dir="${build.dist}/sources"/>
+		<mkdir dir="${build.dist}/javadocs"/>
 		<mkdir dir="${build.stage}"/>
 		<mkdir dir="${build.stage}/lib"/>
 		<mkdir dir="${test.tmp}"/>
@@ -99,7 +100,7 @@ once for each module in the project.
 		<ivy:cachepath pathid="module.test.path" conf="test"/>
 	</target>
 
-	<target name="compile" description="compiles java sources">
+	<target name="compile" depends="depend" description="compiles java sources">
 		<if>
 			<available file="${src.dir}"/>
 			<then>
@@ -116,6 +117,19 @@ once for each module in the project.
 				<copy todir="${build.classes}">
 					<fileset dir="${src.dir}" includes="${module.resource.includes}"/>
 				</copy>
+			</then>
+		</if>
+	</target>
+	
+	<target name="document" depends="depend" description="generates javadoc">
+		<if>
+			<available file="${src.dir}"/>
+			<then>
+				<javadoc classpathref="module.class.path"
+						 destdir="${build.docs.api}"
+						 windowtitle="${module.docs.api.title}">
+					<sourcepath location="${src.dir}" />
+				</javadoc>
 			</then>
 		</if>
 	</target>
@@ -283,17 +297,41 @@ once for each module in the project.
 	<target name="package" description="select, stage, and build the desired archive"
 			depends="compile,compile-tests,jar">
 
-		<jar destfile="${build.dist}/jars/${module.archive.name}-test.jar" update="true">
-			<fileset dir="${test.classes}" includes="**/*"/>
-			<manifest>
-				<attribute name="Specification-Title" value="${ivy-module.info.module}"/>
-				<attribute name="Specification-Vendor" value="Mantis Technology Group, Inc."/>
-				<attribute name="Specification-Version" value="${ivy-module.info.revision}"/>
-				<attribute name="Implementation-Vendor" value="Mantis Technology Group, Inc."/>
-				<attribute name="Implementation-Version" value="${ivy-module.info.revision}"/>
-				<attribute name="Created-On" value="${touch.time}"/>
-			</manifest>
-		</jar>
+		<!-- jar test classes -->
+		<if>
+			<available file="${test.classes}"/>
+			<then>
+				<jar destfile="${build.dist}/jars/${module.archive.name}-test.jar" update="true">
+					<fileset dir="${test.classes}" includes="**/*"/>
+					<manifest>
+						<attribute name="Specification-Title" value="${ivy-module.info.module}"/>
+						<attribute name="Specification-Vendor" value="Mantis Technology Group, Inc."/>
+						<attribute name="Specification-Version" value="${ivy-module.info.revision}"/>
+						<attribute name="Implementation-Vendor" value="Mantis Technology Group, Inc."/>
+						<attribute name="Implementation-Version" value="${ivy-module.info.revision}"/>
+						<attribute name="Created-On" value="${touch.time}"/>
+					</manifest>
+				</jar>
+			</then>
+		</if>
+		
+		<!-- jar javadocs -->
+		<if>
+			<available file="${build.docs.api}"/>
+			<then>
+				<jar destfile="${build.dist}/javadocs/${module.archive.name}.jar" update="true">
+					<fileset dir="${build.docs.api}" includes="**/*"/>
+					<manifest>
+						<attribute name="Specification-Title" value="${ivy-module.info.module}"/>
+						<attribute name="Specification-Vendor" value="Mantis Technology Group, Inc."/>
+						<attribute name="Specification-Version" value="${ivy-module.info.revision}"/>
+						<attribute name="Implementation-Vendor" value="Mantis Technology Group, Inc."/>
+						<attribute name="Implementation-Version" value="${ivy-module.info.revision}"/>
+						<attribute name="Created-On" value="${touch.time}"/>
+					</manifest>
+				</jar>
+			</then>
+		</if>
 		
 		<!-- publish the generated archive into the temporary repository,
 			 where it can be found by other sub-module builds -->
