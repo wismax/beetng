@@ -87,16 +87,16 @@ public class JdbcBehaviorEventPersisterTest extends JdbcEventTestCase {
 		assertEquals(event.getName(), data.getString("EVENT_NAME"));
 		assertEquals(event.getApplication(), data.getString("APPLICATION"));
 		assertEquals(event.getStart().getTime(), data.getTimestamp("EVENT_START").getTime());
-		assertEquals(event.getDuration(), (Long)data.getLong("DURATION_MS"));
+		assertEquals(event.getDurationNs(), (Long)data.getLong("DURATION_NS"));
 		assertEquals(event.getError(), data.getString("ERROR"));
 		assertEquals(event.getUserId(), data.getString("USER_ID"));
 		assertEquals(event.getSessionId(), data.getString("SESSION_ID"));
 		
 		data.close();
 
-		long total = event.getDuration();
+		long total = event.getDurationNs();
 			
-		ResultSet rs = stmt.executeQuery("select sum(duration_ms) from BEHAVIOR_TRACKING_EVENT where PARENT_EVENT_ID = " + event.getId());
+		ResultSet rs = stmt.executeQuery("select sum(duration_ns) from BEHAVIOR_TRACKING_EVENT where PARENT_EVENT_ID = " + event.getId());
 		assertTrue(rs.next());
 		long childTotal = rs.getLong(1);
 		assertTrue("child duration is less than parent event duration", childTotal <= total);

@@ -46,7 +46,7 @@ public class JdbcBehaviorEventPersisterImpl extends JdbcDaoSupport
 		"select SEQ_BEHAVIOR_TRACKING_EVENT.nextval from dual";
 	private static final String DEFAULT_INSERT_SQL = 
 		"insert into BEHAVIOR_TRACKING_EVENT " +
-			"(EVENT_ID, PARENT_EVENT_ID, APPLICATION, EVENT_TYPE, EVENT_NAME, EVENT_START, DURATION_MS, USER_ID, SESSION_ID, ERROR, EVENT_DATA) values " +
+			"(EVENT_ID, PARENT_EVENT_ID, APPLICATION, EVENT_TYPE, EVENT_NAME, EVENT_START, DURATION_NS, USER_ID, SESSION_ID, ERROR, EVENT_DATA) values " +
 			"(       ?,               ?,           ?,          ?,           ?,          ?,           ?,       ?,          ?,     ?,          ?)";
 	
 	private int batchSize = 25;
@@ -173,7 +173,7 @@ public class JdbcBehaviorEventPersisterImpl extends JdbcDaoSupport
 							insert.setString(4, next.getType());
 							insert.setString(5, next.getName());
 							insert.setTimestamp(6, new java.sql.Timestamp(next.getStart().getTime()));
-							insert.setLong(7, next.getDuration());
+							insert.setLong(7, next.getDurationNs());
 
 							//set optional context information on the event.
 							nullSafeSet(insert, 8, next.getUserId(), Types.VARCHAR);

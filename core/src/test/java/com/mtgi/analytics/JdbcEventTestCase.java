@@ -104,7 +104,7 @@ public abstract class JdbcEventTestCase {
         	String name = c.getColumnName();
         	//strip out time columns.
         	//TODO: leave in duration, with which we can compare with a tolerance value?
-        	if ("EVENT_START".equals(name) || "DURATION_MS".equals(name))
+        	if ("EVENT_START".equals(name) || "DURATION_NS".equals(name))
         		continue;
         	//replace string data type comparator with an xmlunit-based comparator
         	if ("EVENT_DATA".equals(name))
