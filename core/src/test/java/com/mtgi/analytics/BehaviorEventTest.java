@@ -26,6 +26,7 @@ public class BehaviorEventTest {
 		BehaviorEvent event = new BehaviorEvent(null, "request", "/foo", "test", "me", "1");
 		assertNull("no start time yet", event.getStart());
 		assertNull("no duration", event.getDuration());
+		assertNull("no durationNs", event.getDurationNs());
 		assertFalse(event.isStarted());
 		assertFalse(event.isEnded());
 		
@@ -38,6 +39,7 @@ public class BehaviorEventTest {
 		assertTrue(event.isStarted());
 		assertFalse(event.isEnded());
 		assertNull(event.getDuration());
+		assertNull(event.getDurationNs());
 		
 		try {
 			event.start();
@@ -50,6 +52,7 @@ public class BehaviorEventTest {
 		assertTrue(event.isStarted());
 		assertFalse(event.isEnded());
 		assertNull(event.getDuration());
+		assertNull(event.getDurationNs());
 	}
 	
 	@Test
@@ -68,6 +71,7 @@ public class BehaviorEventTest {
 		assertFalse(event.isEnded());
 		assertNull(event.getStart());
 		assertNull(event.getDuration());
+		assertNull(event.getDurationNs());
 		
 		event.start();
 		
@@ -78,16 +82,21 @@ public class BehaviorEventTest {
 		assertFalse(event.isEnded());
 		assertNotNull(date);
 		assertNull(event.getDuration());
-
+		assertNull(event.getDurationNs());
+		
 		event.stop();
 		
 		assertTrue(event.isStarted());
 		assertTrue(event.isEnded());
 		
 		Long duration = event.getDuration();
+		Long durationNs = event.getDurationNs();
 		assertNotNull("duration has been logged", duration);
+		assertNotNull("duration ns logged", durationNs);
 		assertTrue("duration greater than sleep [" + duration + "]", duration >= 100L);
 		assertTrue("duration within reasonable limits [" + duration + "]", duration <= 250L);
+		assertEquals("duration NS and MS correctly scaled", duration * 1000000, durationNs - (durationNs % 1000000));
+		
 		assertSame("start date is unchanged", date, event.getStart());
 		
 		try {
@@ -101,6 +110,7 @@ public class BehaviorEventTest {
 		assertTrue(event.isEnded());
 		assertSame(date, event.getStart());
 		assertSame(duration, event.getDuration());
+		assertSame(durationNs, event.getDurationNs());
 
 		try {
 			event.start();
@@ -113,6 +123,7 @@ public class BehaviorEventTest {
 		assertTrue(event.isEnded());
 		assertSame(date, event.getStart());
 		assertSame(duration, event.getDuration());
+		assertSame(durationNs, event.getDurationNs());
 	}
 	
 	@Test

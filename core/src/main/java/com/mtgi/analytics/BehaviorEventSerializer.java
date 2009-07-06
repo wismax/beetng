@@ -39,7 +39,7 @@ public class BehaviorEventSerializer {
 		writeEventAttribute(writer, "name", event.getName());
 		writeEventAttribute(writer, "application", event.getApplication());
 		writeEventAttribute(writer, "start", XS_DATE_FORMAT.format(event.getStart()));
-		writeEventAttribute(writer, "duration-ms", event.getDuration().toString());
+		writeEventAttribute(writer, "duration-ns", event.getDurationNs().toString());
 		writeEventAttribute(writer, "user-id", event.getUserId());
 		writeEventAttribute(writer, "session-id", event.getSessionId());
 		writeEventAttribute(writer, "error", event.getError());

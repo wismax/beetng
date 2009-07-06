@@ -149,7 +149,7 @@ public class XmlBehaviorEventPersisterTest {
 							String tname = tn.getParentNode().getNodeName();
 							if (cname.equals(tname)) {
 								//TODO: sanity check values.
-								if ("duration-ms".equals(cname) || "start".equals(cname))
+								if ("duration-ns".equals(cname) || "start".equals(cname))
 									return RETURN_IGNORE_DIFFERENCE_NODES_SIMILAR;
 							}
 						}
@@ -240,7 +240,7 @@ public class XmlBehaviorEventPersisterTest {
 				assertTrue("log contains parent reference", actual.contains("parent-id=\"" + parent.getId() + "\""));
 			
 			assertTrue("log records time correctly", DATE_PATTERN.matcher(actual).find());
-			assertTrue("log records duration correctly", actual.contains("<duration-ms>" + evt.getDuration() + "</duration-ms>"));
+			assertTrue("log records duration correctly", actual.contains("<duration-ns>" + evt.getDurationNs() + "</duration-ns>"));
 		}
 	}
 	
@@ -320,7 +320,7 @@ public class XmlBehaviorEventPersisterTest {
 					assertTrue("log contains parent reference", actual.contains("parent-id=\"" + parent.getId() + "\""));
 				
 				assertTrue("log records time correctly", DATE_PATTERN.matcher(actual).find());
-				assertTrue("log records duration correctly", actual.contains("<duration-ms>" + evt.getDuration() + "</duration-ms>"));
+				assertTrue("log records duration correctly", actual.contains("<duration-ns>" + evt.getDurationNs() + "</duration-ns>"));
 			}
 		}
 	}
@@ -450,7 +450,7 @@ public class XmlBehaviorEventPersisterTest {
 	private static String stripVariableData(String logLine) {
 		logLine = logLine.replaceAll("(?:parent-)?id=\".+?\"", "");
 		logLine = logLine.replaceAll("<start>.+?</start>", "");
-		logLine = logLine.replaceAll("<duration-ms>.+?</duration-ms>", "");
+		logLine = logLine.replaceAll("<duration-ns>.+?</duration-ns>", "");
 		return logLine;
 	}
 }

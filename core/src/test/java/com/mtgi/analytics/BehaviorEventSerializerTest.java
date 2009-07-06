@@ -77,7 +77,7 @@ public class BehaviorEventSerializerTest {
 		
 		assertEquals("<event id=\"b\" parent-id=\"a\">" +
 					"<type>test-event</type><name>child</name><application>test</application>" +
-					"<start>2006-07-01T13:59:07.000+00:00</start><duration-ms>17</duration-ms>" +
+					"<start>2006-07-01T13:59:07.000+00:00</start><duration-ns>17</duration-ns>" +
 					"<user-id>user</user-id><session-id>session</session-id>" +
 					"<error>java.lang.RuntimeException: boom</error>" +
 					"<event-data hello=\"world\"></event-data></event>", 
@@ -106,7 +106,7 @@ public class BehaviorEventSerializerTest {
 		writer.close();
 		
 		assertEquals("<event id=\"b\"><type>test-event</type><name>child</name><application>test</application>" +
-					"<start>2006-07-01T13:59:07.000+00:00</start><duration-ms>17</duration-ms></event>", 
+					"<start>2006-07-01T13:59:07.000+00:00</start><duration-ns>17</duration-ns></event>", 
 					buffer.toString());
 		
 	}
@@ -135,7 +135,7 @@ public class BehaviorEventSerializerTest {
 		writer.close();
 		
 		assertEquals("<event id=\"b\"><type>test-event</type><name>child</name><application>test</application>" +
-					"<start>2006-07-01T13:59:07.000-07:00</start><duration-ms>17</duration-ms></event>", 
+					"<start>2006-07-01T13:59:07.000-07:00</start><duration-ns>17</duration-ns></event>", 
 					buffer.toString());
 	}
 	
@@ -156,7 +156,7 @@ public class BehaviorEventSerializerTest {
 			return date;
 		}
 		@Override
-		public Long getDuration() {
+		public Long getDurationNs() {
 			return duration;
 		}
 		
