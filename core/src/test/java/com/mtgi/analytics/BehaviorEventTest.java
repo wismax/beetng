@@ -109,7 +109,7 @@ public class BehaviorEventTest {
 		assertTrue(event.isStarted());
 		assertTrue(event.isEnded());
 		assertSame(date, event.getStart());
-		assertSame(duration, event.getDuration());
+		assertEquals(duration, event.getDuration());
 		assertSame(durationNs, event.getDurationNs());
 
 		try {
@@ -122,7 +122,7 @@ public class BehaviorEventTest {
 		assertTrue(event.isStarted());
 		assertTrue(event.isEnded());
 		assertSame(date, event.getStart());
-		assertSame(duration, event.getDuration());
+		assertEquals(duration, event.getDuration());
 		assertSame(durationNs, event.getDurationNs());
 	}
 	

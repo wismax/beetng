@@ -52,7 +52,6 @@ public class BehaviorEvent implements Serializable {
 	private Date start;
 	private Long startNs;
 	private Long duration;
-	private Long durationMs;
 	private EventDataElement data = DeferredDataElement.INSTANCE;
 	private String error;
 	
@@ -100,7 +99,6 @@ public class BehaviorEvent implements Serializable {
 		if (isEnded())
 			throw new IllegalStateException("Event has already ended");
 		duration = System.nanoTime() - startNs;
-		durationMs = duration / 1000000;
 	}
 	
 	/** @return true if this event has started already */
@@ -136,10 +134,10 @@ public class BehaviorEvent implements Serializable {
 
 	/**
 	 * If this event is finished, return its duration (in milliseconds).  Otherwise return null.
-	 * @deprecated to be removed after 1.4.0, use {@link #getDurationNs()}
+	 * @deprecated to be removed after 1.4.0, use {@link #getDurationNs()} instead
 	 */
 	public Long getDuration() {
-		return durationMs;
+		return duration == null ? null : duration / 1000000;
 	}
 	
 	/**
