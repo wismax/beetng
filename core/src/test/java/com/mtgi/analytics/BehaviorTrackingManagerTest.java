@@ -73,7 +73,7 @@ public class BehaviorTrackingManagerTest extends JdbcEventTestCase {
 		assertNull(event.getParent());
 		assertNull(event.getError());
 		assertNull(event.getStart());
-		assertNull(event.getDuration());
+		assertNull(event.getDurationNs());
 		assertTrue(event.isRoot());
 		assertFalse(event.isStarted());
 		assertFalse(event.isEnded());
@@ -93,7 +93,7 @@ public class BehaviorTrackingManagerTest extends JdbcEventTestCase {
 		assertTrue(child.getData().isNull());
 		assertNull(child.getError());
 		assertNull(child.getStart());
-		assertNull(child.getDuration());
+		assertNull(child.getDurationNs());
 		assertFalse(child.isRoot());
 		assertFalse(child.isStarted());
 		assertFalse(child.isEnded());
@@ -130,7 +130,7 @@ public class BehaviorTrackingManagerTest extends JdbcEventTestCase {
 		assertTrue(child2.getData().isNull());
 		assertNull(child2.getError());
 		assertNull(child2.getStart());
-		assertNull(child2.getDuration());
+		assertNull(child2.getDurationNs());
 		assertFalse(child2.isRoot());
 		assertFalse(child2.isStarted());
 		assertFalse(child2.isEnded());
@@ -179,7 +179,7 @@ public class BehaviorTrackingManagerTest extends JdbcEventTestCase {
 		assertTrue(event.getData().isNull());
 		assertNull(event.getError());
 		assertNull(event.getStart());
-		assertNull(event.getDuration());
+		assertNull(event.getDurationNs());
 		assertTrue(event.isRoot());
 		assertFalse(event.isStarted());
 		assertFalse(event.isEnded());
