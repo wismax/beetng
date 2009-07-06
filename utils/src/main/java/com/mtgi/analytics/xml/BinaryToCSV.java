@@ -45,7 +45,7 @@ public class BinaryToCSV extends BinaryXmlProcessor {
 
 	private static final String HELP_TEXT = "Usage: -tool csv [input] [output]";
 	static enum CsvField {
-		id, parent_id, type, name, application, start, duration_ms, user_id, session_id, error, event_data;
+		id, parent_id, type, name, application, start, duration_ns, user_id, session_id, error, event_data;
 		public static CsvField forElement(String localName) {
 			localName = localName.toLowerCase().replace('-', '_');
 			return valueOf(localName);

@@ -1,4 +1,4 @@
-"id","parent_id","type","name","application","start","duration_ms","user_id","session_id","error","event_data",
+"id","parent_id","type","name","application","start","duration_ns","user_id","session_id","error","event_data",
 "d1684167-5484-4afc-bf85-c94ce06203d3","3fba2ea7-5dcc-424d-8e33-92a80a05dff3","request","world","test","2008-11-14 10:34:38","0","him","him1","error[2]","<event-data><key>value&lt;2&gt;</key></event-data>",
 "47f93ee6-241e-4713-ae7a-7c29c4a05c6c","3fba2ea7-5dcc-424d-8e33-92a80a05dff3","app","hello","test","2008-11-14 10:34:38","16","her","her2",,"<event-data><key>value&lt;3&gt;</key></event-data>",
 "cce29d81-ab7a-4548-9773-1b4ce7de58ea","3fba2ea7-5dcc-424d-8e33-92a80a05dff3","request","goodbye","test","2008-11-14 10:34:38","16",,,"error[4]",,

@@ -11,7 +11,7 @@
 	<!-- output a sqlldr record for each event.  the first record is preceded by a prologue that
 		specifies the record format. -->
 	<xsl:template match="event">
-<xsl:value-of select="@id"/>,<xsl:value-of select="@parent-id"/>,<xsl:value-of select="m:quoteCsv(type/node())"/>,<xsl:value-of select="m:quoteCsv(name/node())"/>,<xsl:value-of select="fn:translate(fn:substring(start,1,19), 'T', ' ')"/>,<xsl:value-of select="m:quoteCsv(user-id/node())"/>,<xsl:value-of select="m:quoteCsv(session-id/node())"/>,<xsl:value-of select="m:quoteCsv(application/node())"/>,<xsl:value-of select="duration-ms"/>,<xsl:value-of select="m:quoteCsv(event-data)"/>,<xsl:value-of select="m:quoteCsv(error/node())"/>,
+<xsl:value-of select="@id"/>,<xsl:value-of select="@parent-id"/>,<xsl:value-of select="m:quoteCsv(type/node())"/>,<xsl:value-of select="m:quoteCsv(name/node())"/>,<xsl:value-of select="fn:translate(fn:substring(start,1,19), 'T', ' ')"/>,<xsl:value-of select="m:quoteCsv(user-id/node())"/>,<xsl:value-of select="m:quoteCsv(session-id/node())"/>,<xsl:value-of select="m:quoteCsv(application/node())"/>,<xsl:value-of select="duration-ns"/>,<xsl:value-of select="m:quoteCsv(event-data)"/>,<xsl:value-of select="m:quoteCsv(error/node())"/>,
 </xsl:template>
 
 </xsl:stylesheet>
