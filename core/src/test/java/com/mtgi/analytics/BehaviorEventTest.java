@@ -203,7 +203,7 @@ public class BehaviorEventTest {
 		//a trivial example, with several null attributes and no parent.
 		assertEquals("behavior-event: id=\"null\" " +
 					 "type=\"application\" name=\"hello.world\" application=\"test\" " +
-					 "start=\"null\" duration-ms=\"null\" " +
+					 "start=\"null\" duration-ns=\"null\" " +
 					 "user-id=\"me\" session-id=\"1\" " +
 					 "error=\"null\"", 
 					 event.toString());
@@ -220,11 +220,11 @@ public class BehaviorEventTest {
 		event.stop();
 		
 		String start = child.getStart().toString();
-		String duration = child.getDuration().toString();
+		String duration = child.getDurationNs().toString();
 		
 		assertEquals("behavior-event: id=\"2\" parent-id=\"1\" " +
 				 "type=\"child\" name=\"foo\" application=\"test\" " +
-				 "start=\"" + start + "\" duration-ms=\"" + duration + "\" " +
+				 "start=\"" + start + "\" duration-ns=\"" + duration + "\" " +
 				 "user-id=\"you\" session-id=\"2\" " +
 				 "error=\"boom\"", 
 				 child.toString());

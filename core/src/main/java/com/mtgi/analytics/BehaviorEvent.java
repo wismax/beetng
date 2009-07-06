@@ -50,7 +50,9 @@ public class BehaviorEvent implements Serializable {
 	private String userId;
 	private String sessionId;
 	private Date start;
+	private Long startNs;
 	private Long duration;
+	private Long durationMs;
 	private EventDataElement data = DeferredDataElement.INSTANCE;
 	private String error;
 	
@@ -81,6 +83,7 @@ public class BehaviorEvent implements Serializable {
 		if (isStarted())
 			throw new IllegalStateException("Event has already started");
 		start = new Date();
+		startNs = System.nanoTime();
 	}
 	
 	/**
@@ -96,7 +99,8 @@ public class BehaviorEvent implements Serializable {
 			throw new IllegalStateException("Event has not started");
 		if (isEnded())
 			throw new IllegalStateException("Event has already ended");
-		duration = System.currentTimeMillis() - start.getTime();
+		duration = System.nanoTime() - startNs;
+		durationMs = duration / 1000000;
 	}
 	
 	/** @return true if this event has started already */
@@ -129,11 +133,19 @@ public class BehaviorEvent implements Serializable {
 	public EventDataElement getData() {
 		return data;
 	}
-	
+
 	/**
-	 * If this event is finished, return its duration.  Otherwise return null.
+	 * If this event is finished, return its duration (in milliseconds).  Otherwise return null.
+	 * @deprecated to be removed after 1.4.0, use {@link #getDurationNs()}
 	 */
 	public Long getDuration() {
+		return durationMs;
+	}
+	
+	/**
+	 * If this event is finished, return its duration (in nanoseconds).  Otherwise return null.
+	 */
+	public Long getDurationNs() {
 		return duration;
 	}
 
@@ -231,7 +243,7 @@ public class BehaviorEvent implements Serializable {
 		   .append(" name=\"").append(name).append('"')
 		   .append(" application=\"").append(application).append('"')
 		   .append(" start=\"").append(start).append('"')
-		   .append(" duration-ms=\"").append(duration).append('"')
+		   .append(" duration-ns=\"").append(duration).append('"')
 		   .append(" user-id=\"").append(userId).append('"')
 		   .append(" session-id=\"").append(sessionId).append('"')
 		   .append(" error=\"").append(error).append('"');
