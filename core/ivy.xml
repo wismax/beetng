@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <ivy-module version="2.0" xmlns:m="http://ant.apache.org/ivy/maven">
-    <info organisation="net.sourceforge.beet" module="beet" status="release" revision="1.4.0_b3">
+    <info organisation="net.sourceforge.beet" module="beet" status="release" revision="1.4.0_rc1">
     	<license name="Mozilla Public License, version 1.1" 
     			 url="http://www.mozilla.org/MPL/MPL-1.1.html"/>
     	<repository name="Beet Ivyrep" url="http://beet.sourceforge.net/ivyrep"
@@ -43,12 +43,12 @@
 		<dependency org="stax" name="stax" rev="1.2.0" conf="1.5,compile,test"/>
 		
 		<!-- only needed for compile/test -->
-		<dependency org="org.springframework" name="spring" rev="2.0.+" conf="compile,test"/>
+		<dependency org="org.springframework" name="spring" rev="2.0.8" conf="compile,test"/>
 		<dependency org="javax.servlet" name="servlet-api" rev="2.4" conf="compile,test"/>
 
 		<!-- only needed for test -->
 		<dependency org="junit" name="junit" rev="4.4" conf="test"/>
-		<dependency org="net.sourceforge.beet" name="beet-test" rev="1.0.+" conf="test" changing="true"/>
+		<dependency org="net.sourceforge.beet" name="beet-test" rev="latest.integration" conf="test" changing="true"/>
 		<dependency org="org.unitils" name="unitils" rev="2.3" conf="test"/>
 		<dependency org="commons-io" name="commons-io" rev="1.2" conf="test"/>
 		<dependency org="net.sourceforge.htmlunit" name="htmlunit" rev="2.1" conf="test"/>

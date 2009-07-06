@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <ivy-module version="2.0" xmlns:m="http://ant.apache.org/ivy/maven">
-    <info organisation="net.sourceforge.beet" module="beet-utils" status="release" revision="1.2.0_b3">
+    <info organisation="net.sourceforge.beet" module="beet-utils" status="release" revision="1.2.0_rc1">
     	<license name="Mozilla Public License, version 1.1" 
     			 url="http://www.mozilla.org/MPL/MPL-1.1.html"/>
     	<repository name="Beet Ivyrep" url="http://beet.sourceforge.net/ivyrep"
