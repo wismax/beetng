@@ -10,7 +10,7 @@
 	    EVENT_TYPE CDATA #REQUIRED
 	    EVENT_NAME CDATA #REQUIRED
 	    EVENT_START CDATA #REQUIRED
-	    DURATION_MS CDATA #REQUIRED
+	    DURATION_NS CDATA #REQUIRED
 	    USER_ID CDATA #IMPLIED
 	    SESSION_ID CDATA #IMPLIED
 	    ERROR CDATA #IMPLIED
@@ -21,32 +21,32 @@
 <dataset>
 	<BEHAVIOR_TRACKING_EVENT EVENT_ID="0" APPLICATION="testBT"
 		EVENT_TYPE="jdbc" EVENT_NAME="execute"
-		EVENT_START="2008-06-26 16:34:25.681" DURATION_MS="100"
+		EVENT_START="2008-06-26 16:34:25.681" DURATION_NS="100"
 		EVENT_DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data&gt;&lt;sql&gt;insert into TEST_TRACKING values (1, 'hello', null)&lt;/sql&gt;&lt;/event-data&gt;"
 		USER_ID="dbUser" SESSION_ID="ABCDEF123" />
 	<BEHAVIOR_TRACKING_EVENT EVENT_ID="1" APPLICATION="testBT"
 		EVENT_TYPE="jdbc" EVENT_NAME="executeBatch"
-		EVENT_START="2008-06-26 16:34:25.681" DURATION_MS="100"
+		EVENT_START="2008-06-26 16:34:25.681" DURATION_NS="100"
 		EVENT_DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data&gt;&lt;batch&gt;&lt;sql&gt;insert into TEST_TRACKING values (3, 'batch', '1')&lt;/sql&gt;&lt;sql&gt;insert into TEST_TRACKING values (4, 'batch', '2')&lt;/sql&gt;&lt;/batch&gt;&lt;/event-data&gt;"
 		USER_ID="dbUser" SESSION_ID="ABCDEF123" />
 	<BEHAVIOR_TRACKING_EVENT EVENT_ID="2" APPLICATION="testBT"
 		EVENT_TYPE="jdbc" EVENT_NAME="execute"
-		EVENT_START="2008-06-26 16:34:25.681" DURATION_MS="100"
+		EVENT_START="2008-06-26 16:34:25.681" DURATION_NS="100"
 		EVENT_DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data&gt;&lt;sql&gt;insert into TEST_TRACKING values (2, 'goodbye', null)&lt;/sql&gt;&lt;/event-data&gt;"
 		USER_ID="dbUser" SESSION_ID="ABCDEF123" />
 	<BEHAVIOR_TRACKING_EVENT EVENT_ID="3" APPLICATION="testBT"
 		EVENT_TYPE="jdbc" EVENT_NAME="executeUpdate"
-		EVENT_START="2008-06-26 16:34:25.681" DURATION_MS="100"
+		EVENT_START="2008-06-26 16:34:25.681" DURATION_NS="100"
 		EVENT_DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data&gt;&lt;sql&gt;update TEST_TRACKING set DESCRIPTION = 'world'&lt;/sql&gt;&lt;/event-data&gt;"
 		USER_ID="dbUser" SESSION_ID="ABCDEF123" />
 	<BEHAVIOR_TRACKING_EVENT EVENT_ID="4" APPLICATION="testBT"
 		EVENT_TYPE="jdbc" EVENT_NAME="executeQuery"
-		EVENT_START="2008-06-26 16:34:25.681" DURATION_MS="100"
+		EVENT_START="2008-06-26 16:34:25.681" DURATION_NS="100"
 		EVENT_DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data&gt;&lt;sql&gt;select ID from TEST_TRACKING order by ID&lt;/sql&gt;&lt;/event-data&gt;"
 		USER_ID="dbUser" SESSION_ID="ABCDEF123" ></BEHAVIOR_TRACKING_EVENT>
 	<BEHAVIOR_TRACKING_EVENT EVENT_ID="5" APPLICATION="testBT"
 		EVENT_TYPE="behavior-tracking" EVENT_NAME="flush" 
-		EVENT_START="2008-06-26 16:34:25.681" DURATION_MS="100" 
+		EVENT_START="2008-06-26 16:34:25.681" DURATION_NS="100" 
 		EVENT_DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data count=&quot;5&quot;&gt;&lt;/event-data&gt;" 
 		USER_ID="dbUser" SESSION_ID="ABCDEF123"/>
 </dataset>

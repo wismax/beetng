@@ -10,7 +10,7 @@
 	    EVENT_TYPE CDATA #REQUIRED
 	    EVENT_NAME CDATA #REQUIRED
 	    EVENT_START CDATA #REQUIRED
-	    DURATION_MS CDATA #REQUIRED
+	    DURATION_NS CDATA #REQUIRED
 	    USER_ID CDATA #IMPLIED
 	    SESSION_ID CDATA #IMPLIED
 	    ERROR CDATA #IMPLIED
@@ -21,12 +21,12 @@
 <dataset>
 	<BEHAVIOR_TRACKING_EVENT EVENT_ID="0" APPLICATION="testBT"
 		EVENT_TYPE="method" EVENT_NAME="com.mtgi.analytics.aop.BehaviorAdviceTest$ServiceA.throwExceptionTracked"
-		EVENT_START="2008-06-26 16:34:25.681" DURATION_MS="100"
+		EVENT_START="2008-06-26 16:34:25.681" DURATION_NS="100"
 		EVENT_DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data&gt;&lt;parameters&gt;&lt;param&gt;1972&lt;/param&gt;&lt;/parameters&gt;&lt;/event-data&gt;"
 		USER_ID="testUser" SESSION_ID="ABCDEF123" ERROR="java.lang.RuntimeException: i'm a bad application"/>
 	<BEHAVIOR_TRACKING_EVENT EVENT_ID="1" APPLICATION="testBT"
 		EVENT_TYPE="behavior-tracking" EVENT_NAME="flush" 
-		EVENT_START="2008-06-26 16:34:25.681" DURATION_MS="100" 
+		EVENT_START="2008-06-26 16:34:25.681" DURATION_NS="100" 
 		EVENT_DATA="&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;event-data count=&quot;1&quot;&gt;&lt;/event-data&gt;" 
 		USER_ID="testUser" SESSION_ID="ABCDEF123"/>
 </dataset>
