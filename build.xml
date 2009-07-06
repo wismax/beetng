@@ -108,7 +108,7 @@
 					<fileset refid="licenses"/>
 					<fileset dir="core/src/main" includes="sql/**"/>
 				</copy>
-
+				
 				<copy todir="${release.dir}/docs" failonerror="false">
 					<fileset dir="${build.root}">
 						<include name="core/docs/api/**/*"/>
@@ -137,6 +137,9 @@
 				<include name="core/reports/**"/>
 				<include name="utils/docs/**"/>
 				<include name="utils/reports/**"/>
+				<include name="test/docs/**"/>
+				<include name="test/reports/**"/>
+				<include name="integration/*/reports/**"/>
 			</tarfileset>
 		</tar>
 		
@@ -150,10 +153,16 @@
 		<ivy:retrieve pattern="${basedir}/repository/ivyrep/[organisation]/[module]/[revision]/[type]s/[artifact].[ext]" 
 					  ivypattern="${basedir}/repository/ivyrep/[organisation]/[module]/[revision]/[type]s/[artifact].[ext]"/>
 
-		<ivy:install from="online" to="local" transitive="true" overwrite="true"
+		<ivy:install from="online" to="local" overwrite="true"
 					 organisation="net.sourceforge.beet" module="beet" revision="latest.integration"/>
-		<ivy:install from="online" to="local" transitive="true"
+		<ivy:install from="online" to="local"
 					 organisation="net.sourceforge.beet" module="beet-utils" revision="latest.integration"
+					 overwrite="true"/>
+		<ivy:install from="online" to="local"
+					 organisation="net.sourceforge.beet" module="beet-test" revision="latest.integration"
+					 overwrite="true"/>
+		<ivy:install from="online" to="local"
+					 organisation="net.sourceforge.beet" module="beet-web" revision="latest.integration"
 					 overwrite="true"/>
 		<!--<ivy:install from="online" to="local" transitive="true"
 					 organisation="net.sourceforge.beet" module="beet-hello" revision="latest.integration"
@@ -164,7 +173,7 @@
 	<target name="maven-repository" description="generate maven packaging artifacts from the local ivy repository" depends="repository">
 
 		<!-- publish ivy descriptors, stripping out test/compile time dependencies -->
-		<for list="core,utils,test" param="module.dir">
+		<for list="core,utils,test,integration/web" param="module.dir">
 			<sequential>
 				<ivy:resolve file="@{module.dir}/ivy.xml"/>
 				<ivy:publish resolver="local" conf="source,javadoc,default,1.5,1.6" overwrite="true" update="true">
@@ -175,7 +184,7 @@
 		
 		<!-- load ivy settings that uses maven naming conventions -->
 		<ivy:settings id="maven.settings" file="${scripts.dir}/ivysettings-maven.xml"/>
-		<for list="beet,beet-utils,beet-test" param="module.name">
+		<for list="beet,beet-utils,beet-test,beet-web" param="module.name">
 			<sequential>
 				
 				<!-- transfer ivy descriptor into maven repository folder, applying name changes -->
