@@ -28,7 +28,7 @@ INSERT INTO BEHAVIOR_TRACKING_EVENT (
 	<xsl:value-of select="m:quoteSql(user-id/node())"/>,
 	<xsl:value-of select="m:quoteSql(session-id/node())"/>,
 	'<xsl:value-of select="application"/>',
-	<xsl:value-of select="duration-ms"/>,
+	<xsl:value-of select="duration-ns"/>,
 	<xsl:value-of select="m:quoteSql(event-data)"/>,
 	<xsl:value-of select="m:quoteSql(error/node())"/>
 );
