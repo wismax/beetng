@@ -45,22 +45,22 @@ public class StatisticsMBean {
 		return errorCount;
 	}
 
-	@ManagedAttribute(description="The average event execution time, in milliseconds")
+	@ManagedAttribute(description="The average event execution time, in nanoseconds")
 	public double getAverageTime() {
 		return averageTime;
 	}
 
-	@ManagedAttribute(description="The maximum event execution time, in milliseconds")
+	@ManagedAttribute(description="The maximum event execution time, in nanoseconds")
 	public long getMaxTime() {
 		return maxTime;
 	}
 
-	@ManagedAttribute(description="The minimum event execution time, in milliseconds")
+	@ManagedAttribute(description="The minimum event execution time, in nanoseconds")
 	public Long getMinTime() {
 		return minTime;
 	}
 
-	@ManagedAttribute(description="The standard deviation of event execution time, in milliseconds")
+	@ManagedAttribute(description="The standard deviation of event execution time, in nanoseconds")
 	public double getStandardDeviation() {
 		return standardDeviation;
 	}
@@ -86,7 +86,7 @@ public class StatisticsMBean {
 		if (event.getError() != null)
 			++errorCount;
 		
-		add(event.getDuration());
+		add(event.getDurationNs());
 	}
 	
 	public synchronized void add(long duration) {

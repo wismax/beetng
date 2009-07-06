@@ -131,7 +131,7 @@ public class StatisticsMBeanTest {
 		}
 
 		@Override
-		public Long getDuration() {
+		public Long getDurationNs() {
 			return duration;
 		}
 		
