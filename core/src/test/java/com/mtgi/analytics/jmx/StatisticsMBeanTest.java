@@ -17,6 +17,8 @@ public class StatisticsMBeanTest {
 	@Before
 	public void setUp() {
 		inst = new StatisticsMBean();
+		assertEquals("default units are milliseconds", "milliseconds", inst.getUnits());
+		inst.setUnits("nanos");
 	}
 	
 	@After
@@ -77,12 +79,50 @@ public class StatisticsMBeanTest {
 		assertEquals(1.6666666666, inst.getAverageTime(), 0.0000000001);
 	}
 	
+	@Test
+	public void testUnits() {
+		Date now = new Date();
+		inst.add(new TestEvent(now, 1L));
+		inst.add(new TestEvent(now, 3L));
+		assertEquals("last invocation set", now, inst.getLastInvocation());
+		assertEquals(2, inst.getCount());
+		assertEquals(2.0, inst.getAverageTime(), 0.0000000001);
+		assertEquals(1.0, inst.getMinTime(), 0.0000000001);
+		assertEquals(3.0, inst.getMaxTime(), 0.0000000001);
+		assertEquals(1.0, inst.getStandardDeviation(), 0.0000000001);
+		assertEquals("nanoseconds", inst.getUnits());
+		
+		inst.setUnits("millis");
+		assertEquals(0.000002, inst.getAverageTime(), 0.0000000001);
+		assertEquals(0.000001, inst.getMinTime(), 0.0000000001);
+		assertEquals(0.000003, inst.getMaxTime(), 0.0000000001);
+		assertEquals(0.000001, inst.getStandardDeviation(), 0.0000000001);
+		assertEquals("milliseconds", inst.getUnits());
+		
+		inst.setUnits("sec");
+		assertEquals(0.000000002, inst.getAverageTime(), 0.0000000001);
+		assertEquals(0.000000001, inst.getMinTime(), 0.0000000001);
+		assertEquals(0.000000003, inst.getMaxTime(), 0.0000000001);
+		assertEquals(0.000000001, inst.getStandardDeviation(), 0.0000000001);
+		assertEquals("seconds", inst.getUnits());
+		
+		try {
+			inst.setUnits("foo");
+			fail("should have thrown exception on unknown units");
+		} catch (IllegalArgumentException expected) {
+			assertEquals("units unchanged", "seconds", inst.getUnits());
+		}
+	}
+	
 	private static final void assertStats(StatisticsMBean inst, Date last, double average, long count, long errors, long max, Long min, double stddev) {
 		assertEquals(count, inst.getCount());
 		assertEquals(0, inst.getErrorCount());
 		assertEquals(last, inst.getLastInvocation());
-		assertEquals(max, inst.getMaxTime());
-		assertEquals(min, inst.getMinTime());
+		assertEquals(max, inst.getMaxTime(), 0.0000000001);
+		if (min == null)
+			assertNull(inst.getMinTime());
+		else
+			assertEquals(min, inst.getMinTime(), 0.0000000001);
 		assertEquals(average, inst.getAverageTime(), 0.0000000001);
 		assertEquals(stddev, inst.getStandardDeviation(), 0.0000000001);
 	}

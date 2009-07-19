@@ -60,9 +60,9 @@
 					</xsd:annotation>
 				</xsd:element>
 				
-				<xsd:element name="duration-ms" type="xsd:long">
+				<xsd:element name="duration-ns" type="xsd:long">
 					<xsd:annotation>
-						<xsd:documentation>The event duration, in milliseconds.</xsd:documentation>
+						<xsd:documentation>The event duration, in nanoseconds.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:element>
 				

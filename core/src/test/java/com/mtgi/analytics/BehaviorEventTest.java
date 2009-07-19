@@ -21,6 +21,7 @@ import org.junit.Test;
 
 public class BehaviorEventTest {
 
+	@SuppressWarnings("deprecation")
 	@Test
 	public void testStart() {
 		BehaviorEvent event = new BehaviorEvent(null, "request", "/foo", "test", "me", "1");
@@ -55,6 +56,7 @@ public class BehaviorEventTest {
 		assertNull(event.getDurationNs());
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Test
 	public void testStop() throws InterruptedException {
 		BehaviorEvent event = new BehaviorEvent(null, "request", "/foo", "test", "me", "1");

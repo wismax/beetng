@@ -21,6 +21,23 @@ import com.mtgi.analytics.BehaviorEvent;
 @ManagedResource(description="Aggregate statistics for a single type of behavior tracking event")
 public class StatisticsMBean {
 
+	public static enum Units {
+		seconds(1e-9), 
+		milliseconds(1e-6), 
+		nanoseconds(1) { public double convertNanos(double identity) { return identity; } };
+		
+		private double ratio;
+		private Units(double ratio) {
+			this.ratio = ratio;
+		}
+		
+		public double convertNanos(double nanos) {
+			return ratio * nanos;
+		}
+	}
+	
+	private Units units = Units.milliseconds;
+	
 	private long count;
 	private long errorCount;
 
@@ -35,6 +52,24 @@ public class StatisticsMBean {
 	private Date lastInvocation;
 	//TODO: throughput statistics, histogram ?
 
+	@ManagedAttribute(description="The unit of measure for attribute values; supported units are seconds, milliseconds, and nanoseconds")
+	public String getUnits() {
+		return units.toString();
+	}
+	
+	public void setUnits(String units) {
+		units = units.toLowerCase();
+		Units v = null;
+		for (Units u : Units.values())
+			if (u.name().startsWith(units)) {
+				v = u;
+				break;
+			}
+		if (v == null)
+			throw new IllegalArgumentException("Unknown unit '" + units + "'; only seconds, milliseconds, nanoseconds are supported");
+		this.units = v;
+	}
+	
 	@ManagedAttribute(description="The number of events received")
 	public long getCount() {
 		return count;
@@ -45,24 +80,24 @@ public class StatisticsMBean {
 		return errorCount;
 	}
 
-	@ManagedAttribute(description="The average event execution time, in nanoseconds")
+	@ManagedAttribute(description="The average event execution time")
 	public double getAverageTime() {
-		return averageTime;
+		return units.convertNanos(averageTime);
 	}
 
-	@ManagedAttribute(description="The maximum event execution time, in nanoseconds")
-	public long getMaxTime() {
-		return maxTime;
+	@ManagedAttribute(description="The maximum event execution time")
+	public double getMaxTime() {
+		return units.convertNanos(maxTime);
 	}
 
-	@ManagedAttribute(description="The minimum event execution time, in nanoseconds")
-	public Long getMinTime() {
-		return minTime;
+	@ManagedAttribute(description="The minimum event execution time")
+	public Double getMinTime() {
+		return minTime == null ? null : units.convertNanos(minTime);
 	}
 
-	@ManagedAttribute(description="The standard deviation of event execution time, in nanoseconds")
+	@ManagedAttribute(description="The standard deviation of event execution time")
 	public double getStandardDeviation() {
-		return standardDeviation;
+		return units.convertNanos(standardDeviation);
 	}
 
 	@ManagedAttribute(description="The start time of the last event recorded")

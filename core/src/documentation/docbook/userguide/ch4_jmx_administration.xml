@@ -161,27 +161,34 @@
 				<seglistitem>
 					<seg>AverageTime</seg>
 					<seg>attribute</seg>
-					<seg>The average execution time, in milliseconds.</seg>
+					<seg>The average execution time, in the selected unit.</seg>
 				</seglistitem>
 				<seglistitem>
 					<seg>MaxTime</seg>
 					<seg>attribute</seg>
-					<seg>The maximum execution time, in milliseconds.</seg>
+					<seg>The maximum execution time, in the selected unit.</seg>
 				</seglistitem>
 				<seglistitem>
 					<seg>MinTime</seg>
 					<seg>attribute</seg>
-					<seg>The minimum execution time, in milliseconds.</seg>
+					<seg>The minimum execution time, in the selected unit.</seg>
 				</seglistitem>
 				<seglistitem>
 					<seg>StandardDeviation</seg>
 					<seg>attribute</seg>
-					<seg>The standard deviation from the mean, in milliseconds.</seg>
+					<seg>The standard deviation from the mean, in the selected unit.</seg>
 				</seglistitem>
 				<seglistitem>
 					<seg>LastInvocation</seg>
 					<seg>attribute</seg>
 					<seg>The most recent date and time at which this event occurred.</seg>
+				</seglistitem>
+				<seglistitem>
+					<seg>Units</seg>
+					<seg>attribute</seg>
+					<seg>The unit of measure for max, min, average, and stddev.  
+					Valid values are seconds, milliseconds, and nanoseconds.
+					Defaults to milliseconds if unspecified.</seg>
 				</seglistitem>
 				<seglistitem>
 					<seg>reset</seg>
