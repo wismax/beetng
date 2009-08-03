@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<ivy-module version="2.0" xmlns:m="http://ant.apache.org/ivy/maven">
+<ivy-module version="2.0" 
+			xmlns:ea="http://www.easyant.org"
+			xmlns:m="http://ant.apache.org/ivy/maven">
     <info organisation="net.sourceforge.beet" module="beet-test" status="release" revision="1.0.0_b3">
     	<license name="Mozilla Public License, version 1.1" 
     			 url="http://www.mozilla.org/MPL/MPL-1.1.html"/>
@@ -8,6 +10,18 @@
     	<description homepage="http://beet.sourceforge.net">
     	Unit testing utilities developed as a corollary of the beet project.
     	</description>
+		<ea:build type="org.apache.easyant.buildtypes#build-std-java;0.2">
+
+			<ea:property name="project.ivy.settings.file" value="${basedir}/src/build/ant/ivysettings.xml"/>
+			<ea:property name="main.confs" value="compile"/>
+			
+			<ea:property name="test.mode" value="report"/>
+			<ea:property name="test.run.includes.pattern" value="**/*Test.class"/>
+			<ea:property name="test.run.excludes.pattern" value="**/PerformanceTest.class"/>
+
+			<ea:plugin module="org.apache.easyant.plugins#source-jar;0.1" mandatory="true" as="source-jar"/>
+			
+		</ea:build>
 	</info>
 	
 	<configurations>
@@ -25,7 +39,7 @@
 	<publications>
 		<artifact name="beet-test" type="jar" conf="base,default,test"/>
 		<artifact name="beet-test" type="source" ext="jar" conf="source" m:classifier="source"/>
-		<artifact name="beet-test" type="javadoc" ext="jar" conf="javadoc" m:classifier="javadoc"/>
+		<artifact name="beet-test" type="javadoc" ext="zip" conf="javadoc" m:classifier="javadoc"/>
 	</publications>
 	
 	<dependencies defaultconfmapping="1.5,1.6,default,compile,test->default">

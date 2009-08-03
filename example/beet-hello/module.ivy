@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<ivy-module version="2.0">
+<ivy-module version="2.0"
+ 			xmlns:ea="http://www.easyant.org">
     <info organisation="net.sourceforge.beet" module="beet-hello" status="milestone" revision="1.0.0">
     	<license name="Mozilla Public License, version 1.1" 
     			 url="http://www.mozilla.org/MPL/MPL-1.1.html"/>
@@ -8,6 +9,16 @@
     	<description homepage="http://beet.sourceforge.net">
     	Example web application demonstrating a range of beet tracking features.
     	</description>
+		<ea:build type="org.apache.easyant.buildtypes#build-webapp-java;0.1">
+
+			<ea:property name="project.ivy.settings.file" value="${basedir}/src/build/ant/ivysettings.xml"/>
+			<ea:property name="main.confs" value="compile"/>
+			
+			<ea:property name="test.mode" value="report"/>
+			<ea:property name="test.run.includes.pattern" value="**/*Test.class"/>
+			<ea:property name="test.run.excludes.pattern" value="**/PerformanceTest.class"/>
+
+		</ea:build>
 	</info>
 	
 	<configurations>

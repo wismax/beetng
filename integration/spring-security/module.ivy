@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<ivy-module version="2.0">
+<ivy-module version="2.0"
+ 			xmlns:ea="http://www.easyant.org">
     <info organisation="net.sourceforge.beet" module="beet-spring-security" status="release" revision="1.0.0_rc1">
     	<license name="Mozilla Public License, version 1.1" 
     			 url="http://www.mozilla.org/MPL/MPL-1.1.html"/>
@@ -8,6 +9,16 @@
     	<description homepage="http://beet.sourceforge.net">
     	Integration tests for spring-security.
     	</description>
+		<ea:build type="org.apache.easyant.buildtypes#build-std-java;0.2">
+
+			<ea:property name="project.ivy.settings.file" value="${basedir}/src/build/ant/ivysettings.xml"/>
+			<ea:property name="main.confs" value="compile"/>
+			
+			<ea:property name="test.mode" value="report"/>
+			<ea:property name="test.run.includes.pattern" value="**/*Test.class"/>
+			<ea:property name="test.run.excludes.pattern" value="**/PerformanceTest.class"/>
+
+		</ea:build>
 	</info>
 	
 	<configurations>
@@ -40,7 +51,7 @@
 		<dependency org="commons-logging" name="commons-logging" rev="1.1"/>
 		<dependency org="commons-collections" name="commons-collections" rev="3.2"/>
 		
-		<dependency org="net.sourceforge.beet" name="beet" rev="latest.integration" transitive="false"/>
+		<dependency org="net.sourceforge.beet" name="beet-core" rev="latest.integration" transitive="false"/>
 
 	</dependencies>
 	

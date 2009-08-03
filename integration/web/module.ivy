@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<ivy-module version="2.0">
+<ivy-module version="2.0"
+ 			xmlns:ea="http://www.easyant.org">
     <info organisation="net.sourceforge.beet" module="beet-web" status="release" revision="1.4.0_rc1">
     	<license name="Mozilla Public License, version 1.1" 
     			 url="http://www.mozilla.org/MPL/MPL-1.1.html"/>
@@ -14,6 +15,15 @@
     	<a href="https://sourceforge.net/tracker/?func=detail&amp;aid=2794532&amp;group_id=258926&amp;atid=1127321">issue 2794532</a>
     	for reference.
     	</description>
+		<ea:build type="org.apache.easyant.buildtypes#build-std-java;0.2">
+
+			<ea:property name="project.ivy.settings.file" value="${basedir}/src/build/ant/ivysettings.xml"/>
+			<ea:property name="main.confs" value="compile"/>
+			
+			<ea:property name="test.mode" value="report"/>
+			<ea:property name="test.run.includes.pattern" value="**/*Test.class"/>
+
+		</ea:build>
 	</info>
 	
 	<configurations>
@@ -31,7 +41,7 @@
 	</publications>
 	
 	<dependencies defaultconfmapping="test->default">
-		<dependency org="net.sourceforge.beet" name="beet" rev="latest.integration" changing="true"/>
+		<dependency org="net.sourceforge.beet" name="beet-core" rev="latest.integration" changing="true"/>
 		<dependency org="net.sourceforge.beet" name="beet-test" rev="latest.integration" changing="true"/>
 		<dependency org="org.unitils" name="unitils" rev="2.3"/>
 		<dependency org="junit" name="junit" rev="4.4"/>

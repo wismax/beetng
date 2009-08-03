@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 
-<project name="beet" default="all"
-		 xmlns:ivy="antlib:org.apache.ivy.ant">
+<project name="beet" xmlns:ivy="antlib:org.apache.ivy.ant">
 
 	<fileset id="licenses" dir="${basedir}">
 		<include name="notice.txt"/>
@@ -13,7 +12,6 @@
 	<property file="${local.properties}"/>
 
 	<property name="scripts.dir" value="${basedir}/src/build/ant"/>
-	<import file="${scripts.dir}/build-master.xml"/>
 
 	<macrodef name="bundle" 
 			  description="Generate tar.gz, tar.bz2, zip, and corresponding MD5 hash files for a release directory">
@@ -52,14 +50,12 @@
 		
 	</macrodef>
 	
-	<target name="all-dist" depends="all,release"/>
-	
 	<!-- replace standard package target with custom routines -->
-	<target name="package" depends="doc,package-release,package-utils,package-reports"/>
+	<target name="package" depends="package-release,package-utils,package-reports"/>
 
 	<target name="package-utils" description="package command line utilities">
 
-		<ivy:resolve file="utils/ivy.xml" resolveId="mtgi-beet-utils" />
+		<ivy:resolve file="utils/module.ivy" resolveId="mtgi-beet-utils" />
 
 		<!-- create separate distributions for java 5 and 6 -->
 		<for list="5,6" param="current.version">
@@ -90,7 +86,7 @@
 	</target>
 
 	<target name="package-release" description="package a new public release for upload to SF">
-		<ivy:resolve file="core/ivy.xml" resolveId="mtgi-beet"/>
+		<ivy:resolve file="core/module.ivy" resolveId="mtgi-beet"/>
 
 		<!-- create separate distributions for java 5 and 6 -->
 		<for list="5,6" param="current.version">
