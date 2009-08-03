@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<ivy-module version="2.0" 
+			xmlns:ea="http://www.easyant.org"
+			xmlns:m="http://ant.apache.org/ivy/maven">
+    <info organisation="mtgi" module="beet-core" status="integration" revision="1.4.0_b3">
+    	<description homepage="http://beet.sourceforge.net">
+    	The beet library adds aspect-oriented user behavior tracking and 
+    	performance monitoring capabilities to a Java application.  It is 
+    	designed for use with Spring-based applications.
+    	</description>
+		<ea:build type="org.apache.easyant.buildtypes#build-std-java;0.2">
+
+			<ea:property name="project.ivy.settings.file" value="${basedir}/src/build/ant/ivysettings.xml"/>
+			<ea:property name="main.confs" value="compile"/>
+			
+			<ea:property name="test.mode" value="report"/>
+			<ea:property name="test.run.includes.pattern" value="**/*Test.class"/>
+			<ea:property name="test.run.excludes.pattern" value="**/PerformanceTest.class"/>
+
+			<ea:plugin module="org.apache.easyant.plugins#source-jar;0.1" mandatory="true" as="source-jar"/>
+			
+		</ea:build>
+	</info>
+	
+	<configurations>
+		<conf name="base" description="core module without runtime dependencies"/>
+		<conf name="source" description="source jar"/>
+		<conf name="compile" description="compile-time dependencies"/>
+		<conf name="test" description="dependencies used for junit testing"/>
+		
+		<conf name="1.5" extends="default" description="core module with dependencies, for SDK 1.5 and below"/>
+		<conf name="1.6" description="core module with runtime dependencies, for SDK 1.6 and higher"/>
+		<conf name="default" extends="1.6" description="alias for '1.6'" />
+	</configurations>
+
+	<publications>
+		<artifact name="beet-core" type="jar" conf="base,default,test"/>
+		<artifact name="beet-core-source" type="source" ext="jar" conf="source" m:classifier="sources"/>
+	</publications>
+	
+	<dependencies defaultconfmapping="1.5->1.5(default);1.6->1.6(default);default,compile,test->default">
+
+		<dependency org="apache" name="commons-logging" rev="1.1.1"/>
+		<dependency org="aspectj" name="aspectjrt" rev="1.5.3"/>
+		<dependency org="aspectj" name="aspectjweaver" rev="1.5.3"/>
+		<dependency org="cglib" name="cglib" rev="2.1.3"/>
+		<dependency org="opensymphony" name="quartz" rev="1.6.0"/>
+		<dependency org="sun" name="FastInfoset" rev="1.2.2"/>
+
+		<!-- only needed on SDK 1.5 and below -->
+		<dependency org="bea" name="stax-impl" rev="1.2.0" conf="1.5,compile,test"/>
+		
+		<!-- only needed for compile/test -->
+		<dependency org="springframework" name="spring" rev="2.0.+" conf="compile,test"/>
+		<dependency org="springframework" name="spring-webmvc" rev="2.0.+" conf="compile,test"/>
+		<dependency org="sun" name="servlet-api" rev="2.4" conf="compile,test"/>
+
+		<!-- only needed for test -->
+		<dependency org="junit" name="junit" rev="4.4" conf="test"/>
+		<dependency org="mtgi" name="testfixtures-tomcat" rev="1.1+" conf="test" changing="true"/>
+		<dependency org="mtgi" name="testfixtures-spring" rev="1.1.+" conf="test" changing="true"/>
+		<dependency org="unitils" name="unitils" rev="1.0" conf="test->junit,spring,easymock,dbunit,hsqldb"/>
+		<dependency org="apache" name="commons-io" rev="1.2" conf="test"/>
+		<dependency org="gargoylesoftware" name="htmlunit" rev="2.1" conf="test"/>
+		<dependency org="xmlunit" name="xmlunit" rev="1.2" conf="test"/>
+
+		<dependency org="sun" name="persistence-api" rev="1.0" conf="test"/>
+		<dependency org="sun" name="jta" rev="1.0" conf="test"/>
+		<dependency org="hibernate" name="hibernate" rev="3.2.+" conf="test"/>
+		<dependency org="hibernate" name="hibernate-annotations" rev="3.3.0" conf="test"/>
+		<dependency org="springframework" name="spring-test" rev="2.5.+" conf="test"/>
+		
+	</dependencies>
+	
+</ivy-module>
