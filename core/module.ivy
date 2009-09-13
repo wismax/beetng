@@ -22,6 +22,10 @@
 			<ea:property name="test.run.excludes.pattern" value="**/PerformanceTest.class"/>
 
 			<ea:plugin module="org.apache.easyant.plugins#source-jar;0.1" mandatory="true" as="source-jar"/>
+			<ea:plugin module="org.apache.easyant.plugins#docbook;0.1" mandatory="true" as="docbook">
+				<ea:property name="docbook.index.file" value="src/documentation/docbook/userguide/manual.xml"/>
+				<ea:property name="docbook.parameters" value="html.stylesheet=css/stylesheet.css table.borders.with.css=1"/>
+			</ea:plugin>
 			
 		</ea:build>
 	</info>
