@@ -15,6 +15,7 @@
 			<ea:property name="main.confs" value="compile"/>
 			
 			<ea:property name="test.mode" value="report"/>
+			<ea:property name="test.run.dir" value="target/tmp"/>
 			<ea:property name="test.run.includes.pattern" value="**/*Test.class"/>
 			<ea:property name="test.run.excludes.pattern" value="**/PerformanceTest.class"/>
 
