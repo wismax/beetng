@@ -6,10 +6,8 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
@@ -20,6 +18,7 @@ import org.unitils.core.util.AnnotatedInstanceManager;
 import com.mtgi.test.unitils.tomcat.annotations.DeployDescriptor;
 import com.mtgi.test.unitils.tomcat.annotations.DeployExploded;
 import com.mtgi.test.unitils.tomcat.annotations.EmbeddedTomcat;
+import com.mtgi.test.util.IOUtils;
 
 public class EmbeddedTomcatManager extends AnnotatedInstanceManager<EmbeddedTomcatServer, EmbeddedTomcat> {
 	
@@ -91,7 +90,7 @@ public class EmbeddedTomcatManager extends AnnotatedInstanceManager<EmbeddedTomc
 						log.warn("Error shutting down server for " + t.getName(), e);
 					} finally {
 						File home = server.getCatalinaHome();
-						delete(home);
+						IOUtils.delete(home);
 					}
 				}
 			} catch (Exception e) {
@@ -121,7 +120,7 @@ public class EmbeddedTomcatManager extends AnnotatedInstanceManager<EmbeddedTomc
 		try {
 			Class<? extends EmbeddedTomcatServer> implClass = (Class<? extends EmbeddedTomcatServer>) loader.loadClass(implClassName);
 			Constructor<? extends EmbeddedTomcatServer> con = implClass.getConstructor(File.class, Boolean.TYPE);
-			return con.newInstance(createTempDir("embeddedTomcat"), autoStart);
+			return con.newInstance(IOUtils.createTempDir("embeddedTomcat"), autoStart);
 		} catch (ClassNotFoundException e) {
 			throw new UnitilsException("Unable to locate server class " + implClassName);
 		} catch (Exception e) {
@@ -142,7 +141,7 @@ public class EmbeddedTomcatManager extends AnnotatedInstanceManager<EmbeddedTomc
 		URL url = testClass.getResource(resourcePath);
 		if (url == null)
 			return getDeployableResource(resourcePath);
-		return urlToFile(url);
+		return IOUtils.urlToFile(url);
 	}
 	
 	/**
@@ -153,50 +152,7 @@ public class EmbeddedTomcatManager extends AnnotatedInstanceManager<EmbeddedTomc
 		if (url == null)
 			throw new FileNotFoundException("Unable to locate classpath resource at " + resourcePath);
 		
-		return urlToFile(url);
-	}
-
-	/**
-	 * Create an empty temporary directory with the given basename.
-	 */
-	public static File createTempDir(String name) throws IOException {
-		File tmp = new File(System.getProperty("java.io.tmpdir"));
-		for (int counter = new Random().nextInt() & 0xffff; true; ++counter) {
-			File dir = new File(tmp, name + counter + ".dir");
-			if (!dir.exists()) {
-				if (!dir.mkdirs())
-					throw new IOException("Unable to create temporary directory " + dir.getAbsolutePath());
-				return dir;
-			}
-		}
-	}
-	
-	/**
-	 * Recursively delete the given filesystem path and its children.
-	 */
-	public static void delete(File dir) throws IOException {
-		if (dir.isDirectory())
-			for (File child : dir.listFiles())
-				delete(child);
-		
-		if (dir.exists() && !dir.delete())
-			throw new IOException("Unable to delete " + dir.getAbsolutePath());
-	}
-	
-	/**
-	 * Convert a file-scheme URL to its equivalent File representation.
-	 * @throws IOException if the URL is invalid, or if the file does not exist.
-	 */
-	public static File urlToFile(URL url) throws IOException {
-		String ext = url.toExternalForm();
-		ext = ext.replaceFirst("^file:/+", "/");
-		ext = URLDecoder.decode(ext, "UTF-8");
-		
-		File location = new File(ext);
-		if (!location.exists())
-			throw new FileNotFoundException("No resource found at path " + location.getAbsolutePath());
-		
-		return location;
+		return IOUtils.urlToFile(url);
 	}
 	
 }

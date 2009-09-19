@@ -3,15 +3,18 @@
 			xmlns:ea="http://www.easyant.org"
 			xmlns:m="http://ant.apache.org/ivy/maven">
     <info organisation="net.sourceforge.beet" module="beet-core" status="release" revision="1.4.0_rc1">
+		
     	<license name="Mozilla Public License, version 1.1" 
     			 url="http://www.mozilla.org/MPL/MPL-1.1.html"/>
     	<repository name="Beet Ivyrep" url="http://beet.sourceforge.net/ivyrep"
     				pattern="[organisation]/[module]/[revision]/[type]s/[artifact].[ext]"/>
+    	
     	<description homepage="http://beet.sourceforge.net">
     	The beet library adds aspect-oriented user behavior tracking and 
     	performance monitoring capabilities to a Java application.  It is 
     	designed for use with Spring-based applications.
     	</description>
+    	
 		<ea:build type="org.apache.easyant.buildtypes#build-std-java;0.2">
 
 			<ea:property name="project.ivy.settings.file" value="${basedir}/src/build/ant/ivysettings.xml"/>
@@ -20,7 +23,9 @@
 			<ea:property name="test.mode" value="report"/>
 			<ea:property name="test.run.includes.pattern" value="**/*Test.class"/>
 			<ea:property name="test.run.excludes.pattern" value="**/PerformanceTest.class"/>
+			<ea:property name="test.run.dir" value="target/tmp"/>
 
+			<ea:plugin module="org.apache.easyant.plugins#coverage-cobertura;0.1" mandatory="true" as="cobertura"/>
 			<ea:plugin module="org.apache.easyant.plugins#source-jar;0.1" mandatory="true" as="source-jar"/>
 			<ea:plugin module="org.apache.easyant.plugins#docbook;0.1" mandatory="true" as="docbook">
 				<ea:property name="docbook.index.file" value="src/documentation/docbook/userguide/manual.xml"/>
@@ -53,7 +58,7 @@
 		<dependency org="commons-logging" name="commons-logging" rev="1.1.1"/>
 		<dependency org="org.aspectj" name="aspectjrt" rev="1.6.4"/>
 		<dependency org="org.aspectj" name="aspectjweaver" rev="1.6.4"/>
-		<dependency org="cglib" name="cglib" rev="2.1_3"/>
+		<dependency org="cglib" name="cglib-nodep" rev="2.1_3"/>
 		<dependency org="opensymphony" name="quartz-all" rev="1.6.0"/>
 		<dependency org="com.sun.xml.fastinfoset" name="FastInfoset" rev="1.2.2"/>
 

@@ -1,7 +1,12 @@
 package com.mtgi.test.unitils.tomcat.v6_0;
 
-import static com.mtgi.test.unitils.tomcat.EmbeddedTomcatManager.urlToFile;
-import static org.junit.Assert.*;
+import static com.mtgi.test.util.IOUtils.createTempDir;
+import static com.mtgi.test.util.IOUtils.delete;
+import static com.mtgi.test.util.IOUtils.urlToFile;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,7 +25,6 @@ import org.junit.Test;
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.Page;
 import com.gargoylesoftware.htmlunit.WebClient;
-import com.mtgi.test.unitils.tomcat.EmbeddedTomcatManager;
 
 public class EmbeddedTomcatServerImplTest {
 
@@ -30,7 +34,7 @@ public class EmbeddedTomcatServerImplTest {
 
 	@Before
 	public void setUp() throws Exception {
-		homeDir = EmbeddedTomcatManager.createTempDir("EmbeddedTomcatServerImplTest");
+		homeDir = createTempDir("EmbeddedTomcatServerImplTest");
 		server = new EmbeddedTomcatServerImpl(homeDir, false);
 		webClient = new WebClient();
 	}
@@ -43,7 +47,7 @@ public class EmbeddedTomcatServerImplTest {
 			} finally {
 				server = null;
 				webClient = null;
-				EmbeddedTomcatManager.delete(homeDir);
+				delete(homeDir);
 				homeDir = null;
 			}
 	}

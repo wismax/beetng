@@ -22,16 +22,10 @@
         </chain>
 		
         <chain name="online" returnFirst="true">
-	       	<!-- first we look into our local set of build products for unpublished versions of jars -->
-	       	<filesystem name="build" cache="temp-cache" alwaysCheckExactRevision="false"
-				 		changingPattern=".*-SNAPSHOT" checkmodified="true">
-	            <ivy pattern="${integration.dir}/[module]/ivys/ivy-[revision].xml"/>
-	            <artifact pattern="${integration.dir}/[module]/[type]s/[revision]/[artifact].[ext]"/>
-	       	</filesystem>
 			<ibiblio name="maven-central" m2compatible="true"/>
         </chain>
         
-       	<filesystem name="local" alwaysCheckExactRevision="false"
+       	<filesystem name="shared" alwaysCheckExactRevision="false"
 			 		cache="temp-cache" checkmodified="false">
             <artifact pattern="${user.dir}/repository/ivyrep/[organisation]/[module]/[revision]/[type]s/[artifact].[ext]"/>
        	</filesystem>

@@ -1,7 +1,7 @@
 package com.mtgi.analytics.servlet;
 
-import static com.mtgi.test.unitils.tomcat.EmbeddedTomcatManager.createTempDir;
 import static com.mtgi.test.unitils.tomcat.EmbeddedTomcatManager.getDeployableResource;
+import static com.mtgi.test.util.IOUtils.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -33,7 +33,6 @@ import com.gargoylesoftware.htmlunit.Page;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.mtgi.analytics.BehaviorEvent;
 import com.mtgi.analytics.BehaviorEventPersister;
-import com.mtgi.test.unitils.tomcat.EmbeddedTomcatManager;
 import com.mtgi.test.unitils.tomcat.EmbeddedTomcatServer;
 import com.mtgi.test.unitils.tomcat.annotations.EmbeddedTomcat;
 
@@ -44,23 +43,18 @@ public class WebIntegrationTest {
 	private EmbeddedTomcatServer server;
 	private File appDir;
 	private TestLoader classLoader;
-	
+
 	@Before
 	public void setUp() throws Exception {
 		
 		//locate beet-web archive
-		String ivyDirName = System.getProperty("integration.dir");
-		assertNotNull("build ivy repository must be specified", ivyDirName);
-		File ivyDir = new File(ivyDirName, "beet-web");
-		assertTrue("ivy directory " + ivyDir.getAbsolutePath() + " exists", ivyDir.isDirectory());
-		
-		File library = find(ivyDir, "beet-web.jar");
-		assertNotNull("found beet-web archive in ivy repository", library);
+		File library = new File("target/artifacts", "beet-web.jar");
+		assertTrue("found beet-web archive in local build directory " + library.getAbsolutePath(), library.isFile());
 
 		//install test class loader to filter out global beet configuration files, simulating the situation
 		//where beet.jar is in some shared directory
 		classLoader = TestLoader.push();
-		
+
 		//create exploded deployment dir, including the beet-web module in WEB-INF/lib
 		appDir = createTempDir("webIntegrationTest");
 		File src = getDeployableResource(WebIntegrationTest.class, "webIntegrationTest");
@@ -83,7 +77,7 @@ public class WebIntegrationTest {
 				server.destroy();
 		} finally {
 			if (appDir != null)
-				EmbeddedTomcatManager.delete(appDir);
+				delete(appDir);
 			appDir = null;
 			server = null;
 			if (classLoader != null)
@@ -106,20 +100,6 @@ public class WebIntegrationTest {
 		assertNull(event.getError());
 		assertNull(event.getParent());
 		assertEquals("/" + appDir.getName() + "/test/" + timestamp, event.getName());
-	}
-	
-	private static File find(File root, String name) {
-		if (name.equals(root.getName()))
-			return root;
-		
-		if (root.isDirectory())
-			for (File child : root.listFiles()) {
-				File ret = find(child, name);
-				if (ret != null)
-					return ret;
-			}
-		
-		return null;
 	}
 	
 	public static class TestPersister implements BehaviorEventPersister {
