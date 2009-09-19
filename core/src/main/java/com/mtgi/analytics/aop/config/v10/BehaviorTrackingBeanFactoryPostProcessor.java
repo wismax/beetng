@@ -13,6 +13,7 @@
  
 package com.mtgi.analytics.aop.config.v10;
 
+import org.springframework.aop.framework.AopInfrastructureBean;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -24,7 +25,7 @@ import com.mtgi.analytics.BehaviorTrackingManager;
 import com.mtgi.analytics.BehaviorTrackingManagerImpl;
 
 /** intelligently assigns a matching BehaviorTrackingManager instance to a BehaviorTrackingAdvice bean, creating one if necessary */
-public class BehaviorTrackingBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
+public class BehaviorTrackingBeanFactoryPostProcessor implements BeanFactoryPostProcessor, AopInfrastructureBean {
 
 	private String application;
 	

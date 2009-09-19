@@ -17,6 +17,7 @@ import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
+import org.springframework.aop.framework.AopInfrastructureBean;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -39,7 +40,7 @@ import com.mtgi.analytics.aop.config.TemplateBeanDefinitionParser;
  * 
  * @see TemplateBeanDefinitionParser
  */
-public class SchedulerActivationPostProcessor implements InitializingBean {
+public class SchedulerActivationPostProcessor implements InitializingBean, AopInfrastructureBean {
 
 	private BeanFactory sourceFactory; 
 	private String schedulerName;

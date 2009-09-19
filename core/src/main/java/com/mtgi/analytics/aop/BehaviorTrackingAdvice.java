@@ -18,6 +18,7 @@ import java.lang.reflect.Method;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.springframework.aop.framework.AopInfrastructureBean;
 import org.springframework.beans.factory.annotation.Required;
 
 import com.mtgi.analytics.BehaviorEvent;
@@ -31,7 +32,7 @@ import com.mtgi.analytics.EventDataElement;
  * The eventType attribute of generated events is set to <code>method</code>
  * unless overridden with {@link #setEventType(String)}.
  */
-public class BehaviorTrackingAdvice implements MethodInterceptor {
+public class BehaviorTrackingAdvice implements MethodInterceptor, AopInfrastructureBean {
 
 	public static final String DEFAULT_EVENT_TYPE = "method";
 	
@@ -61,7 +62,6 @@ public class BehaviorTrackingAdvice implements MethodInterceptor {
 	public BehaviorTrackingManager getTrackingManager() {
 		return trackingManager;
 	}
-	
 
 	public Object invoke(MethodInvocation invocation) throws Throwable {
 

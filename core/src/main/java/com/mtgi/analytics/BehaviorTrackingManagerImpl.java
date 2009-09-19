@@ -17,6 +17,7 @@ import java.util.LinkedList;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.aop.framework.AopInfrastructureBean;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Required;
@@ -40,7 +41,7 @@ import com.mtgi.analytics.servlet.SpringSessionContext;
  */
 @ManagedResource(objectName="com.mtgi.analytics:name=BeetManager", 
 		 		 description="Monitor and control basic beet behavior")
-public class BehaviorTrackingManagerImpl implements BehaviorTrackingManager, InitializingBean, BeanNameAware {
+public class BehaviorTrackingManagerImpl implements BehaviorTrackingManager, InitializingBean, BeanNameAware, AopInfrastructureBean {
 
 	/*
 	 * Implementation is complicated by many issues, the first of which is performance.

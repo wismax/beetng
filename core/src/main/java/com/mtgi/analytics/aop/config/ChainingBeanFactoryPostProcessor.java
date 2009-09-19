@@ -16,6 +16,7 @@ package com.mtgi.analytics.aop.config;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.springframework.aop.framework.AopInfrastructureBean;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -26,7 +27,7 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
  * operations across multiple unrelated factories.
  * @see TemplateBeanDefinitionParser
  */
-public class ChainingBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
+public class ChainingBeanFactoryPostProcessor implements BeanFactoryPostProcessor, AopInfrastructureBean {
 
 	private static final HashSet<String> DEFAULT_EXCLUDES;
 	static {
