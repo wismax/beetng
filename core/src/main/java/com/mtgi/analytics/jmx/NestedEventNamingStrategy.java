@@ -52,6 +52,7 @@ public class NestedEventNamingStrategy extends BehaviorEventNamingStrategy
 		} else {
 			//descend on parent name
 			ObjectName pName = getObjectName(parent, null);
+			@SuppressWarnings("unchecked")
 			Hashtable<String,String> props = pName.getKeyPropertyList();
 
 			String nestedKey = "nested";

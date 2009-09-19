@@ -79,6 +79,7 @@ public class AppendNamingStrategy implements ObjectNamingStrategy {
 			throws MalformedObjectNameException {
 		ObjectName base = delegate.getObjectName(managedBean, beanKey);
 
+		@SuppressWarnings("unchecked")
 		HashMap<String,String> properties = new HashMap<String,String>(base.getKeyPropertyList());
 		//change the domain if required
 		String domain = this.domain;
