@@ -25,10 +25,9 @@ import com.mtgi.analytics.BehaviorTrackingManagerImpl;
 import com.mtgi.analytics.JdbcEventTestCase;
 import com.mtgi.analytics.MockSessionContext;
 
-@SpringApplicationContext({"com/mtgi/analytics/aop/BehaviorAdviceTest-applicationContext.xml"})
+@SpringApplicationContext("com/mtgi/analytics/aop/BehaviorAdviceTest-applicationContext.xml")
 public class BehaviorAdviceTest extends JdbcEventTestCase {
 
-	/** the bt:advice tag should automatically add a BehaviorTrackingManager to the spring context. */
 	@SpringBeanByType
 	private BehaviorTrackingManagerImpl manager;
 	

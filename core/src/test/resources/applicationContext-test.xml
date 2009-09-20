@@ -5,7 +5,7 @@
 	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 	   xsi:schemaLocation="
 	   		http://www.springframework.org/schema/beans		http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
-			http://beet.sourceforge.net/schema/bt/1.1			http://beet.sourceforge.net/schema/bt/mtgi-bt-1.1.xsd">
+			http://beet.sourceforge.net/schema/bt/1.1		http://beet.sourceforge.net/schema/bt/mtgi-bt-1.1.xsd">
 
 	<!-- check required annotations on test beans -->
 	<bean class="org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor"/>

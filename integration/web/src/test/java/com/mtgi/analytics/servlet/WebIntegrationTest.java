@@ -1,9 +1,9 @@
 package com.mtgi.analytics.servlet;
 
 import static com.mtgi.test.unitils.tomcat.EmbeddedTomcatManager.getDeployableResource;
-import static com.mtgi.test.util.IOUtils.*;
+import static com.mtgi.test.util.IOUtils.createTempDir;
+import static com.mtgi.test.util.IOUtils.delete;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.copyDirectory;

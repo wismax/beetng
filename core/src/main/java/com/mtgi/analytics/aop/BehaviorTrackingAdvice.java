@@ -39,17 +39,6 @@ public class BehaviorTrackingAdvice implements MethodInterceptor, AopInfrastruct
 	private String eventType = DEFAULT_EVENT_TYPE;
 	private BehaviorTrackingManager trackingManager;
 	
-	private String application;
-	
-	public String getApplication() {
-		return application;
-	}
-
-	@Required
-	public void setApplication(String application) {
-		this.application = application;
-	}
-
 	public void setEventType(String eventType) {
 		this.eventType = eventType;
 	}

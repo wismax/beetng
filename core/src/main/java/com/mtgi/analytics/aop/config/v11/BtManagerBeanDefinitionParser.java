@@ -216,7 +216,6 @@ public class BtManagerBeanDefinitionParser extends TemplateBeanDefinitionParser 
 
 			//create implicit pointcut advice bean.
 			RootBeanDefinition advice = new RootBeanDefinition(BehaviorTrackingAdvice.class);
-			overrideProperty(ATT_APPLICATION, advice, element, false);
 			advice.getPropertyValues().addPropertyValue("trackingManager", new RuntimeBeanReference(managerId));
 
 			//register advice, pointcut, and advisor entry to bind the two together.

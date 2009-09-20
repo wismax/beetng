@@ -12,12 +12,14 @@
 	<!-- check required annotations on test beans -->
 	<bean class="org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor" />
 
-	<!-- 
-		add support for behavior tracking.  this tag should:
-		1.  automatically configure an instance of BehaviorTrackingManager in the spring context
-		2.  notice that instances of TaskExecutor, PersistenceManager, and SessionContext have been setup below, and use them
-	-->
-	<bt:advice id="btAdvice" application="testBT"/>
+	<!-- add support for behavior tracking.  -->
+	<bt:manager application="testBT" task-executor="taskExecutor" session-context="trackingSessionContext">
+		<bt:jdbc-persister>
+			<bt:data-source ref="dataSource"/>
+			<bt:id-sql increment="25">call next value for SEQ_BEHAVIOR_TRACKING_EVENT</bt:id-sql>
+		</bt:jdbc-persister>
+	</bt:manager>
+	<bt:advice id="btAdvice"/>
 	
 	<!-- 
 		this is where we configure which methods get instrumented.  We configure only methods
@@ -39,16 +41,6 @@
 
 	<!-- use in-memory datasource for testing -->
 	<bean id="dataSource" class="org.unitils.database.UnitilsDataSourceFactoryBean" />
-
-	<!-- create jdbc persistence manager used to store events -->	
-	<bean id="jdbcPersistenceManager" class="com.mtgi.analytics.JdbcBehaviorEventPersisterImpl">
-		<property name="dataSource" ref="dataSource"/>
-		<!-- accommodate HSQL seq syntax for tests -->
-		<property name="idSql">
-			<value>call next value for SEQ_BEHAVIOR_TRACKING_EVENT</value>
-		</property>
-		<property name="idIncrement" value="25"/>
-	</bean>
 
 	<!-- task queue for async persistence operations -->	
 	<bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">

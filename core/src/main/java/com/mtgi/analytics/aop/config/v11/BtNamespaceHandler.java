@@ -15,7 +15,6 @@ package com.mtgi.analytics.aop.config.v11;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
-import com.mtgi.analytics.aop.config.v10.BtAdviceBeanDefinitionParser;
 
 /**
  * <code>NamespaceHandler</code> allowing for the configuration of
