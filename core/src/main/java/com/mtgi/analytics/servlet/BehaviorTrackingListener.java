@@ -13,6 +13,7 @@
  
 package com.mtgi.analytics.servlet;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 
@@ -26,7 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.web.context.WebApplicationContext;
+import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.servlet.FrameworkServlet;
 
@@ -81,7 +82,7 @@ public class BehaviorTrackingListener implements ServletRequestListener, Servlet
 				log.error("no behavior events stored in the current request (" + ((HttpServletRequest)request).getRequestURI());
 			} else {
 				request.removeAttribute(ATT_EVENTS);
-				for (int i = 0; i < adapters.length; ++i)
+				for (int i = adapters.length - 1; i >= 0; --i)
 					try {
 						adapters[i].stop(events[i]);
 					} catch (Exception e) {
@@ -91,37 +92,44 @@ public class BehaviorTrackingListener implements ServletRequestListener, Servlet
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	private synchronized void checkInit(ServletRequestEvent event) {
 		if (!initialized) {
 
-			WebApplicationContext spring = null;
 			ServletContext context = event.getServletContext();
+			boolean hasFilter = BehaviorTrackingFilter.isFiltered(context);
+			ArrayList<ServletRequestBehaviorTrackingAdapter> beans = new ArrayList<ServletRequestBehaviorTrackingAdapter>();
 
-			//look first for MVC application context.
-			for (Enumeration atts = context.getAttributeNames(); spring == null && atts.hasMoreElements(); ) {
+			//find registered request adapters in all mvc servlet contexts.
+			for (Enumeration<?> atts = context.getAttributeNames(); atts.hasMoreElements(); ) {
 				String name = (String)atts.nextElement();
 				if (name.startsWith(FrameworkServlet.SERVLET_CONTEXT_PREFIX)) {
 					Object value = context.getAttribute(name);
-					if (value instanceof WebApplicationContext)
-						spring = (WebApplicationContext)value;
+					if (value instanceof ListableBeanFactory)
+						addRequestAdapters(beans, (ListableBeanFactory)value, hasFilter);
 				}
 			}
+
+			//look for shared application context, loaded by ContextLoaderListener.
+			ListableBeanFactory parent = WebApplicationContextUtils.getWebApplicationContext(context);
+			if (parent != null)
+				addRequestAdapters(beans, parent, hasFilter);
 			
-			if (spring == null) //no MVC context, look for ContextLoaderListener-registered context
-				spring = WebApplicationContextUtils.getWebApplicationContext(context);
-			
-			if (spring != null) {
-				Collection<ServletRequestBehaviorTrackingAdapter> beans = spring.getBeansOfType(ServletRequestBehaviorTrackingAdapter.class, false, false).values();
-				if (!beans.isEmpty()) {
-					if (BehaviorTrackingFilter.isFiltered(context))
-						throw new IllegalStateException("You have configured both BehaviorTrackingFilters and BehaviorTrackingListeners in the same web application.  Only one of these methods may be used in a single application.");
-					adapters = beans.toArray(new ServletRequestBehaviorTrackingAdapter[beans.size()]);
-					log.info("BehaviorTracking for HTTP servlet requests started");
-				}
+			if (!beans.isEmpty()) {
+				adapters = beans.toArray(new ServletRequestBehaviorTrackingAdapter[beans.size()]);
+				log.info("BehaviorTracking for HTTP servlet requests started");
 			}
 			
 			initialized = true;
+		}
+	}
+	
+	private static void addRequestAdapters(Collection<ServletRequestBehaviorTrackingAdapter> accum, ListableBeanFactory beanFactory, boolean hasFilter) {
+		@SuppressWarnings("unchecked")
+		Collection<ServletRequestBehaviorTrackingAdapter> beans = beanFactory.getBeansOfType(ServletRequestBehaviorTrackingAdapter.class, false, false).values();
+		if (!beans.isEmpty()) {
+			if (hasFilter)
+				throw new IllegalStateException("You have configured both BehaviorTrackingFilters and BehaviorTrackingListeners in the same web application.  Only one of these methods may be used in a single application.");
+			accum.addAll(beans);
 		}
 	}
 }

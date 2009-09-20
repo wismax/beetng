@@ -35,6 +35,7 @@ public class BtHttpRequestsBeanDefinitionParser extends AbstractSingleBeanDefini
 
 	private static final Pattern LIST_SEPARATOR = Pattern.compile("[,;]+");
 	
+	private static final String ATT_TRACKING_MANAGER = "tracking-manager";
 	private static final String ATT_EVENT_TYPE = "event-type";
 	private static final String ATT_PARAMETERS = "parameters";
 	private static final String ATT_URI_PATTERN = "uri-pattern";
@@ -56,8 +57,9 @@ public class BtHttpRequestsBeanDefinitionParser extends AbstractSingleBeanDefini
 		//compile required constructor arguments from attributes and nested elements.  first up, event type.
 		builder.addConstructorArg(element.getAttribute(ATT_EVENT_TYPE));
 
-		//manager ID from enclosing tag.
-		String managerId = (String)parserContext.getContainingBeanDefinition().getAttribute("id");
+		//manager ID from enclosing tag, or ref attribute.
+		String managerId = parserContext.isNested() ? (String)parserContext.getContainingBeanDefinition().getAttribute("id")
+													: element.getAttribute(ATT_TRACKING_MANAGER);
 		builder.addConstructorArgReference(managerId);
 
 		//parameter list to include in event data, if any.
@@ -86,7 +88,8 @@ public class BtHttpRequestsBeanDefinitionParser extends AbstractSingleBeanDefini
 		else
 			builder.addConstructorArg(accum.toArray(new Pattern[accum.size()]));
 
-		parserContext.getReaderContext().registerWithGeneratedName(builder.getBeanDefinition());
+		if (parserContext.isNested())
+			parserContext.getReaderContext().registerWithGeneratedName(builder.getBeanDefinition());
 	}
 	
 	private static final String[] parseList(String paramList) {
