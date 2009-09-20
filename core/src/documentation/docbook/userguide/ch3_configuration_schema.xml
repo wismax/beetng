@@ -7,7 +7,7 @@
 		sectionPrefix   = elt_
 -->
 <section id="config_schema">
-   <title>XML Schema Documentation for http://www.mantis-tgi.com/schema/bt/1.1</title>
+   <title>XML Schema Documentation for http://beet.sourceforge.net/schema/bt/1.1</title>
    <para>Import this schema into your Spring beans definition file (namespace http://www.springframework.org/schema/beans) to configure behavior tracking.</para>
    <section id="elt_config">
       <title id="elt_config_title">&lt;bt:config&gt;</title>

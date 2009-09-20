@@ -3,7 +3,7 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
      xmlns:aop="http://www.springframework.org/schema/aop"
-     xmlns:bt="http://www.mantis-tgi.com/schema/bt"
+     xmlns:bt="http://beet.sourceforge.net/schema/bt"
      xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 
 	<!-- check required annotations on test beans -->

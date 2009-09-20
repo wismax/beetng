@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 
-<xsd:schema xmlns="http://www.mantis-tgi.com/schema/bt"
+<xsd:schema xmlns="http://beet.sourceforge.net/schema/bt"
 			xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-			xmlns:bt="http://www.mantis-tgi.com/schema/bt/event"
-			targetNamespace="http://www.mantis-tgi.com/schema/bt/event"
+			xmlns:bt="http://beet.sourceforge.net/schema/bt/event"
+			targetNamespace="http://beet.sourceforge.net/schema/bt/event"
 			elementFormDefault="qualified"
 			attributeFormDefault="unqualified">
 

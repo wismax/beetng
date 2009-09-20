@@ -33,10 +33,10 @@
 					<title>Adding method and http tracking to applicationContext.xml</title>
 					<programlisting><![CDATA[<beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:bt="http://www.mantis-tgi.com/schema/bt/1.1"
+       xmlns:bt="http://beet.sourceforge.net/schema/bt/1.1"
        xsi:schemaLocation="
           http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
-          http://www.mantis-tgi.com/schema/bt/1.1         http://www.mantis-tgi.com/schema/bt/mtgi-bt-1.1.xsd">
+          http://beet.sourceforge.net/schema/bt/1.1         http://beet.sourceforge.net/schema/bt/mtgi-bt-1.1.xsd">
 
       <bt:manager application="myapp"]]><co id="appname"/><![CDATA[
       			  register-mbeans="true"]]><co id="mbeans"/><![CDATA[

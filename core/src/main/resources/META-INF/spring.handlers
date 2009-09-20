@@ -1,3 +1,4 @@
-http\://www.mantis-tgi.com/schema/bt=com.mtgi.analytics.aop.config.v10.BtNamespaceHandler
-http\://www.mantis-tgi.com/schema/bt/1.0=com.mtgi.analytics.aop.config.v10.BtNamespaceHandler
+http\://www.mantis-tgi.com/schema/bt=com.mtgi.analytics.aop.config.v11.BtNamespaceHandler
 http\://www.mantis-tgi.com/schema/bt/1.1=com.mtgi.analytics.aop.config.v11.BtNamespaceHandler
+http\://beet.sourceforge.net/schema/bt/1.1=com.mtgi.analytics.aop.config.v11.BtNamespaceHandler
+

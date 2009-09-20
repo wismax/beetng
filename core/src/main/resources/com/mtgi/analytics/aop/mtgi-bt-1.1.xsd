@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 
-<xsd:schema xmlns="http://www.mantis-tgi.com/schema/bt/1.1"
+<xsd:schema xmlns="http://beet.sourceforge.net/schema/bt/1.1"
 		xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 		xmlns:beans="http://www.springframework.org/schema/beans"
 		xmlns:tool="http://www.springframework.org/schema/tool"
-		xmlns:bt="http://www.mantis-tgi.com/schema/bt/1.1"
-		targetNamespace="http://www.mantis-tgi.com/schema/bt/1.1"
+		xmlns:bt="http://beet.sourceforge.net/schema/bt/1.1"
+		targetNamespace="http://beet.sourceforge.net/schema/bt/1.1"
 		elementFormDefault="qualified"
 		attributeFormDefault="unqualified">
 
@@ -120,66 +120,10 @@
 								]]></xsd:documentation>
 							</xsd:annotation>
 						</xsd:element>
-						<xsd:element name="http-requests" minOccurs="0">
+						<xsd:element ref="http-requests" minOccurs="0">
 							<xsd:annotation>
-								<xsd:documentation><![CDATA[
-								Activate logging of http requests using this manager.  All parameters are logged unless the 
-								"parameters" attribute is specified.  Similarly, all requests are logged, unless one or more 
-								"uri-patterns" are specified.
-								
-								Use of this element requires a servlet container supporting JSP 2.0 and higher, and requires 
-								beet.jar to be placed in WEB-INF/lib, not in a shared libraries folder or in an EAR library
-								folder.  If you can't use bt:http-requests for these reasons, you must use the 
-								BehaviorTrackingFilter servlet filter class instead.
-								
-								Adding BehaviorTrackingFilter to web.xml achieves almost exactly the same behavior as adding
-								<bt:http-requests> to your Spring configuration.  Both methods record HTTP request information
-								and parameter values, but only the Filter can log response information such as HTTP return code
-								and error information.  <bt:http-requests> is thus simpler to use, while BehaviorTrackingFilter is
-								slightly (very slightly) more powerful.
-								]]></xsd:documentation>
+								<xsd:documentation><![CDATA[Activate logging of http requests using this manager]]></xsd:documentation>
 							</xsd:annotation>
-							<xsd:complexType>
-								<xsd:sequence>
-									<xsd:element name="uri-pattern" type="xsd:string" minOccurs="0" maxOccurs="unbounded">
-										<xsd:annotation>
-											<xsd:documentation><![CDATA[A regular expression identifying URIs that should be
-											logged to the behavior event persister.  The value of HttpServletRequest.getServletURI()
-											will be matched against this expression.
-											
-											This element has equivalent behavior to the uri-pattern attribute, but
-											can appear multiple times.
-											]]></xsd:documentation>
-										</xsd:annotation>
-									</xsd:element>
-								</xsd:sequence>
-								<xsd:attribute name="parameters" type="xsd:string">
-										<xsd:annotation>
-											<xsd:documentation><![CDATA[If specified, a comma-separated list of request parameters that
-											should be logged with behavior events.  If unspecified, all parameters are logged.]]></xsd:documentation>
-										</xsd:annotation>
-								</xsd:attribute>
-								<xsd:attribute name="name-parameters" type="xsd:string">
-										<xsd:annotation>
-											<xsd:documentation><![CDATA[If specified, a comma-separated list of request parameters that
-											should be included as part of the event name.  This is useful if you want to differentiate
-											events by key parameter values, rather than by URL alone.  If unspecified, no parameters are 
-											included in the event name.]]></xsd:documentation>
-										</xsd:annotation>
-								</xsd:attribute>
-								<xsd:attribute name="uri-pattern" type="xsd:string">
-										<xsd:annotation>
-											<xsd:documentation><![CDATA[Equivalent to a single nested uri-pattern element, provided
-											as an attribute for syntactic convenience.]]></xsd:documentation>
-										</xsd:annotation>
-								</xsd:attribute>
-								<xsd:attribute name="event-type" type="xsd:string">
-										<xsd:annotation>
-											<xsd:documentation><![CDATA[The value to log for event type when recording http requests.  
-											Defaults to "http-request" if unspecified.]]></xsd:documentation>
-										</xsd:annotation>
-								</xsd:attribute>
-							</xsd:complexType>
 						</xsd:element>
 					</xsd:sequence>
 					<xsd:attribute name="application" type="xsd:string" use="required">
@@ -574,6 +518,78 @@
 		</xsd:annotation>
 	</xsd:element>
 	
+	<xsd:element name="http-requests">
+		<xsd:annotation>
+			<xsd:documentation><![CDATA[
+			Activate logging of http requests.  All parameters are logged unless the 
+			"parameters" attribute is specified.  Similarly, all requests are logged, unless one or more 
+			"uri-patterns" are specified.  Use of this element requires a servlet container supporting JSP 2.0 and higher.
+			
+			Adding BehaviorTrackingFilter to web.xml achieves almost exactly the same behavior as adding
+			<bt:http-requests> to your Spring configuration.  Both methods record HTTP request information
+			and parameter values, but only the Filter can log response information such as HTTP return code
+			and error information.  <bt:http-requests> is thus simpler to use, while BehaviorTrackingFilter is
+			slightly (very slightly) more powerful.
+			]]></xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="uri-pattern" type="xsd:string" minOccurs="0" maxOccurs="unbounded">
+					<xsd:annotation>
+						<xsd:documentation><![CDATA[A regular expression identifying URIs that should be
+						logged to the behavior event persister.  The value of HttpServletRequest.getServletURI()
+						will be matched against this expression.
+						
+						This element has equivalent behavior to the uri-pattern attribute, but
+						can appear multiple times.
+						]]></xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+			</xsd:sequence>
+			<xsd:attribute name="tracking-manager" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+					Bean name of the tracking manager to which events are broadcast.  Not necessary
+					if <bt:http-requests> nested inside of a <bt:manager> tag.
+					
+					If otherwised unspecified, the default tracking manager is assumed.
+					]]></xsd:documentation>
+					<xsd:appinfo>
+						<tool:annotation kind="ref">
+							<tool:expected-type type="com.mtgi.analytics.BehaviorTrackingManager"/>
+						</tool:annotation>
+					</xsd:appinfo>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="parameters" type="xsd:string">
+					<xsd:annotation>
+						<xsd:documentation><![CDATA[If specified, a comma-separated list of request parameters that
+						should be logged with behavior events.  If unspecified, all parameters are logged.]]></xsd:documentation>
+					</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="name-parameters" type="xsd:string">
+					<xsd:annotation>
+						<xsd:documentation><![CDATA[If specified, a comma-separated list of request parameters that
+						should be included as part of the event name.  This is useful if you want to differentiate
+						events by key parameter values, rather than by URL alone.  If unspecified, no parameters are 
+						included in the event name.]]></xsd:documentation>
+					</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="uri-pattern" type="xsd:string">
+					<xsd:annotation>
+						<xsd:documentation><![CDATA[Equivalent to a single nested uri-pattern element, provided
+						as an attribute for syntactic convenience.]]></xsd:documentation>
+					</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="event-type" type="xsd:string">
+					<xsd:annotation>
+						<xsd:documentation><![CDATA[The value to log for event type when recording http requests.  
+						Defaults to "http-request" if unspecified.]]></xsd:documentation>
+					</xsd:annotation>
+			</xsd:attribute>
+		</xsd:complexType>
+	</xsd:element>
+
 	<xsd:attribute name="tracking-manager" type="xsd:string">
 		<xsd:annotation>
 			<xsd:documentation source="java:com.mtgi.analytics.sql.BehaviorTrackingDataSource"><![CDATA[Annotates a Spring bean definition for behavior tracking.

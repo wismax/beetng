@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<beans xmlns:bt="http://www.mantis-tgi.com/schema/bt/1.1" 
+<beans xmlns:bt="http://beet.sourceforge.net/schema/bt/1.1" 
 	xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="
 	   		http://www.springframework.org/schema/beans		http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
-			http://www.mantis-tgi.com/schema/bt/1.1			http://www.mantis-tgi.com/schema/bt/mtgi-bt-1.1.xsd">
+			http://beet.sourceforge.net/schema/bt/1.1			http://beet.sourceforge.net/schema/bt/mtgi-bt-1.1.xsd">
 
 	<bt:config>
 

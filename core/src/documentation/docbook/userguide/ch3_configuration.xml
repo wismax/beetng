@@ -17,10 +17,10 @@
 			<title>Store performance logs in the Tomcat logs directory</title>
 			<programlisting><![CDATA[<beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:bt="http://www.mantis-tgi.com/schema/bt/1.1"
+       xmlns:bt="http://beet.sourceforge.net/schema/bt/1.1"
        xsi:schemaLocation="
           http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
-          http://www.mantis-tgi.com/schema/bt/1.1        http://www.mantis-tgi.com/schema/bt/mtgi-bt-1.1.xsd">
+          http://beet.sourceforge.net/schema/bt/1.1        http://beet.sourceforge.net/schema/bt/mtgi-bt-1.1.xsd">
 
    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>]]><co id="placeholder"/><![CDATA[
    
@@ -42,10 +42,10 @@
 			<title>Monitor application performance from a JMX console</title>
 			<programlisting><![CDATA[<beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:bt="http://www.mantis-tgi.com/schema/bt/1.1"
+       xmlns:bt="http://beet.sourceforge.net/schema/bt/1.1"
        xsi:schemaLocation="
           http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
-          http://www.mantis-tgi.com/schema/bt/1.1        http://www.mantis-tgi.com/schema/bt/mtgi-bt-1.1.xsd">
+          http://beet.sourceforge.net/schema/bt/1.1        http://beet.sourceforge.net/schema/bt/mtgi-bt-1.1.xsd">
 
    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>]]><co id="placeholder"/><![CDATA[
    
@@ -68,10 +68,10 @@
 			<title>Use a custom SessionContext implementation to specify user IDs</title>
 			<programlisting><![CDATA[<beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:bt="http://www.mantis-tgi.com/schema/bt/1.1"
+       xmlns:bt="http://beet.sourceforge.net/schema/bt/1.1"
        xsi:schemaLocation="
           http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
-          http://www.mantis-tgi.com/schema/bt/1.1        http://www.mantis-tgi.com/schema/bt/mtgi-bt-1.1.xsd">
+          http://beet.sourceforge.net/schema/bt/1.1        http://beet.sourceforge.net/schema/bt/mtgi-bt-1.1.xsd">
 		
    <bt:manager application="myapp">
       <bt:session-context class="com.me.MySessionContextImpl]]><co id="custom-sc"/><![CDATA["/>
@@ -88,10 +88,10 @@
 			<title>Send tracking data for different packages to different log files</title>
 			<programlisting><![CDATA[<beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:bt="http://www.mantis-tgi.com/schema/bt/1.1"
+       xmlns:bt="http://beet.sourceforge.net/schema/bt/1.1"
        xsi:schemaLocation="
           http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
-          http://www.mantis-tgi.com/schema/bt/1.1        http://www.mantis-tgi.com/schema/bt/mtgi-bt-1.1.xsd">
+          http://beet.sourceforge.net/schema/bt/1.1        http://beet.sourceforge.net/schema/bt/mtgi-bt-1.1.xsd">
 		
    <bt:config>
       <bt:manager id="loggerA]]><co id="multiple-managers"/><![CDATA[" application="myapp"
@@ -118,12 +118,12 @@
 			<programlisting><![CDATA[<beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:tx="http://www.springframework.org/schema/tx"
-       xmlns:bt="http://www.mantis-tgi.com/schema/bt/1.1"
+       xmlns:bt="http://beet.sourceforge.net/schema/bt/1.1"
        xmlns:aop="http://www.springframework.org/schema/aop"
        xsi:schemaLocation="
           http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
           http://www.springframework.org/schema/tx    http://www.springframework.org/schema/tx/spring-tx-2.0.xsd
-          http://www.mantis-tgi.com/schema/bt/1.1        http://www.mantis-tgi.com/schema/bt/mtgi-bt-1.1.xsd
+          http://beet.sourceforge.net/schema/bt/1.1        http://beet.sourceforge.net/schema/bt/mtgi-bt-1.1.xsd
           http://www.springframework.org/schema/aop   http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
 		
    <bt:manager/>]]><co id="no-expression"/><![CDATA[
@@ -150,10 +150,10 @@
 			<title>Register Beet JMX MBeans</title>
 			<programlisting><![CDATA[<beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:bt="http://www.mantis-tgi.com/schema/bt/1.1"
+       xmlns:bt="http://beet.sourceforge.net/schema/bt/1.1"
        xsi:schemaLocation="
           http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
-          http://www.mantis-tgi.com/schema/bt/1.1        http://www.mantis-tgi.com/schema/bt/mtgi-bt-1.1.xsd">
+          http://beet.sourceforge.net/schema/bt/1.1        http://beet.sourceforge.net/schema/bt/mtgi-bt-1.1.xsd">
 		
    <bt:manager application="myapp" register-mbeans="true"]]><co id="jmx-naming"/><![CDATA[/>
 		]]></programlisting>
