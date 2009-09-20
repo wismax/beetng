@@ -1,10 +1,6 @@
 <ivysettings>
 
-	<!-- build.mode should be "online" or "offline" -->
-	<property name="build.mode" value="online" override="false"/>
-	<property name="integration.dir" value="${ivy.settings.dir}/../ide/ivyrep" override="false"/>
-	
-    <settings defaultResolver="${build.mode}" validate="false"/>
+    <settings defaultResolver="maven-central" validate="false"/>
 
     <caches checkUpToDate="false" useOrigin="true" lockStrategy="artifact-lock" default="default-cache">
     	<cache name="default-cache"/>
@@ -13,17 +9,7 @@
 
     <resolvers>
 
-		<chain name="offline" returnFirst="true">
-			<!-- use the cache directly as a repository for builds in offline mode -->    	
-	       	<filesystem name="cache" cache="temp-cache" alwaysCheckExactRevision="false" checkmodified="false">
-	            <ivy pattern="${ivy.default.ivy.user.dir}/cache/[organisation]/[module](/[branch])/ivy-[revision].xml"/>
-	            <artifact pattern="${ivy.default.ivy.user.dir}/cache/[organisation]/[module](/[branch])/[type]s/[artifact]-[revision](-[classifier])(.[ext])"/>
-	    	</filesystem>
-        </chain>
-		
-        <chain name="online" returnFirst="true">
-			<ibiblio name="maven-central" m2compatible="true"/>
-        </chain>
+		<ibiblio name="maven-central" m2compatible="true"/>
         
        	<filesystem name="shared" alwaysCheckExactRevision="false"
 			 		cache="temp-cache" checkmodified="false">
