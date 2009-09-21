@@ -13,6 +13,7 @@
 
 			<ea:property name="project.ivy.settings.file" value="${basedir}/src/build/ant/ivysettings.xml"/>
 			<ea:property name="main.confs" value="compile"/>
+			<ea:property name="skip.jar.package" value="true"/>
 			
 			<ea:property name="test.mode" value="report"/>
 			<ea:property name="test.run.dir" value="target/tmp"/>

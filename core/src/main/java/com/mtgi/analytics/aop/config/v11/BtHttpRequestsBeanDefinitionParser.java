@@ -35,7 +35,6 @@ public class BtHttpRequestsBeanDefinitionParser extends AbstractSingleBeanDefini
 
 	private static final Pattern LIST_SEPARATOR = Pattern.compile("[,;]+");
 	
-	private static final String ATT_TRACKING_MANAGER = "tracking-manager";
 	private static final String ATT_EVENT_TYPE = "event-type";
 	private static final String ATT_PARAMETERS = "parameters";
 	private static final String ATT_URI_PATTERN = "uri-pattern";
@@ -59,7 +58,7 @@ public class BtHttpRequestsBeanDefinitionParser extends AbstractSingleBeanDefini
 
 		//manager ID from enclosing tag, or ref attribute.
 		String managerId = parserContext.isNested() ? (String)parserContext.getContainingBeanDefinition().getAttribute("id")
-													: element.getAttribute(ATT_TRACKING_MANAGER);
+													: element.getAttribute(BtNamespaceConstants.ATT_TRACKING_MANAGER);
 		builder.addConstructorArgReference(managerId);
 
 		//parameter list to include in event data, if any.
