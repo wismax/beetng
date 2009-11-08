@@ -14,6 +14,9 @@
 
 			<ea:property name="project.ivy.settings.file" value="${basedir}/src/build/ant/ivysettings.xml"/>
 			<ea:property name="main.confs" value="compile"/>
+
+			<ea:property name="lib.main" value="target/artifacts/lib"/>
+			<ea:property name="manifest.main.classname" value="com.mtgi.analytics.xml.Main"/>
 			
 			<ea:property name="test.mode" value="report"/>
 			<ea:property name="test.run.includes.pattern" value="**/*Test.class"/>
