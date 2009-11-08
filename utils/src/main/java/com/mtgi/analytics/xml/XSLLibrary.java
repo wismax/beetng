@@ -45,7 +45,7 @@ public class XSLLibrary {
     	//of introspection to handle various data types.
     	
     	//collection of nodes get just get appended together recursively
-    	if (node instanceof Collection) {
+    	if (node instanceof Collection<?>) {
     		Collection<?> coll = (Collection<?>)node;
     		if (coll.isEmpty()) //empty collection same as null
     			return null;
