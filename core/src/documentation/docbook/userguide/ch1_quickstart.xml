@@ -151,6 +151,13 @@
 				You can easily export a binary log to a simple XML format legible to humans or other XML
 				processing utilities:
 				<informalexample><screen>&gt; zcat path/to/log.bxml.gz | java -jar bt-utils.jar -tool xml &gt; result.xml</screen></informalexample>
+				<caution>
+					<title>Problems with zcat</title>
+					<para>Some systems (like OS X) may not ship with zcat, or may contain a version
+					that is incompatible with the above command line interface.  Try using <code>gzcat</code>
+					if <code>zcat</code> is missing or doesn't work.  Otherwise, you may have to install
+					zcat, or research the available compression utilities on your host platform.</para>
+				</caution>
 				<example>
 					<title>Sample XML Data</title>
 					<programlisting><![CDATA[<event id="244f5f4e-21d0-4044-b71f-ba39bb96cfbd"]]><co id="eventId"/><![CDATA[
