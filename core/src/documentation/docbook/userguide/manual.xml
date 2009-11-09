@@ -1,14 +1,7 @@
 <?xml version="1.0" ?>
 
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
-                 "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
-	<!ENTITY chap1 SYSTEM "ch1_quickstart.xml">
-	<!ENTITY chap2 SYSTEM "ch2_justification.xml">
-	<!ENTITY chap3 SYSTEM "ch3_configuration.xml">
-	<!ENTITY chap3_schema SYSTEM "ch3_configuration_schema.xml">
-	<!ENTITY chap4 SYSTEM "ch4_jmx_administration.xml">
-	<!ENTITY chap5 SYSTEM "ch5_programmer_reference.xml">
-]>
+                 "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
 
 <book>
 	<title>Beet 1.x User's Guide</title>
@@ -24,15 +17,10 @@
 		</keywordset>
 	</bookinfo>
 
-	<!-- 
-	TODO: XIncludes would be much nicer, but they don't seem to be supported by the
-	docbook build scripts. 
-	-->
-
-	&chap1;
-	&chap2;
-	&chap3;
-	&chap4;
-	&chap5;
+    <xi:include href="ch1_quickstart.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="ch2_justification.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="ch3_configuration.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="ch4_jmx_administration.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="ch5_programmer_reference.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 
 </book>

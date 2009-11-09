@@ -231,6 +231,6 @@
       </para>
    </section>
    
-   &chap3_schema; 
+   <xi:include href="ch3_configuration_schema.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
    
 </chapter>
