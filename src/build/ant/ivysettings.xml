@@ -3,8 +3,9 @@
     <settings defaultResolver="maven-central" validate="false"/>
 
     <caches checkUpToDate="false" useOrigin="true" lockStrategy="artifact-lock" default="default-cache">
-    	<cache name="default-cache"/>
+    	<cache name="default-cache" basedir="${user.home}/.ivy2/cache"/>
     	<cache name="temp-cache" basedir="${java.io.tmpdir}/ivy2/cache"/>
+    	<cache name="ea-cache" basedir="${user.dir}/target/cache"/>
     </caches>
 
     <resolvers>
@@ -15,7 +16,7 @@
 			 		cache="temp-cache" checkmodified="false">
             <artifact pattern="${user.dir}/repository/ivyrep/[organisation]/[module]/[revision]/[type]s/[artifact].[ext]"/>
        	</filesystem>
-
+       	
     </resolvers>
     
 </ivysettings>
