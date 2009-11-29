@@ -1,17 +1,24 @@
 <ivy-module version="2.0" xmlns:ea="http://www.easyant.org"> 
-	<info organisation="net.sourceforge.beet" module="beet" status="integration">
+	<info organisation="net.sourceforge.beet" module="beet" status="integration" revision="1.4.0_rc1">
     	<license name="Mozilla Public License, version 1.1" 
     			 url="http://www.mozilla.org/MPL/MPL-1.1.html"/>
     	<repository name="Beet Ivyrep" url="http://beet.sourceforge.net/ivyrep"
     				pattern="[organisation]/[module]/[revision]/[type]s/[artifact].[ext]"/>
 		<description>beet master build</description>
 		<ea:build type="org.apache.easyant.buildtypes#meta-build;0.1">
-			<ea:property name="integration.dir" value="${user.dir}/build/ivyrep"/>
 			<ea:property name="project.ivy.settings.file" value="${basedir}/src/build/ant/ivysettings.xml"/>
 		</ea:build>
 	</info>
 	<configurations>
-		<conf name="default" visibility="public" description="runtime dependencies and master artifact can be used with this conf"/>
-		<conf name="test" visibility="private" description="this scope indicates that the dependency is not required for normal use of the application, and is only available for the test compilation and execution phases."/>
+		<conf name="base" description="core module without runtime dependencies"/>
+		<conf name="source" description="source jar"/>
+		<conf name="javadoc" description="docs jar"/>
+		<conf name="compile" description="compile-time dependencies"/>
+		<conf name="test" description="dependencies used for junit testing"/>
+		
+		<conf name="1.5" extends="default" description="core module with dependencies, for SDK 1.5 and below"/>
+		<conf name="1.6" description="core module with runtime dependencies, for SDK 1.6 and higher"/>
+		<conf name="default" extends="1.6" description="alias for '1.6'" />
 	</configurations>
+	<publications/>
 </ivy-module>

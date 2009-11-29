@@ -1,0 +1,194 @@
+<?xml version="1.0"?>
+
+<project name="net.sourseforge.beet#beet" xmlns:ivy="antlib:org.apache.ivy.ant"
+		 xmlns:ea="antlib:org.apache.easyant">
+
+	<fileset id="licenses" dir="${basedir}">
+		<include name="notice.txt"/>
+		<include name="changelog.txt"/>
+		<include name="licenses/*.txt"/>
+	</fileset>
+	
+	<property name="local.properties" value="local.properties"/>
+	<property file="${local.properties}"/>
+
+	<property name="scripts.dir" location="${basedir}/src/build/ant"/>
+	<property name="target.dir" location="target/release"/>
+
+	<property name="project.ivy.settings.file" value="${scripts.dir}/ivysettings.xml"/>
+	<property name="main.confs" value="default"/>
+	<property name="test.confs" value="test"/>
+	
+	<property name="test.run.forkmode" value="once"/>
+	
+    <ea:path pathid="compile.main.classpath"/>
+    <ea:path pathid="compile.test.classpath"/>
+	
+	<ea:import module="org.apache.easyant.buildtypes#meta-build;0.1"/>
+    <ea:include module="org.apache.easyant.plugins#phases-std;0.2" as="phase" />
+    <ea:include module="org.apache.easyant.plugins#antcontrib-activator;0.1" as="ac" />
+    <ea:include module="org.apache.easyant.plugins#ivy-provisioning;0.1" as="ivy" />
+		
+	<macrodef name="bundle" 
+			  description="Generate tar.gz, tar.bz2, zip, and corresponding MD5 hash files for a release directory">
+
+		<attribute name="basename" description="Base name for the generated archives, without extensions"/>
+		<attribute name="prefix" description="Root directory name of contents placed in the archive"/>
+		<attribute name="dir" description="Base directory for files to include" />
+		<attribute name="includes" description="Include patterns relative to 'dir'" default=""/>
+		<attribute name="excludes" description="Exclude patterns relative to 'dir'" default=""/>
+		<element name="contents" description="nested include, exclude, or pattern directives" implicit="true" optional="true"/>
+
+		<sequential>
+
+			<zip file="@{basename}.zip">
+				<zipfileset prefix="@{prefix}" dir="@{dir}" includes="@{includes}" excludes="@{excludes}">
+					<contents/>
+				</zipfileset>
+			</zip>
+			<checksum file="@{basename}.zip"/>
+			
+			<tar destfile="@{basename}.tar.gz" compression="gzip">
+				<tarfileset prefix="@{prefix}" dir="@{dir}" includes="@{includes}" excludes="@{excludes}">
+					<contents/>
+				</tarfileset>
+			</tar>
+			<checksum file="@{basename}.tar.gz"/>
+
+			<tar destfile="@{basename}.tar.bz2" compression="bzip2">
+				<tarfileset prefix="@{prefix}" dir="@{dir}" includes="@{includes}" excludes="@{excludes}">
+					<contents/>
+				</tarfileset>
+			</tar>
+			<checksum file="@{basename}.tar.bz2"/>
+			
+		</sequential>
+		
+	</macrodef>
+	
+	<target name="module-docs" phase="documentation" depends="validate" description="generate documentation in all submodules">
+		<ivy:buildlist reference="doc-path" ivyfilepath="module.ivy" settingsRef="${project.ivy.instance}">
+			<fileset dir="${basedir}" excludes="module.ivy" includes="${submodule.dirs}">
+				<filename name="**/module.ivy"/>
+			</fileset>
+		</ivy:buildlist>
+		<ea:submodule target="documentation" buildpathref="doc-path" useBuildRepository="false"/>
+	</target>
+	
+	<!-- replace standard package target with custom routines -->
+	<target name="package" depends="package-release,package-reports"/>
+
+	<target name="package-release" depends="validate,provision" description="package a new public release for upload to SF">
+
+		<!-- create separate distributions for java 5 and 6 -->
+		<for list="5,6" param="current.version">
+			<sequential>
+				<var name="release.dir" value="${target.dir}/java@{current.version}"/>
+				<mkdir dir="${release.dir}"/>
+
+				<var name="main.confs" value="1.@{current.version}"/>
+				<var name="lib.main" value="${release.dir}/lib"/>
+				<ea:submodule target="provision" useBuildRepository="true">
+					<buildpath><pathelement location="${basedir}/core/module.ivy"/></buildpath>
+				</ea:submodule>
+				
+				<copy todir="${release.dir}">
+					<fileset dir="core/target/artifacts"
+		                     includes="**/*.jar" excludes="**/*test*"/>
+					<fileset refid="licenses"/>
+					<fileset dir="core/src/main" includes="sql/**"/>
+					<fileset dir="utils/src/main" includes="sql/**"/>
+					<fileset dir="utils/src/main/sh" includes="**/**"/>
+				</copy>
+				
+				<copy todir="${release.dir}/utils">
+					<fileset dir="utils/target/artifacts" includes="**/*.jar" excludes="**/*test*"/>
+				</copy>
+				
+				<copy todir="${release.dir}/web">
+					<fileset dir="integration/web/target/artifacts" includes="**/*.jar"/>
+				</copy>
+				
+				<copy todir="${release.dir}/docs/userguide">
+					<fileset dir="core/target/documentation" includes="html/**"/>
+				</copy>
+				<copy todir="${release.dir}/docs/api/core">
+					<fileset dir="core/target/report/javadoc/main" includes="**/*"/>
+				</copy>
+				<copy todir="${release.dir}/docs/api/utils">
+					<fileset dir="utils/target/report/javadoc/main" includes="**/*"/>
+				</copy>
+
+				<bundle basename="${target.dir}/beet-java@{current.version}-${ivy.revision}"
+						prefix="beet-${ivy.revision}"
+						dir="${release.dir}" includes="**/*"/>
+			</sequential>
+		</for>
+	</target>
+
+	<target name="package-reports" description="package build reports and documentation for a project web site update">
+
+		<var name="release.dir" value="${target.dir}/site"/>
+		<mkdir dir="${release.dir}"/>
+
+		<tar destfile="${target.dir}/reports.tar.bz2" compression="bzip2">
+			<tarfileset prefix="build" dir="${build.root}">
+				<include name="core/docs/api/**/*"/>
+				<include name="core/docs/userguide/**/*"/>
+				<include name="core/reports/**"/>
+				<include name="utils/docs/**"/>
+				<include name="utils/reports/**"/>
+				<include name="test/docs/**"/>
+				<include name="test/reports/**"/>
+				<include name="integration/*/reports/**"/>
+			</tarfileset>
+		</tar>
+		
+	</target>
+
+	<target name="maven-repository" depends="validate" description="generate maven packaging artifacts from the local ivy repository">
+
+		<for param="module.ivy.file">
+			<fileset dir="target/repository" includes="**/*.ivy"/>
+			<sequential>
+
+				<!-- compute destination path for pom file -->
+				<var name="maven.artifact.dir" unset="true"/>
+				<var name="module.name" unset="true"/>
+
+				<basename file="@{module.ivy.file}" suffix=".ivy" property="module.name"/>
+				<dirname file="@{module.ivy.file}" property="maven.artifact.dir"/>
+
+				<var name="pom.file" value="${maven.artifact.dir}/${module.name}.pom"/>
+
+				<!-- generate pom -->
+				<ivy:makepom pomfile="${pom.file}" ivyfile="@{module.ivy.file}"
+							 headerfile="${scripts.dir}/license-header.txt"
+							 settingsRef="project.ivy.instance">
+					<mapping conf="1.5, 1.6, default, compile, test" scope="runtime" />
+					<mapping conf="compile, test" scope="compile" />
+					<mapping conf="test" scope="test"/>
+				</ivy:makepom>
+
+				<!-- generate hashes -->
+				<checksum file="${pom.file}" todir="${maven.artifact.dir}" algorithm="MD5" fileext=".md5"/>
+				<checksum file="${pom.file}" todir="${maven.artifact.dir}" algorithm="SHA" fileext=".sha1"/>
+
+			</sequential>
+		</for>
+			
+	</target>
+	
+	<target name="release">
+		<zip destfile="${target.dir}/release-packages-full.zip">
+			<zipfileset prefix="beet-release" dir="${target.dir}">
+				<include name="*.gz"/>
+				<include name="*.bz2"/>
+				<include name="*.zip"/>
+				<include name="*.MD5"/>
+				<exclude name="reports.tar.bz2"/>
+			</zipfileset>
+		</zip>
+	</target>
+
+</project>
