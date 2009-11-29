@@ -32,7 +32,7 @@
 	<xsl:param name="rootElementId"></xsl:param>
 
 	<!-- relative path to JavaDoc API documentation -->	
-	<xsl:param name="apiBase">../../api/</xsl:param>
+	<xsl:param name="apiBase">../../api/core/</xsl:param>
 
 	<!-- we omit the XML declaration so that our output can easily be included as a fragment in another DocBook file. -->
 	<xsl:output method="xml" indent="yes" omit-xml-declaration="yes"/>

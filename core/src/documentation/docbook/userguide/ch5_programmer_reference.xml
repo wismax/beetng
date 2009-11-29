@@ -7,14 +7,14 @@
 		<segtitle>JavaDocs</segtitle>
 		<segtitle>Description</segtitle>
 		<seglistitem>
-			<seg><ulink url="../../api/index.html">Beet Core API</ulink></seg>
+			<seg><ulink url="../../api/core/index.html">Beet Core API</ulink></seg>
 			<seg>beet core interfaces and utility classes.  
 			This library is packaged as <literal>beet-[version].jar</literal>.
 			This package contains interfaces you must implement for custom persistence 
 			mechanisms and user identity providers.</seg>
 		</seglistitem>
 		<seglistitem>
-			<seg><ulink url="../../../../utils/docs/api/index.html">Beet Utils API</ulink></seg>
+			<seg><ulink url="../../api/utils/index.html">Beet Utils API</ulink></seg>
 			<seg>is a library useful for manipulating common behavior tracking log formats.  These
 			tools are primarily intended for command line use, but can be programmatically extended
 			to support custom data loaders.  This API is packaged as beet-utils-[version].jar.</seg>
