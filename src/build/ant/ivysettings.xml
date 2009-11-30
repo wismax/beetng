@@ -1,21 +1,29 @@
 <ivysettings>
 
-    <settings defaultResolver="maven-central" validate="false"/>
+    <settings defaultResolver="default" validate="false"/>
 
-    <caches checkUpToDate="false" useOrigin="true" lockStrategy="artifact-lock" default="default-cache">
-    	<cache name="default-cache" basedir="${user.home}/.ivy2/cache"/>
-    	<cache name="temp-cache" basedir="${java.io.tmpdir}/ivy2/cache"/>
-    	<cache name="ea-cache" basedir="${user.dir}/target/cache"/>
+    <caches checkUpToDate="false" useOrigin="true" lockStrategy="artifact-lock" 
+    		default="default-cache" defaultCacheDir="${user.dir}/target/cache">
+    	<cache name="default-cache"/>
+    	<cache name="global-cache" basedir="${user.home}/.ivy2/cache"/>
     </caches>
 
     <resolvers>
 
-		<ibiblio name="maven-central" m2compatible="true"/>
-        
-       	<filesystem name="shared" alwaysCheckExactRevision="false"
-			 		cache="temp-cache" checkmodified="false">
-            <artifact pattern="${user.dir}/repository/ivyrep/[organisation]/[module]/[revision]/[type]s/[artifact].[ext]"/>
+		<ibiblio name="maven-central" m2compatible="true" cache="global-cache"/>
+
+		<!-- transactional publish temporarily disabled, due to bug in m2compatible setting.
+			see https://issues.apache.org/jira/browse/IVY-968  -->
+       	<filesystem name="shared" alwaysCheckExactRevision="false" checkmodified="false" 
+			 		m2compatible="true" transactional="false">
+            <ivy pattern="${user.dir}/repository/[organisation]/[module]/[revision]/[module]-[revision].ivy"/>
+            <artifact pattern="${user.dir}/repository/[organisation]/[module]/[revision]/[artifact]-[revision](-[classifier]).[ext]"/>
        	</filesystem>
+       	
+       	<chain name="default" returnFirst="true">
+       		<resolver ref="shared"/>
+       		<resolver ref="maven-central"/>
+       	</chain>
        	
     </resolvers>
     

@@ -2,7 +2,8 @@
 <ivy-module version="2.0" 
 			xmlns:m="http://ant.apache.org/ivy/maven"
 			xmlns:ea="http://www.easyant.org">
-    <info organisation="net.sourceforge.beet" module="beet-utils" status="release" revision="1.2.0_rc1">
+    <info organisation="net.sourceforge.beet" module="beet-utils">
+		<extends organisation="net.sourceforge.beet" name="beet" revision="latest.revision"/>
     	<license name="Mozilla Public License, version 1.1" 
     			 url="http://www.mozilla.org/MPL/MPL-1.1.html"/>
     	<repository name="Beet Ivyrep" url="http://beet.sourceforge.net/ivyrep"
@@ -12,15 +13,11 @@
     	</description>
 		<ea:build type="org.apache.easyant.buildtypes#build-std-java;0.2">
 
-			<ea:property name="project.ivy.settings.file" value="${basedir}/src/build/ant/ivysettings.xml"/>
 			<ea:property name="main.confs" value="compile"/>
 
 			<ea:property name="lib.main" value="target/artifacts/lib"/>
 			<ea:property name="manifest.main.classname" value="com.mtgi.analytics.xml.Main"/>
 			
-			<ea:property name="test.mode" value="report"/>
-			<ea:property name="test.run.includes.pattern" value="**/*Test.class"/>
-
 			<ea:plugin module="org.apache.easyant.plugins#source-jar;0.1" mandatory="true" as="source-jar"/>
 			
 		</ea:build>

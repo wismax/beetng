@@ -1,13 +1,22 @@
 <ivy-module version="2.0" xmlns:ea="http://www.easyant.org"> 
-	<info organisation="net.sourceforge.beet" module="beet" status="integration" revision="1.4.0_rc1">
+	<info organisation="net.sourceforge.beet" module="beet">
     	<license name="Mozilla Public License, version 1.1" 
     			 url="http://www.mozilla.org/MPL/MPL-1.1.html"/>
     	<repository name="Beet Ivyrep" url="http://beet.sourceforge.net/ivyrep"
     				pattern="[organisation]/[module]/[revision]/[type]s/[artifact].[ext]"/>
 		<description>beet master build</description>
-		<ea:build type="org.apache.easyant.buildtypes#meta-build;0.1">
-			<ea:property name="project.ivy.settings.file" value="${basedir}/src/build/ant/ivysettings.xml"/>
-		</ea:build>
+		
+		<ea:property name="module.version.target" value="1.4.0_rc1"/>
+
+		<ea:property name="project.ivy.settings.file" value="${basedir}/src/build/ant/ivysettings.xml"/>
+
+		<ea:property name="test.run.forkmode" value="once"/>
+		<ea:property name="test.mode" value="report"/>
+		<ea:property name="test.run.includes.pattern" value="**/*Test.class"/>
+		<ea:property name="test.run.excludes.pattern" value="**/PerformanceTest.class"/>
+		
+		<ea:build type="org.apache.easyant.buildtypes#meta-build;0.1"/>
+		
 	</info>
 	<configurations>
 		<conf name="base" description="core module without runtime dependencies"/>
@@ -20,5 +29,5 @@
 		<conf name="1.6" description="core module with runtime dependencies, for SDK 1.6 and higher"/>
 		<conf name="default" extends="1.6" description="alias for '1.6'" />
 	</configurations>
-	<publications/>
+
 </ivy-module>

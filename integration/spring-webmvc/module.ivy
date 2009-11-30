@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <ivy-module version="2.0"
  			xmlns:ea="http://www.easyant.org">
-    <info organisation="net.sourceforge.beet" module="beet-spring-webmvc" status="release" revision="1.0.0_rc1">
+    <info organisation="net.sourceforge.beet" module="beet-spring-webmvc">
+		<extends organisation="net.sourceforge.beet" name="beet" revision="latest.integration" location="../../module.ivy"/>
     	<license name="Mozilla Public License, version 1.1" 
     			 url="http://www.mozilla.org/MPL/MPL-1.1.html"/>
     	<repository name="Beet Ivyrep" url="http://beet.sourceforge.net/ivyrep"
@@ -11,14 +12,9 @@
     	</description>
 		<ea:build type="org.apache.easyant.buildtypes#build-std-java;0.2">
 
-			<ea:property name="project.ivy.settings.file" value="${basedir}/src/build/ant/ivysettings.xml"/>
 			<ea:property name="main.confs" value="compile"/>
 			<ea:property name="skip.jar.package" value="true"/>
-			
-			<ea:property name="test.mode" value="report"/>
 			<ea:property name="test.run.dir" value="target/tmp"/>
-			<ea:property name="test.run.includes.pattern" value="**/*Test.class"/>
-			<ea:property name="test.run.excludes.pattern" value="**/PerformanceTest.class"/>
 
 		</ea:build>
 	</info>

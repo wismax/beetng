@@ -66,6 +66,10 @@
 		
 	</macrodef>
 	
+	<target name="clean-repository" phase="clean" depends="meta:clean-all">
+		<delete dir="${basedir}/repository"/>
+	</target>
+	
 	<target name="module-docs" phase="documentation" depends="validate" description="generate documentation in all submodules">
 		<ivy:buildlist reference="doc-path" ivyfilepath="module.ivy" settingsRef="${project.ivy.instance}">
 			<fileset dir="${basedir}" excludes="module.ivy" includes="${submodule.dirs}">
@@ -75,10 +79,10 @@
 		<ea:submodule target="documentation" buildpathref="doc-path" useBuildRepository="false"/>
 	</target>
 	
-	<!-- replace standard package target with custom routines -->
-	<target name="package" depends="package-release,package-reports"/>
+	<target name="package-release" phase="package" depends="validate,provision" description="package a new public release for upload to SF">
 
-	<target name="package-release" depends="validate,provision" description="package a new public release for upload to SF">
+		<ivy:info organisation="net.sourceforge.beet" module="beet-core" revision="latest.integration" settingsRef="${project.ivy.instance}"/>
+		<var name="release.revision" value="${ivy.revision}"/>
 
 		<!-- create separate distributions for java 5 and 6 -->
 		<for list="5,6" param="current.version">
@@ -88,7 +92,8 @@
 
 				<var name="main.confs" value="1.@{current.version}"/>
 				<var name="lib.main" value="${release.dir}/lib"/>
-				<ea:submodule target="provision" useBuildRepository="true">
+
+				<ea:submodule target="provision">
 					<buildpath><pathelement location="${basedir}/core/module.ivy"/></buildpath>
 				</ea:submodule>
 				
@@ -119,14 +124,14 @@
 					<fileset dir="utils/target/report/javadoc/main" includes="**/*"/>
 				</copy>
 
-				<bundle basename="${target.dir}/beet-java@{current.version}-${ivy.revision}"
-						prefix="beet-${ivy.revision}"
+				<bundle basename="${target.dir}/beet-java@{current.version}-${release.revision}"
+						prefix="beet-${release.revision}"
 						dir="${release.dir}" includes="**/*"/>
 			</sequential>
 		</for>
 	</target>
 
-	<target name="package-reports" description="package build reports and documentation for a project web site update">
+	<target name="package-reports" phase="package" description="package build reports and documentation for a project web site update">
 
 		<var name="release.dir" value="${target.dir}/site"/>
 		<mkdir dir="${release.dir}"/>
@@ -146,10 +151,10 @@
 		
 	</target>
 
-	<target name="maven-repository" depends="validate" description="generate maven packaging artifacts from the local ivy repository">
+	<target name="maven-repository" depends="validate,provision" description="generate maven packaging artifacts from the local ivy repository">
 
 		<for param="module.ivy.file">
-			<fileset dir="target/repository" includes="**/*.ivy"/>
+			<fileset dir="repository" includes="**/*.ivy"/>
 			<sequential>
 
 				<!-- compute destination path for pom file -->
