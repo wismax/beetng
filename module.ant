@@ -131,21 +131,19 @@
 		</for>
 	</target>
 
-	<target name="package-reports" phase="package" description="package build reports and documentation for a project web site update">
-
-		<var name="release.dir" value="${target.dir}/site"/>
-		<mkdir dir="${release.dir}"/>
+	<target name="package-reports" phase="package" depends="validate" description="package build reports and documentation for a project web site update">
 
 		<tar destfile="${target.dir}/reports.tar.bz2" compression="bzip2">
-			<tarfileset prefix="build" dir="${build.root}">
-				<include name="core/docs/api/**/*"/>
-				<include name="core/docs/userguide/**/*"/>
-				<include name="core/reports/**"/>
-				<include name="utils/docs/**"/>
-				<include name="utils/reports/**"/>
-				<include name="test/docs/**"/>
-				<include name="test/reports/**"/>
-				<include name="integration/*/reports/**"/>
+			<tarfileset prefix="build/core" dir="core/target">
+				<include name="report/coverage/**"/>
+				<include name="test/html/**"/>
+			</tarfileset>
+			<tarfileset prefix="build/utils" dir="utils/target">
+				<include name="report/coverage/**"/>
+				<include name="test/html/**"/>
+			</tarfileset>
+			<tarfileset prefix="build/docs" dir="target/release/java6/docs">
+				<include name="**/*"/>
 			</tarfileset>
 		</tar>
 		
