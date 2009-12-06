@@ -98,16 +98,12 @@
 				</ea:submodule>
 				
 				<copy todir="${release.dir}">
-					<fileset dir="core/target/artifacts"
-		                     includes="**/*.jar" excludes="**/*test*"/>
+					<fileset dir="core/target/artifacts" includes="**/*.jar" excludes="**/*test*"/>
+					<fileset dir="utils/target/artifacts" includes="**/*.jar" excludes="**/*test*"/>
 					<fileset refid="licenses"/>
 					<fileset dir="core/src/main" includes="sql/**"/>
 					<fileset dir="utils/src/main" includes="sql/**"/>
 					<fileset dir="utils/src/main/sh" includes="**/**"/>
-				</copy>
-				
-				<copy todir="${release.dir}/utils">
-					<fileset dir="utils/target/artifacts" includes="**/*.jar" excludes="**/*test*"/>
 				</copy>
 				
 				<copy todir="${release.dir}/web">

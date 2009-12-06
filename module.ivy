@@ -6,8 +6,6 @@
     				pattern="[organisation]/[module]/[revision]/[type]s/[artifact].[ext]"/>
 		<description>beet master build</description>
 		
-		<ea:property name="module.version.target" value="1.4.0_rc1"/>
-
 		<ea:property name="project.ivy.settings.file" value="${basedir}/src/build/ant/ivysettings.xml"/>
 
 		<ea:property name="test.run.forkmode" value="once"/>

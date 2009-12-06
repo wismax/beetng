@@ -2,7 +2,7 @@
 <ivy-module version="2.0" 
 			xmlns:ea="http://www.easyant.org"
 			xmlns:m="http://ant.apache.org/ivy/maven">
-    <info organisation="net.sourceforge.beet" module="beet-core">
+    <info organisation="net.sourceforge.beet" module="beet-core" revision="1.4.0_rc1">
 		<extends organisation="net.sourceforge.beet" name="beet" revision="latest.revision"/>
 		
     	<license name="Mozilla Public License, version 1.1" 
