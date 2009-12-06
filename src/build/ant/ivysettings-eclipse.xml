@@ -1,0 +1,10 @@
+<ivysettings>
+
+    <include file="ivysettings.xml"/>
+
+    <caches checkUpToDate="false" useOrigin="true" default="default-cache" lockStrategy="no-lock" resolutionCacheDir="${ivy.settings.dir}/target/ide/cache">
+    	<cache name="default-cache"/>
+    	<cache name="temp-cache" basedir="${java.io.tmpdir}/ivy2/cache/ide"/>
+    </caches>
+
+</ivysettings>

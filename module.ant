@@ -178,7 +178,7 @@
 			
 	</target>
 	
-	<target name="release">
+	<target name="release-bundle">
 		<zip destfile="${target.dir}/release-packages-full.zip">
 			<zipfileset prefix="beet-release" dir="${target.dir}">
 				<include name="*.gz"/>
