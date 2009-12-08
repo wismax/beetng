@@ -3,7 +3,7 @@
 			xmlns:ea="http://www.easyant.org"
 			xmlns:m="http://ant.apache.org/ivy/maven">
     <info organisation="net.sourceforge.beet" module="beet-test" revision="1.4.0_rc1">
-		<extends organisation="net.sourceforge.beet" name="beet" revision="latest.integration"/>
+		<extends organisation="net.sourceforge.beet" module="beet" revision="latest.integration"/>
 		
     	<license name="Mozilla Public License, version 1.1" 
     			 url="http://www.mozilla.org/MPL/MPL-1.1.html"/>

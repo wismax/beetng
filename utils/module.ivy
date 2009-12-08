@@ -3,7 +3,7 @@
 			xmlns:m="http://ant.apache.org/ivy/maven"
 			xmlns:ea="http://www.easyant.org">
     <info organisation="net.sourceforge.beet" module="beet-utils" revision="1.4.0_rc1">
-		<extends organisation="net.sourceforge.beet" name="beet" revision="latest.revision"/>
+		<extends organisation="net.sourceforge.beet" module="beet" revision="latest.revision"/>
     	<license name="Mozilla Public License, version 1.1" 
     			 url="http://www.mozilla.org/MPL/MPL-1.1.html"/>
     	<repository name="Beet Ivyrep" url="http://beet.sourceforge.net/ivyrep"

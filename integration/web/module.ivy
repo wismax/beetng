@@ -2,7 +2,7 @@
 <ivy-module version="2.0"
  			xmlns:ea="http://www.easyant.org">
     <info organisation="net.sourceforge.beet" module="beet-web" revision="1.4.0_rc1">
-		<extends organisation="net.sourceforge.beet" name="beet" revision="latest.integration" location="../../module.ivy"/>
+		<extends organisation="net.sourceforge.beet" module="beet" revision="latest.integration" location="../../module.ivy"/>
     	<license name="Mozilla Public License, version 1.1" 
     			 url="http://www.mozilla.org/MPL/MPL-1.1.html"/>
     	<repository name="Beet Ivyrep" url="http://beet.sourceforge.net/ivyrep"
