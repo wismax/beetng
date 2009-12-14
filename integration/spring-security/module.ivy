@@ -10,7 +10,7 @@
     	<description homepage="http://beet.sourceforge.net">
     	Integration tests for spring-security.
     	</description>
-		<ea:build type="org.apache.easyant.buildtypes#build-std-java;0.2">
+		<ea:build module="build-std-java" revision="0.2">
 
 			<ea:property name="main.confs" value="compile"/>
 			<ea:property name="skip.jar.package" value="true"/>

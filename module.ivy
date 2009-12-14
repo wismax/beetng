@@ -13,7 +13,7 @@
 		<ea:property name="test.run.includes.pattern" value="**/*Test.class"/>
 		<ea:property name="test.run.excludes.pattern" value="**/PerformanceTest.class"/>
 		
-		<ea:build type="org.apache.easyant.buildtypes#meta-build;0.1"/>
+		<ea:build module="meta-build" revision="0.1"/>
 		
 	</info>
 	<configurations>

@@ -13,9 +13,9 @@
     	Unit testing utilities developed as a corollary of the beet project.
     	</description>
     	
-		<ea:build type="org.apache.easyant.buildtypes#build-std-java;0.2">
+		<ea:build module="build-std-java" revision="0.2">
 			<ea:property name="main.confs" value="compile"/>
-			<ea:plugin module="org.apache.easyant.plugins#source-jar;0.1" mandatory="true" as="source-jar"/>
+			<ea:plugin module="source-jar" revision="0.1" mandatory="true" as="source-jar"/>
 		</ea:build>
 		
 	</info>

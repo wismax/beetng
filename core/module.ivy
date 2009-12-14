@@ -16,14 +16,14 @@
     	designed for use with Spring-based applications.
     	</description>
     	
-		<ea:build type="org.apache.easyant.buildtypes#build-std-java;0.2">
+		<ea:build module="build-std-java" revision="0.2">
 
 			<ea:property name="main.confs" value="compile"/>
 			<ea:property name="test.run.dir" value="target/tmp"/>
 
-			<ea:plugin module="org.apache.easyant.plugins#coverage-cobertura;0.1" mandatory="true" as="cobertura"/>
-			<ea:plugin module="org.apache.easyant.plugins#source-jar;0.1" mandatory="true" as="source-jar"/>
-			<ea:plugin module="org.apache.easyant.plugins#docbook;0.1" mandatory="true" as="docbook">
+			<ea:plugin module="coverage-cobertura" revision="0.1" mandatory="true" as="cobertura"/>
+			<ea:plugin module="source-jar" revision="0.1" mandatory="true" as="source-jar"/>
+			<ea:plugin module="docbook" revision="0.1" mandatory="true" as="docbook">
 				<ea:property name="docbook.index.file" value="src/documentation/docbook/userguide/manual.xml"/>
 				<ea:property name="docbook.parameters" value="html.stylesheet=css/stylesheet.css table.borders.with.css=1"/>
 			</ea:plugin>

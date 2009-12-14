@@ -11,14 +11,14 @@
     	<description homepage="http://beet.sourceforge.net">
     	Utilities for working with behavior tracking log files.
     	</description>
-		<ea:build type="org.apache.easyant.buildtypes#build-std-java;0.2">
+		<ea:build module="build-std-java" revision="0.2">
 
 			<ea:property name="main.confs" value="compile"/>
 
 			<ea:property name="lib.main" value="target/artifacts/lib"/>
 			<ea:property name="manifest.main.classname" value="com.mtgi.analytics.xml.Main"/>
 			
-			<ea:plugin module="org.apache.easyant.plugins#source-jar;0.1" mandatory="true" as="source-jar"/>
+			<ea:plugin module="source-jar" revision="0.1" mandatory="true" as="source-jar"/>
 			
 		</ea:build>
 	</info>

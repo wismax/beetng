@@ -24,10 +24,10 @@
     <ea:path pathid="compile.main.classpath"/>
     <ea:path pathid="compile.test.classpath"/>
 	
-	<ea:import module="org.apache.easyant.buildtypes#meta-build;0.1"/>
-    <ea:include module="org.apache.easyant.plugins#phases-std;0.2" as="phase" />
-    <ea:include module="org.apache.easyant.plugins#antcontrib-activator;0.1" as="ac" />
-    <ea:include module="org.apache.easyant.plugins#ivy-provisioning;0.1" as="ivy" />
+	<ea:import mrid="org.apache.easyant.buildtypes#meta-build;0.1"/>
+    <ea:include mrid="org.apache.easyant.plugins#phases-std;0.2" as="phase" />
+    <ea:include mrid="org.apache.easyant.plugins#antcontrib-activator;0.1" as="ac" />
+    <ea:include mrid="org.apache.easyant.plugins#ivy-provisioning;0.1" as="ivy" />
 		
 	<macrodef name="bundle" 
 			  description="Generate tar.gz, tar.bz2, zip, and corresponding MD5 hash files for a release directory">

@@ -10,7 +10,7 @@
     	<description homepage="http://beet.sourceforge.net">
     	Example web application demonstrating a range of beet tracking features.
     	</description>
-		<ea:build type="org.apache.easyant.buildtypes#build-webapp-java;0.1">
+		<ea:build module="build-webapp-java" revision="0.1">
 			<ea:property name="main.confs" value="compile"/>
 		</ea:build>
 	</info>

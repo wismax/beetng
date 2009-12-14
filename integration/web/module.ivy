@@ -16,7 +16,7 @@
     	<a href="https://sourceforge.net/tracker/?func=detail&amp;aid=2794532&amp;group_id=258926&amp;atid=1127321">issue 2794532</a>
     	for reference.
     	</description>
-		<ea:build type="org.apache.easyant.buildtypes#build-std-java;0.2">
+		<ea:build module="build-std-java" revision="0.2">
 
 			<ea:property name="main.confs" value="compile"/>
 
