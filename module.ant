@@ -92,8 +92,8 @@
 
 				<!-- copy dependency jars into release directory -->
 				<var name="main.confs" value="1.@{current.version}"/>
+				
 				<var name="lib.main" value="${release.dir}/lib"/>
-
 				<ea:submodule target="provision">
 					<buildpath><pathelement location="${basedir}/core/module.ivy"/></buildpath>
 				</ea:submodule>
@@ -109,21 +109,26 @@
 				</copy>
 				
 				<!-- copy extra libraries required by beet-utils -->
+				<var name="lib.main" value="${release.dir}/tmp"/>
+				<ea:submodule target="provision">
+					<buildpath><pathelement location="${basedir}/utils/module.ivy"/></buildpath>
+				</ea:submodule>
 				<copy todir="${release.dir}/utils">
-					<fileset dir="utils/target/artifacts/lib" includes="*.jar" excludes="beet-core*">
+					<fileset dir="${release.dir}/tmp" includes="*.jar" excludes="beet-core*">
 						<present present="srconly" targetdir="${release.dir}/lib"/>
 					</fileset>
 				</copy>
+				<delete dir="${release.dir}/tmp"/>
 				
 				<!-- update the utils jar classpath to reflect the distro layout -->
 				<manifestclasspath property="utils.class.path" jarfile="${release.dir}/beet-utils.jar">
-                        <classpath>
-                        	<fileset dir="${release.dir}">
-                        		<include name="beet-core.jar"/>
-                        		<include name="lib/*.jar"/>
-                        		<include name="utils/*.jar"/>
-                        	</fileset>
-                       	</classpath>
+                    <classpath>
+                    	<fileset dir="${release.dir}">
+                    		<include name="beet-core.jar"/>
+                    		<include name="lib/*.jar"/>
+                    		<include name="utils/*.jar"/>
+                    	</fileset>
+                   	</classpath>
                 </manifestclasspath>
 				<jar update="true" destfile="${release.dir}/beet-utils.jar">
 					<manifest>
@@ -155,7 +160,7 @@
 
 				<bundle basename="${target.dir}/beet-java@{current.version}-${release.revision}"
 						prefix="beet-${release.revision}"
-						dir="${release.dir}" includes="**/*"/>
+						dir="${release.dir}" includes="**/*" excludes="tmp/*"/>
 			</sequential>
 		</for>
 	</target>
