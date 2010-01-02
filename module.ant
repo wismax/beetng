@@ -90,6 +90,7 @@
 				<var name="release.dir" value="${target.dir}/java@{current.version}"/>
 				<mkdir dir="${release.dir}"/>
 
+				<!-- copy dependency jars into release directory -->
 				<var name="main.confs" value="1.@{current.version}"/>
 				<var name="lib.main" value="${release.dir}/lib"/>
 
@@ -97,19 +98,51 @@
 					<buildpath><pathelement location="${basedir}/core/module.ivy"/></buildpath>
 				</ea:submodule>
 				
+				<!-- copy main artifacts and scripts -->
 				<copy todir="${release.dir}">
-					<fileset dir="core/target/artifacts" includes="**/*.jar" excludes="**/*test*"/>
-					<fileset dir="utils/target/artifacts" includes="**/*.jar" excludes="**/*test*"/>
+					<fileset dir="core/target/artifacts" includes="*.jar" excludes="*test*,*source*"/>
+					<fileset dir="utils/target/artifacts" includes="*.jar" excludes="*test*,*source*"/>
 					<fileset refid="licenses"/>
 					<fileset dir="core/src/main" includes="sql/**"/>
 					<fileset dir="utils/src/main" includes="sql/**"/>
 					<fileset dir="utils/src/main/sh" includes="**/**"/>
 				</copy>
 				
+				<!-- copy extra libraries required by beet-utils -->
+				<copy todir="${release.dir}/utils">
+					<fileset dir="utils/target/artifacts/lib" includes="*.jar" excludes="beet-core*">
+						<present present="srconly" targetdir="${release.dir}/lib"/>
+					</fileset>
+				</copy>
+				
+				<!-- update the utils jar classpath to reflect the distro layout -->
+				<manifestclasspath property="utils.class.path" jarfile="${release.dir}/beet-utils.jar">
+                        <classpath>
+                        	<fileset dir="${release.dir}">
+                        		<include name="beet-core.jar"/>
+                        		<include name="lib/*.jar"/>
+                        		<include name="utils/*.jar"/>
+                        	</fileset>
+                       	</classpath>
+                </manifestclasspath>
+				<jar update="true" destfile="${release.dir}/beet-utils.jar">
+					<manifest>
+						<attribute name="Class-Path" value="${utils.class.path}"/>
+					</manifest>
+				</jar>
+				
+				<!-- copy the web compatibility jar -->
 				<copy todir="${release.dir}/web">
 					<fileset dir="integration/web/target/artifacts" includes="**/*.jar"/>
 				</copy>
 				
+				<!-- include source jars, to be neighborly. -->
+				<copy todir="${release.dir}/src">
+					<fileset dir="core/target/artifacts" includes="*.jar" excludes="*source*"/>
+					<fileset dir="utils/target/artifacts" includes="*.jar" excludes="*source*"/>
+				</copy>
+				
+				<!-- include documentation -->
 				<copy todir="${release.dir}/docs/userguide">
 					<fileset dir="core/target/documentation" includes="html/**"/>
 				</copy>
