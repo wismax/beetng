@@ -58,8 +58,12 @@
 		<dependency org="opensymphony" name="quartz-all" rev="1.6.0"/>
 		<dependency org="com.sun.xml.fastinfoset" name="FastInfoset" rev="1.2.2"/>
 
+		<!-- runtime dependencies for cglib. -->
+		<dependency org="asm" name="asm" rev="1.5.3" conf="1.6"/>
+		<dependency org="asm" name="asm-attrs" rev="1.5.3" conf="1.6"/>
+
 		<!-- actually a dependency of quartz, which unfortunately doesn't specify it directly -->
-		<dependency org="commons-collections" name="commons-collections" rev="3.2.1" conf="default"/>
+		<dependency org="commons-collections" name="commons-collections" rev="3.2.1" conf="1.6"/>
 
 		<!-- only needed on SDK 1.5 and below -->
 		<dependency org="stax" name="stax" rev="1.2.0" conf="1.5,compile,test"/>
