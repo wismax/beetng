@@ -24,7 +24,7 @@
 		The steps for a basic installation into an existing Spring application are:
 		<orderedlist>
 			<listitem><para>Download an appropriate release package from <ulink url="http://beet.sourceforge.net/downloads">SourceForge</ulink>.</para></listitem>
-			<listitem><para>Add the library <literal>beet.jar</literal> and its dependency jars to your application
+			<listitem><para>Add <literal>beet-core.jar</literal> and its dependency jars in <literal>lib/</literal> to your application
 			(e.g. in the WEB-INF/lib directory for WAR archives).</para></listitem>
 			<listitem>
 				<para>Add behavior tracking markup to your Spring applicationContext.xml file
@@ -85,11 +85,21 @@
 			</para></listitem>
 		</orderedlist>
 		</para>
+		
+		<section>
+			<title>EAR Deployments</title>
+			<para>Beet libraries can be deployed to a shared library location, either in the EAR or
+			in your application server.  If you want to include HTTP request tracking to a WAR module
+			in your application, you should also add <literal>beet-web.jar</literal> to the WAR's
+			<literal>WEB-INF/lib</literal> directory.  <literal>beet-web.jar</literal> can be found
+			in the beet distribution under <literal>web/</literal>.  This step is not necessary if
+			beet libraries are included directly in <literal>WEB-INF/lib</literal>.</para>
+		</section>
 	</section>
 
 	<section id="section_log_analysis">
 		<title>Log Analysis</title>
-		<para>The beet build generates a command-line tool suite for 
+		<para>The beet distribution includes a command-line tool suite for 
 		analyzing beet logs. The tool suite can be used to convert binary 
 		logs to CSV or XML, apply custom XSL transforms, and perform efficient bulk 
 		loads of beet data to an Oracle database. The tools require the 
@@ -102,13 +112,9 @@
 		</itemizedlist>
 		</para>
 
-		<para>There are two packages, for java 5 and java 6; you only need to install the 
-		version appropriate to your local SDK install.</para> 
-		 
-		<para>After you have unpacked the archive, you can run any of the following utilities 
-		from a command prompt within the created <literal>beet</literal> directory.  All of these 
-		instructions assume you are logging in the default format, GZIP-compressed FastInfoSet 
-		(i.e. binary XML).</para>
+		<para>You can run any of the following utilities from a command prompt within the created 
+		<literal>beet</literal> directory.  All of these instructions assume you are logging in 
+		the default format, GZIP-compressed FastInfoSet (i.e. binary XML).</para>
 
 		<section>
 			<title>Upload to an Oracle Database</title>
@@ -150,7 +156,7 @@
 			<para>
 				You can easily export a binary log to a simple XML format legible to humans or other XML
 				processing utilities:
-				<informalexample><screen>&gt; zcat path/to/log.bxml.gz | java -jar bt-utils.jar -tool xml &gt; result.xml</screen></informalexample>
+				<informalexample><screen>&gt; zcat path/to/log.bxml.gz | java -jar beet-utils.jar -tool xml &gt; result.xml</screen></informalexample>
 				<caution>
 					<title>Problems with zcat</title>
 					<para>Some systems (like OS X) may not ship with zcat, or may contain a version
@@ -202,7 +208,7 @@
 			<title>Export to CSV</title>
 			<para>
 				Similarly, you can export to a CSV file for use in a spreadsheet or older EDI tools:
-				<informalexample><screen>&gt; zcat path/to/log.bxml.gz | java -jar bt-utils.jar -tool csv &gt; result.csv</screen></informalexample>
+				<informalexample><screen>&gt; zcat path/to/log.bxml.gz | java -jar beet-utils.jar -tool csv &gt; result.csv</screen></informalexample>
 			</para>
 			<para>Again, assume that your CSV data will be quite a bit larger than the compressed-binary data.</para>
 		</section>
@@ -219,10 +225,10 @@
 			<para>The following example splits the input document into one fragment per 'event' element,
 			applying the given XSL transform file to each fragment and streaming the result to standard
 			out:
-				<informalexample><screen>&gt; zcat path/to/log.bxml.gz | java -jar bt-utils.jar -tool xslt -split event-log/event -xsl etl/insert_events.xsl &gt; result.csv</screen></informalexample>
+				<informalexample><screen>&gt; zcat path/to/log.bxml.gz | java -jar beet-utils.jar -tool xslt -split event-log/event -xsl sql/etl/insert_events.xsl &gt; result.csv</screen></informalexample>
 			</para>
 			 
-			<para>The included file <varname>etl/insert_events.xsl</varname> provides an example transform document, including some custom XSL functions available to transforms 
+			<para>The included file <varname>sql/etl/insert_events.xsl</varname> provides an example transform document, including some custom XSL functions available to transforms 
 			invoked in this way.</para>
 		</section>
 	</section>
