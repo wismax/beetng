@@ -1,6 +1,6 @@
 <ivysettings>
 
-    <settings defaultResolver="default" validate="false"/>
+    <settings defaultResolver="main" validate="false"/>
 
     <caches checkUpToDate="false" useOrigin="true" lockStrategy="artifact-lock" 
     		default="default-cache" defaultCacheDir="${user.dir}/target/cache">
@@ -20,7 +20,7 @@
             <artifact pattern="${user.dir}/repository/[organisation]/[module]/[revision]/[artifact]-[revision](-[classifier]).[ext]"/>
        	</filesystem>
        	
-       	<chain name="default" returnFirst="true">
+       	<chain name="main" returnFirst="true">
        		<resolver ref="shared"/>
        		<resolver ref="maven-central"/>
        	</chain>

@@ -143,8 +143,8 @@
 				
 				<!-- include source jars, to be neighborly. -->
 				<copy todir="${release.dir}/src">
-					<fileset dir="core/target/artifacts" includes="*.jar" excludes="*source*"/>
-					<fileset dir="utils/target/artifacts" includes="*.jar" excludes="*source*"/>
+					<fileset dir="core/target/artifacts" includes="*source*"/>
+					<fileset dir="utils/target/artifacts" includes="*source*"/>
 				</copy>
 				
 				<!-- include documentation -->
@@ -160,7 +160,8 @@
 
 				<bundle basename="${target.dir}/beet-java@{current.version}-${release.revision}"
 						prefix="beet-${release.revision}"
-						dir="${release.dir}" includes="**/*" excludes="tmp/*"/>
+						dir="${release.dir}" includes="**/*"/>
+				
 			</sequential>
 		</for>
 	</target>

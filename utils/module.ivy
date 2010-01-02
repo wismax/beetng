@@ -14,6 +14,8 @@
 		<ea:build module="build-std-java" revision="0.2">
 
 			<ea:property name="main.confs" value="compile"/>
+
+			<ea:property name="lib.main" value="target/artifacts/lib"/>
 			<ea:property name="manifest.main.classname" value="com.mtgi.analytics.xml.Main"/>
 			
 			<ea:plugin module="source-jar" revision="0.1" mandatory="true" as="source-jar"/>

@@ -49,6 +49,9 @@
 		<dependency org="javax.transaction" name="jta" rev="1.1"/>
 		<dependency org="hsqldb" name="hsqldb" rev="1.8.0.10"/>
 		
+		<!-- bump to a version that's beet-compatible, to make the tutorial simpler -->
+		<dependency org="commons-collections" name="commons-collections" rev="3.2.1"/>
+		
 		<dependency org="javax.servlet" name="servlet-api" rev="2.4" conf="compile"/>
 		
 	</dependencies>
