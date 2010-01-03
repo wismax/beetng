@@ -52,24 +52,24 @@ case "`uname`" in
 CYGWIN*)
 	TEMPFILE=`mktemp --tmpdir=.`
 	zcat "$2" | "$JAVA" -jar beet-utils.jar -tool csv > $TEMPFILE
-	sqlldr $1 control=etl/load_event_csv.ctl,direct=true,silent=FEEDBACK,data="$TEMPFILE"
+	sqlldr $1 control=sql/etl/load_event_csv.ctl,direct=true,silent=FEEDBACK,data="$TEMPFILE"
 	rm $TEMPFILE
 	;;
 
 SunOS*)
 	gzcat "$2" | 
 		"$JAVA" -jar beet-utils.jar -tool csv | 
-		sqlldr $1 control=etl/load_event_csv.ctl,direct=true,silent=FEEDBACK
+		sqlldr $1 control=sql/etl/load_event_csv.ctl,direct=true,silent=FEEDBACK
 	;;
 
 *)
 	zcat "$2" | 
 		"$JAVA" -jar beet-utils.jar -tool csv | 
-		sqlldr $1 control=etl/load_event_csv.ctl,direct=true,silent=FEEDBACK
+		sqlldr $1 control=sql/etl/load_event_csv.ctl,direct=true,silent=FEEDBACK
 	;;
 esac
 
 echo "Summarizing data..."
-sqlplus -S $1 @etl/event_summarize.sql
+sqlplus -S $1 @sql/etl/event_summarize.sql
 
 echo "End: " $(date)
