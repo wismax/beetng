@@ -17,7 +17,7 @@
        	<filesystem name="shared" alwaysCheckExactRevision="false" checkmodified="false" 
 			 		m2compatible="true" transactional="false">
             <ivy pattern="${user.dir}/repository/[organisation]/[module]/[revision]/[module]-[revision].ivy"/>
-            <artifact pattern="${user.dir}/repository/[organisation]/[module]/[revision]/[artifact]-[revision](-[classifier]).[ext]"/>
+            <artifact pattern="${user.dir}/repository/[organisation]/[module]/[revision]/[artifact]-[revision](-[classifier]s).[ext]"/>
        	</filesystem>
        	
        	<chain name="main" returnFirst="true">
