@@ -121,6 +121,7 @@
 				<delete dir="${release.dir}/tmp"/>
 				
 				<!-- update the utils jar classpath to reflect the distro layout -->
+				<var name="utils.class.path" unset="true"/>
 				<manifestclasspath property="utils.class.path" jarfile="${release.dir}/beet-utils.jar">
                     <classpath>
                     	<fileset dir="${release.dir}">
