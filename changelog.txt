@@ -1,3 +1,30 @@
+since 1.4.0_b3
+
+ features:
+ 
+  * beet-core 2810502: record times with nanosecond accuracy
+  
+  * beet-core 2794524: bt:manager/enabled attribute, so that tracking
+                       can be toggled in an external properies file
+                       
+  * beet-core 2794532: beet-web.jar added to distribution, for easier
+                       EAR deployments
+                       
+  * beet-core 2794532: maven repository has sources and javadocs
+
+ bugfixes:
+
+  * beet-core 2832049: deploy latest XSD to project site, fix schema URI
+                       inconsistencies
+                       
+  * beet-core 2824858: fix runtime compatibility with spring-test
+  
+  * beet-core 2790194: batch event ID lookup, to improve JDBC persister 
+                       performance
+                       
+  * beet-core 2806458: fix runtime compatibility with spring-security 2.0
+  
+  
 since 1.4.0_b2
 
  new features:
