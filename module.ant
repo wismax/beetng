@@ -171,10 +171,12 @@
 
 		<tar destfile="${target.dir}/reports.tar.bz2" compression="bzip2">
 			<tarfileset prefix="build/core" dir="core/target">
+				<include name="report/deps-report/**"/>
 				<include name="report/coverage/**"/>
 				<include name="test/html/**"/>
 			</tarfileset>
 			<tarfileset prefix="build/utils" dir="utils/target">
+				<include name="report/deps-report/**"/>
 				<include name="report/coverage/**"/>
 				<include name="test/html/**"/>
 			</tarfileset>
