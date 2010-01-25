@@ -20,6 +20,7 @@
 			
 			<ea:plugin module="coverage-cobertura" revision="0.1" mandatory="true" as="cobertura"/>
 			<ea:plugin module="source-jar" revision="0.1" mandatory="true" as="source-jar"/>
+			<ea:plugin module="javadoc" revision="0.1" mandatory="true" as="javadoc"/>
 			
 		</ea:build>
 	</info>

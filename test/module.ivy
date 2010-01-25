@@ -16,6 +16,7 @@
 		<ea:build module="build-std-java" revision="0.2">
 			<ea:property name="main.confs" value="compile"/>
 			<ea:plugin module="source-jar" revision="0.1" mandatory="true" as="source-jar"/>
+			<ea:plugin module="javadoc" revision="0.1" mandatory="true" as="javadoc"/>
 		</ea:build>
 		
 	</info>
