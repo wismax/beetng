@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 
+	Template definitions for bt configuration tags.  These definitions are loaded and manipulated by the
+	BtNamespaceHandler during spring configuration, and ultimately handed back out to the calling application context.
+	Lazy-init must be true, since many of these bean definitions won't be needed unless explicitly referenced by
+	external configuration.
+ -->
+<beans xmlns="http://www.springframework.org/schema/beans" 
+	   default-lazy-init="true"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<bean id="com.mtgi.analytics.btManager" 
+		  class="com.mtgi.analytics.BehaviorTrackingManagerImpl">
+		<description>Default configuration values for a bt:manager tag.  This definition is
+		loaded by BtManagerBeanDefinitionParser, and then manipulated to suit the attributes
+		and sub-elements provided at runtime.</description>
+		<property name="persister">
+			<ref local="com.mtgi.analytics.btPersister"/>
+		</property>
+		<property name="executor">
+			<ref local="com.mtgi.analytics.btExecutor"/>
+		</property>
+		<property name="sessionContext">
+			<ref local="com.mtgi.analytics.btSessionContext"/>
+		</property>
+	</bean>
+	
+	<bean id="com.mtgi.analytics.btSessionContext" 
+		  class="com.mtgi.analytics.JAASSessionContext">
+		  <description>Default SessionContext implementation.  Defaults to com.mtgi.analytics.servlet.SpringSessionContext
+		  if we are in a servlet environment, otherwise defaults to JAASSessionContext.</description>
+	</bean>
+		  
+	<bean id="com.mtgi.analytics.btPersister"
+		  class="com.mtgi.analytics.XmlBehaviorEventPersisterImpl">
+		<description>Default configuration values for a bt:persister tag.  This definition is
+		loaded by BtXmlPersisterBeanDefinitionParser, and then manipulated to suit the attributes
+		and sub-elements provided at runtime.</description>
+		<property name="file" value="beet.xml"/>
+		<property name="binary" value="true"/>
+		<property name="compress" value="true"/>
+	</bean>
+	
+	<bean id="com.mtgi.analytics.btExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+		<description>Private task executor used for asynchronous behavior tracking operations,
+		unless the user specifies an application executor.</description>
+		<property name="corePoolSize" value="1"/>
+		<property name="maxPoolSize" value="1"/>
+		<property name="queueCapacity" value="100"/>
+		<property name="threadFactory">
+			<bean class="org.springframework.scheduling.concurrent.CustomizableThreadFactory">
+				<!-- one below normal priority.  we stay out of the way of http request threads, but get an equal share with other background tasks. -->
+				<property name="threadPriority" value="4"/>
+				<property name="threadNamePrefix" value="beet-"/>
+			</bean>
+		</property>
+	</bean>
+
+	<!-- cron triggers are not registered here, but are modified and then registered by BtManager parser. -->
+	<bean id="com.mtgi.analytics.btFlushTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<description>Quartz Trigger to flush the behavior tracking manager every five minutes.  Modified
+		and registered with the scheduler by BtManagerBeanDefinitionParser</description>
+		<property name="cronExpression" value="0 0/5 * * * ?"/>
+		<property name="group" value="beet"/>
+		<property name="jobDetail">
+			<bean class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+				<property name="group" value="beet"/>
+				<property name="targetBeanName" value="com.mtgi.analytics.btManager"/>
+				<property name="targetMethod" value="flush"/>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="com.mtgi.analytics.btRotateTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<description>Quartz Trigger to rotate the behavior tracking xml log every day at midnight.  Modified
+		and registered with the scheduler by BtXmlPersisterBeanDefinitionParser</description>
+		<property name="cronExpression" value="0 0 0 * * ?"/>
+		<property name="group" value="beet"/>
+		<property name="jobDetail">
+			<bean class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+				<property name="group" value="beet"/>
+				<property name="targetBeanName" value="com.mtgi.analytics.btPersister"/>
+				<property name="targetMethod" value="rotateLog"/>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="com.mtgi.analytics.btScheduler" 
+		  class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<description>Private scheduler used for asynchronous behavior tracking operations,
+		unless the user specifies an application scheduler.</description>
+		<property name="schedulerName" value="BeetScheduler"/>
+		<property name="taskExecutor">
+			<ref local="com.mtgi.analytics.btExecutor"/>
+		</property>
+	</bean>
+	
+	<!-- mbean auto-registration support -->
+	<bean id="com.mtgi.analytics.btMBeanServer" class="org.springframework.jmx.support.MBeanServerFactoryBean">
+		<property name="locateExistingServerIfPossible" value="true"/>
+	</bean>
+	<bean id="com.mtgi.analytics.btMBeanPersister" class="com.mtgi.analytics.jmx.StatisticsMBeanEventPersisterImpl">
+		<description>Default configuration values for a bt:mbean-persister tag.  This definition is
+		loaded by BtMBeanPersisterBeanDefinitionParser, and then manipulated to suit the attributes
+		and sub-elements provided at runtime.</description>
+		<property name="server" ref="com.mtgi.analytics.btMBeanServer"/>
+	</bean>
+	
+    <bean id="com.mtgi.analytics.btJmxAttributeSource" 
+    	  class="org.springframework.jmx.export.annotation.AnnotationJmxAttributeSource"/>
+	<bean id="com.mtgi.analytics.btJmxNamingStrategy"
+		  class="com.mtgi.jmx.export.naming.AppendNamingStrategy">
+		<property name="domain">
+			<bean factory-bean="com.mtgi.analytics.btManager" factory-method="getApplication"/>
+		</property>
+		<property name="key" value="group"/>
+		<property name="delegate">
+			<bean class="org.springframework.jmx.export.naming.MetadataNamingStrategy">
+				<property name="attributeSource" ref="com.mtgi.analytics.btJmxAttributeSource"/>
+			</bean>
+		</property>
+    </bean>
+    <bean id="com.mtgi.analytics.btMBeanExporter" class="org.springframework.jmx.export.MBeanExporter">
+    	<description>Exports Beet MBeans to the platform MBeanServer.  Uses an instance of
+    	ApplicationNamingStrategy to put all beans under the domain name of the application,
+    	to avoid naming collisions if we have multiple apps on the same server.</description>
+    	<property name="autodetect" value="true"/>
+    	<property name="server" ref="com.mtgi.analytics.btMBeanServer"/>
+        <property name="assembler">
+		    <bean class="org.springframework.jmx.export.assembler.MetadataMBeanInfoAssembler">
+		        <property name="attributeSource" ref="com.mtgi.analytics.btJmxAttributeSource"/>
+		    </bean>
+        </property>
+        <property name="namingStrategy" ref="com.mtgi.analytics.btJmxNamingStrategy"/>
+    </bean>
+    
+</beans>
