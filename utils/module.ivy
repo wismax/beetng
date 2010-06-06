@@ -17,6 +17,7 @@
 
 			<ea:property name="lib.main" value="target/artifacts/lib"/>
 			<ea:property name="manifest.main.classname" value="com.mtgi.analytics.xml.Main"/>
+            <ea:property name="retrieve.dependencies" value="true"/>
 			
 			<ea:plugin module="coverage-cobertura" revision="0.1" mandatory="true" as="cobertura"/>
 			<ea:plugin module="source-jar" revision="0.1" mandatory="true" as="source-jar"/>
