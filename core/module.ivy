@@ -46,6 +46,7 @@
 
 	<publications>
 		<artifact name="beet-core" type="jar" conf="base,default,test"/>
+		<artifact name="beet-core-test" type="jar" conf="base,default,test"/>
 		<artifact name="beet-core" type="source" ext="jar" conf="source" m:classifier="source"/>
 		<artifact name="beet-core" type="javadoc" ext="zip" conf="javadoc" m:classifier="javadoc"/>
 	</publications>
