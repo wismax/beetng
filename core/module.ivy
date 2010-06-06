@@ -22,6 +22,7 @@
 			<ea:property name="test.run.dir" value="target/tmp"/>
 
 			<ea:plugin module="coverage-cobertura" revision="0.1" mandatory="true" as="cobertura"/>
+            <ea:plugin module="package-test-jar" revision="0.1" mandatory="true" as="test-jar"/>
 			<ea:plugin module="source-jar" revision="0.1" mandatory="true" as="source-jar"/>
 			<ea:plugin module="javadoc" revision="0.1" mandatory="true" as="javadoc"/>
 			<ea:plugin module="docbook" revision="0.1" mandatory="true" as="docbook">
