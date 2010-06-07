@@ -158,6 +158,8 @@ public class EventDataElement extends DataLink<EventDataElement> implements Seri
 
 	private static class PropertyListHead extends Property {
 		
+		private static final long serialVersionUID = 4732909206016080014L;
+
 		public static final Property INSTANCE = new PropertyListHead();
 
 		private PropertyListHead() {
@@ -182,8 +184,10 @@ public class EventDataElement extends DataLink<EventDataElement> implements Seri
 	}
 	
 	private static class Property extends DataLink<Property> 
-		implements Map.Entry<String, Object> 
+		implements Map.Entry<String, Object>, Serializable 
 	{
+		private static final long serialVersionUID = -3061168174673927050L;
+
 		private String key;
 		private Object value;
 
