@@ -12,7 +12,8 @@
 		<ea:property name="test.mode" value="report"/>
 		<ea:property name="test.run.includes.pattern" value="**/*Test.class"/>
 		<ea:property name="test.run.excludes.pattern" value="**/PerformanceTest.class"/>
-		
+        <ea:property name="test.integration.run.includes.pattern" value="**/*Test.class"/>
+
 		<ea:build module="meta-build" revision="0.2"/>
 		
 	</info>
