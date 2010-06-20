@@ -160,7 +160,7 @@ public class BtManagerBeanDefinitionParser extends TemplateBeanDefinitionParser 
 			for (String att : template.attributeNames())
 				if (!ATT_ID.equals(att))
 					template.removeAttribute(att);
-			template.getPropertyValues().clear();
+			template.getPropertyValues().getPropertyValueList().clear();
 			//terminate immediately, do not parse any nested definitions (persisters, AOP config, context beans, etc)
 			return;
 		}

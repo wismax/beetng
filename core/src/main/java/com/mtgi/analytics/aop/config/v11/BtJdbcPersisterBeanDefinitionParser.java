@@ -26,6 +26,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import com.mtgi.analytics.JdbcBehaviorEventPersisterImpl;
+import com.mtgi.util.BeanDefinitionReaderUtilsWrapper;
 
 /** 
  * Parses the <code>bt:jdbc-persister</code> tag to produce an {@link JdbcBehaviorEventPersisterImpl} bean,
@@ -66,7 +67,7 @@ public class BtJdbcPersisterBeanDefinitionParser extends AbstractSingleBeanDefin
 		if (parserContext.isNested()) {
 			AbstractBeanDefinition def = builder.getBeanDefinition();
 			String id = element.hasAttribute("id") ? element.getAttribute("id")
-												   : BeanDefinitionReaderUtils.generateBeanName(def, parserContext.getReaderContext().getRegistry(), true);
+												   : BeanDefinitionReaderUtilsWrapper.generateBeanName(def, parserContext.getReaderContext().getRegistry(), true);
 			BeanDefinitionHolder holder = new BeanDefinitionHolder(def, id);
 			BtManagerBeanDefinitionParser.registerNestedBean(holder, "persister", parserContext);
 		}

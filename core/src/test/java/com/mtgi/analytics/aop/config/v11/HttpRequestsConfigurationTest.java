@@ -78,7 +78,6 @@ public class HttpRequestsConfigurationTest {
 	}
 	
 	/** Test basic logging of a GET request */
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testGetRequest() throws Exception {
 	    webClient.getPage(baseUrl + "/app/test/path?param1=hello&param1=world&param2&param3=72%3C");
@@ -86,9 +85,9 @@ public class HttpRequestsConfigurationTest {
 	    webClient.getPage(baseUrl + "/app/test/also.traq?param1=hello&param1=world&param2&param3=72%3C&dispatch=dang");
 	    webClient.getPage(baseUrl + "/app/test/also.traq?param1=nodispatch&param1=world&param2&param3=72%3C");
 
-	    Collection<BehaviorTrackingManagerImpl> managers = servlet.context.getBeansOfType(BehaviorTrackingManager.class).values();
-	    for (BehaviorTrackingManagerImpl m : managers)
-	    	m.flush();
+	    Collection<BehaviorTrackingManager> managers = servlet.context.getBeansOfType(BehaviorTrackingManager.class).values();
+	    for (BehaviorTrackingManager m : managers)
+	    	((BehaviorTrackingManagerImpl) m).flush();
 	    
 	    //first manager only gets events matching supplied filter patterns, and has
 	    //a custom event type configured.  second manager gets all events.
