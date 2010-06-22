@@ -45,8 +45,9 @@ public class BeanDefinitionReaderUtilsWrapper {
 		try {
 			try {
 				// try to see if the Spring >= 2.5 signature exists
-				generateBeanNameMethod = BeanDefinitionReaderUtils.class.getMethod(METHOD_GENERATE_BEAN_NAME, parameters);
-				log.fatal("Found Spring 2.5+ BeanDefinitionReaderUtils#generateBeanName");
+				generateBeanNameMethod = BeanDefinitionReaderUtils.class.getMethod(METHOD_GENERATE_BEAN_NAME,
+						parameters);
+				log.trace("Found Spring 2.5+ BeanDefinitionReaderUtils#generateBeanName");
 
 			} catch (NoSuchMethodException nsme) {
 				// Spring < 2.5 args
@@ -56,7 +57,7 @@ public class BeanDefinitionReaderUtilsWrapper {
 					// try to see if the Spring < 2.5 signature exists
 					generateBeanNameMethod = BeanDefinitionReaderUtils.class.getMethod(METHOD_GENERATE_BEAN_NAME,
 							parameters);
-					log.fatal("Found Spring <2.5 BeanDefinitionReaderUtils#generateBeanName");
+					log.trace("Found Spring <2.5 BeanDefinitionReaderUtils#generateBeanName");
 
 				} catch (NoSuchMethodException nsme2) {
 					nsme2.printStackTrace();
