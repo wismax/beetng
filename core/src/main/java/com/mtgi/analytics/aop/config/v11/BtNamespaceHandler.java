@@ -29,6 +29,7 @@ public class BtNamespaceHandler extends NamespaceHandlerSupport {
 		registerBeanDefinitionParser("xml-persister", new BtXmlPersisterBeanDefinitionParser());
 		registerBeanDefinitionParser("jdbc-persister", new BtJdbcPersisterBeanDefinitionParser());
 		registerBeanDefinitionParser("mbean-persister", new BtMBeanPersisterBeanDefinitionParser());
+		registerBeanDefinitionParser("log-persister", new BtCommonsLoggingPersisterBeanDefinitionParser());
 		registerBeanDefinitionParser("custom-persister", new BtInnerBeanDefinitionParser("persister"));
 		registerBeanDefinitionParser("session-context", new BtInnerBeanDefinitionParser("sessionContext"));
 		registerBeanDefinitionParser("http-requests", new BtHttpRequestsBeanDefinitionParser());

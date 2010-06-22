@@ -45,6 +45,7 @@
 					<xsd:element ref="xml-persister"/>
 					<xsd:element ref="jdbc-persister"/>
 					<xsd:element ref="mbean-persister"/>
+					<xsd:element ref="log-persister"/>
 					<xsd:element ref="custom-persister"/>
 				</xsd:choice>
 			</xsd:sequence>
@@ -101,6 +102,13 @@
 									Configure JMX monitoring for this manager.  Event statistics are
 									aggregated in MBeans, where they can be viewed from a JMX console for
 									monitoring quality-of-service.
+									]]></xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+							<xsd:element ref="bt:log-persister">
+								<xsd:annotation>
+									<xsd:documentation><![CDATA[
+									Configure commons-logging logging for this manager.
 									]]></xsd:documentation>
 								</xsd:annotation>
 							</xsd:element>
@@ -314,6 +322,13 @@
 								]]></xsd:documentation>
 							</xsd:annotation>
 						</xsd:element>
+						<xsd:element ref="bt:log-persister">
+							<xsd:annotation>
+								<xsd:documentation><![CDATA[
+								Add a commons-logging logging persister to the chain.
+								]]></xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
 						<xsd:element ref="bt:custom-persister">
 							<xsd:annotation>
 								<xsd:documentation><![CDATA[
@@ -478,6 +493,32 @@
 									<tool:expected-type type="javax.management.MBeanServer"/>
 								</tool:annotation>
 							</xsd:appinfo>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:extension>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="log-persister">
+		<xsd:complexType>
+			<xsd:annotation>
+				<xsd:documentation source="java:com.mtgi.analytics.CommonsLoggingBehaviorEventPersisterImpl"><![CDATA[
+		Defines behavior tracking event persistence to commons-logging. Generally this element will appear
+		as a child of <bt:manager> without an "id", though it is possible to declare it as a top-level
+		bean if you want to inject it into other application beans.
+				]]></xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation>
+						<tool:exports type="com.mtgi.analytics.CommonsLoggingBehaviorEventPersisterImpl"/>
+					</tool:annotation>
+				</xsd:appinfo>
+			</xsd:annotation>
+			<xsd:complexContent>
+				<xsd:extension base="beans:identifiedType">
+					<xsd:attribute name="level" default="info" type="xsd:string">
+						<xsd:annotation>
+							<xsd:documentation>Logging level as defined by commons-logging. Defaults to 'info'.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:attribute>
 				</xsd:extension>
