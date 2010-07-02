@@ -24,7 +24,7 @@ import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import com.mtgi.analytics.JdbcBehaviorEventPersisterImpl;
+import com.mtgi.analytics.SequenceStyleJdbcBehaviorEventPersisterImpl;
 import com.mtgi.util.BeanDefinitionReaderUtilsWrapper;
 
 /** 
@@ -74,7 +74,7 @@ public class BtJdbcPersisterBeanDefinitionParser extends AbstractSingleBeanDefin
 
 	@Override
 	protected Class<?> getBeanClass(Element element) {
-		return JdbcBehaviorEventPersisterImpl.class;
+		return SequenceStyleJdbcBehaviorEventPersisterImpl.class;
 	}
 
 	@Override

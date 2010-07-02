@@ -95,7 +95,7 @@ public class XmlBehaviorEventPersisterTest {
 		final ArrayList<BehaviorEvent> events = new ArrayList<BehaviorEvent>();
 		int[] counter = { 0 };
 		for (int i = 0; i < 3; ++i)
-			JdbcBehaviorEventPersisterTest.createEvent(null, 1, 3, 3, counter, events);
+			SequenceStyleJdbcBehaviorEventPersisterTest.createEvent(null, 1, 3, 3, counter, events);
 		LinkedList<BehaviorEvent> queue = new LinkedList<BehaviorEvent>(events);
 
 		persister.persist(queue);
@@ -179,7 +179,7 @@ public class XmlBehaviorEventPersisterTest {
 		ArrayList<BehaviorEvent> events = new ArrayList<BehaviorEvent>();
 		int[] counter = { 0 };
 		for (int i = 0; i < 3; ++i)
-			JdbcBehaviorEventPersisterTest.createEvent(null, 1, 3, 3, counter, events);
+			SequenceStyleJdbcBehaviorEventPersisterTest.createEvent(null, 1, 3, 3, counter, events);
 		LinkedList<BehaviorEvent> queue = new LinkedList<BehaviorEvent>(events);
 
 		persister.persist(queue);
@@ -257,7 +257,7 @@ public class XmlBehaviorEventPersisterTest {
 		ArrayList<BehaviorEvent> events = new ArrayList<BehaviorEvent>();
 		int[] counter = { 0 };
 		for (int i = 0; i < 3; ++i)
-			JdbcBehaviorEventPersisterTest.createEvent(null, 1, 3, 3, counter, events);
+			SequenceStyleJdbcBehaviorEventPersisterTest.createEvent(null, 1, 3, 3, counter, events);
 		LinkedList<BehaviorEvent> queue = new LinkedList<BehaviorEvent>(events);
 
 		persister.persist(queue);

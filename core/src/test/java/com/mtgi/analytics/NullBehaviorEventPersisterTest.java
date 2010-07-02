@@ -49,7 +49,7 @@ public class NullBehaviorEventPersisterTest {
 		ArrayList<BehaviorEvent> events = new ArrayList<BehaviorEvent>();
 		int[] counter = { 0 };
 		for (int i = 0; i < 3; ++i)
-			JdbcBehaviorEventPersisterTest.createEvent(null, 1, 3, 3, counter, events);
+			SequenceStyleJdbcBehaviorEventPersisterTest.createEvent(null, 1, 3, 3, counter, events);
 		LinkedList<BehaviorEvent> queue = new LinkedList<BehaviorEvent>(events);
 		inst.persist(queue);
 		assertEquals("queue unmodified by persistence operation", 39, queue.size());

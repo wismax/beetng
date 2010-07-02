@@ -18,7 +18,7 @@
 	</bean>
 
 	<!-- create jdbc persistence manager used to store events -->	
-	<bean id="jdbcPersistenceManager" class="com.mtgi.analytics.JdbcBehaviorEventPersisterImpl">
+	<bean id="jdbcPersistenceManager" class="com.mtgi.analytics.SequenceStyleJdbcBehaviorEventPersisterImpl">
 		<property name="dataSource" ref="dataSource"/>
 		<!-- accommodate HSQL seq syntax for tests -->
 		<property name="idSql">
