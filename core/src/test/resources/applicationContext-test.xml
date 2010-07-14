@@ -13,11 +13,15 @@
 	<!-- use unitils hsqldb datasource for test persistence ops -->
 	<bean id="dataSource" class="org.unitils.database.UnitilsDataSourceFactoryBean" />
 
-  	<bt:jdbc-persister id="jdbcPersistenceManager">
+  	<bt:jdbc-persister id="sequenceJdbcPersistenceManager" dialect="sequence">
   		<bt:data-source ref="dataSource"/>
   		<bt:id-sql increment="25">call next value for SEQ_BEHAVIOR_TRACKING_EVENT</bt:id-sql>
   	</bt:jdbc-persister>
-	  	
+
+  	<bt:jdbc-persister id="uuidJdbcPersistenceManager" dialect="uuid">
+  		<bt:data-source ref="dataSource"/>
+  	</bt:jdbc-persister>
+
 	<!-- task queue for async persistence operations -->	
 	<bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
 		<property name="corePoolSize" value="1"/>
@@ -34,7 +38,7 @@
 	<bean id="behaviorTrackingManager" class="com.mtgi.analytics.BehaviorTrackingManagerImpl">
 		<property name="application" value="testBT"/>
 		<property name="executor" ref="taskExecutor"/>
-		<property name="persister" ref="jdbcPersistenceManager"/>
+		<property name="persister" ref="sequenceJdbcPersistenceManager"/>
 		<property name="flushThreshold" value="5"/>
 		<property name="sessionContext" ref="sessionContext"/>
 	</bean>

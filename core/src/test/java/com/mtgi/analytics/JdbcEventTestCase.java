@@ -15,6 +15,9 @@ package com.mtgi.analytics;
 
 import static org.junit.Assert.fail;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -29,6 +32,7 @@ import org.custommonkey.xmlunit.Diff;
 import org.dbunit.DatabaseUnitException;
 import org.dbunit.database.DatabaseConnection;
 import org.dbunit.database.IDatabaseConnection;
+import org.dbunit.database.QueryDataSet;
 import org.dbunit.dataset.Column;
 import org.dbunit.dataset.CompositeTable;
 import org.dbunit.dataset.DataSetException;
@@ -52,22 +56,31 @@ public abstract class JdbcEventTestCase {
 
 	@SpringBeanByType
 	protected DataSource ds;
+	protected String databaseStyle;
 	
 	//we keep a connection and statement open for general purpose verification during test runs
 	protected Connection conn;
 	protected Statement stmt;
 	
+	public JdbcEventTestCase() {
+		this.databaseStyle = "sequence";
+	}
+	
+	public JdbcEventTestCase(String databaseStyle) {
+		this.databaseStyle = databaseStyle;
+	}
+	
 	@Before
 	public void createDB() throws IOException, SQLException {
 		conn = ds.getConnection();
 		stmt = conn.createStatement();
-		runResourceScript("create/create_behavior_tracking.sql");
+		runResourceScript("create/create_behavior_tracking-" + this.databaseStyle + ".sql");
 	}
 
 	@After
 	public void dropDB() throws IOException, SQLException {
 		try {
-			runResourceScript("create/drop_behavior_tracking.sql");
+			runResourceScript("create/drop_behavior_tracking-" + this.databaseStyle + ".sql");
 		} finally {
 			stmt.close();
 			conn.close();
@@ -136,7 +149,15 @@ public abstract class JdbcEventTestCase {
 		sql = sql.replaceAll("CLOB", "LONGVARCHAR");
 		stmt.execute(sql);
 	}
-	
+
+	protected void dumpDBUnitFlatXmlDataSet(File file) throws DatabaseUnitException, FileNotFoundException, IOException {
+        // partial database export
+		IDatabaseConnection connection = new DatabaseConnection(conn);
+        QueryDataSet partialDataSet = new QueryDataSet(connection);
+        partialDataSet.addTable("BEHAVIOR_TRACKING_EVENT");
+        FlatXmlDataSet.write(partialDataSet, new FileOutputStream(file));
+	}
+
 	public static class XmlStringDataType extends StringDataType {
 
 		public XmlStringDataType(String name, int sqlType) {

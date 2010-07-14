@@ -454,6 +454,17 @@
 							</xsd:complexType>
 						</xsd:element>
 					</xsd:sequence>
+					<xsd:attribute name="dialect">
+						<xsd:annotation>
+							<xsd:documentation>Type of ID generation used in the database.</xsd:documentation>
+						</xsd:annotation>
+						<xsd:simpleType>
+							<xsd:restriction base="xsd:string">
+								<xsd:enumeration value="sequence" />
+								<xsd:enumeration value="uuid" />
+							</xsd:restriction>
+						</xsd:simpleType>
+					</xsd:attribute>
 					<xsd:attribute name="batch-size" default="25" type="xsd:long">
 						<xsd:annotation>
 							<xsd:documentation>Statement batch size for persistence operations, only used if underlying JDBC driver

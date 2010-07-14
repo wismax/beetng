@@ -27,18 +27,18 @@ import java.util.List;
 import org.junit.Test;
 import org.unitils.spring.annotation.SpringBeanByName;
 
-public class SequenceStyleJdbcBehaviorEventPersisterTest extends JdbcEventTestCase {
+public class UuidJdbcBehaviorEventPersisterTest extends JdbcEventTestCase {
 
 	@SpringBeanByName
-	private SequenceStyleJdbcBehaviorEventPersisterImpl sequenceJdbcPersistenceManager;
+	private UuidJdbcBehaviorEventPersisterImpl uuidJdbcPersistenceManager;
 
-	public SequenceStyleJdbcBehaviorEventPersisterTest() {
-		super("sequence");
+	public UuidJdbcBehaviorEventPersisterTest() {
+		super("uuid");
 	}
 
 	@Test
 	public void testEmptyQueue() throws SQLException {
-		sequenceJdbcPersistenceManager.persist(new LinkedList<BehaviorEvent>());
+		uuidJdbcPersistenceManager.persist(new LinkedList<BehaviorEvent>());
 		
 		ResultSet rs = stmt.executeQuery("select count(*) from BEHAVIOR_TRACKING_EVENT");
 		assertTrue(rs.next());
@@ -61,8 +61,17 @@ public class SequenceStyleJdbcBehaviorEventPersisterTest extends JdbcEventTestCa
 			createEvent(null, 1, 3, 3, counter, events);
 		LinkedList<BehaviorEvent> queue = new LinkedList<BehaviorEvent>(events);
 
-		sequenceJdbcPersistenceManager.persist(queue);
+		uuidJdbcPersistenceManager.persist(queue);
 		assertEquals("queue unmodified by persistence operation", 39, queue.size());
+
+		// DEBUG
+		// this.dumpDBUnitFlatXmlDataSet(new File("uuid-before.xml"));
+
+		// use the sequence-style dbunit check, so modify the table so as to match the expected result
+		this.runResourceScript("alter/alter-uuid-to-seq-style.sql");
+
+		// DEBUG
+		// this.dumpDBUnitFlatXmlDataSet(new File("uuid-after.xml"));
 
 		//use the dbunit API to do a full check of data contents.  we can't use simple
 		//annotations because we have to exclude variable date columns from comparison.
@@ -81,13 +90,15 @@ public class SequenceStyleJdbcBehaviorEventPersisterTest extends JdbcEventTestCa
 	 */
 	private void verifyEvent(BehaviorEvent event) throws SQLException {
 		assertNotNull("event was persisted", event.getId());
-		ResultSet data = getEventData(event.getId());
+		Long eventId = getEventId(event.getId().toString());
+		ResultSet data = getEventData(eventId);
 
 		if (event.getParent() == null) {
 			assertEquals(0, data.getLong("PARENT_EVENT_ID"));
 			assertTrue("no parent for event " + event.getId(), data.wasNull());
 		} else {
-			assertEquals(event.getParent().getId(), data.getLong("PARENT_EVENT_ID"));
+			Long parentId = data.getLong("PARENT_EVENT_ID");
+			assertEquals(event.getParent().getId().toString(), getEventUuid(parentId));
 		}
 		assertEquals(event.getType(), data.getString("EVENT_TYPE"));
 		assertEquals(event.getName(), data.getString("EVENT_NAME"));
@@ -102,16 +113,30 @@ public class SequenceStyleJdbcBehaviorEventPersisterTest extends JdbcEventTestCa
 
 		long total = event.getDurationNs();
 			
-		ResultSet rs = stmt.executeQuery("select sum(duration_ns) from BEHAVIOR_TRACKING_EVENT where PARENT_EVENT_ID = " + event.getId());
+		ResultSet rs = stmt.executeQuery("select sum(duration_ns) from BEHAVIOR_TRACKING_EVENT where PARENT_EVENT_ID = " + eventId);
 		assertTrue(rs.next());
 		long childTotal = rs.getLong(1);
 		assertTrue("child duration is less than parent event duration", childTotal <= total);
 	}
 
-	private ResultSet getEventData(Serializable id) throws SQLException {
+	private ResultSet getEventData(Long id) throws SQLException {
 		ResultSet ret = stmt.executeQuery("select * from BEHAVIOR_TRACKING_EVENT where EVENT_ID = " + id);
 		assertTrue("found event with id " + id, ret.next());
 		return ret;
+	}
+
+	private Long getEventId(String uuid) throws SQLException {
+		ResultSet idRet = stmt.executeQuery("select ID from TMP_CONVERSION_ID where EVENT_UUID = '" + uuid + '\'');
+		assertTrue("found event id with uuid " + uuid, idRet.next());
+		Long id = idRet.getLong("ID");
+		return id;
+	}
+
+	private String getEventUuid(Long id) throws SQLException {
+		ResultSet idRet = stmt.executeQuery("select EVENT_UUID from TMP_CONVERSION_ID where ID = " + id);
+		assertTrue("found event uuid with id " + id, idRet.next());
+		String uuid = idRet.getString("EVENT_UUID");
+		return uuid;
 	}
 
 	/**
@@ -145,7 +170,8 @@ public class SequenceStyleJdbcBehaviorEventPersisterTest extends JdbcEventTestCa
 		ret.start();
 		
 		//give the events some duration to make things more interesting.
-		Thread.sleep((long)(Math.random() * 25));
+		// adds a minimal wait because this unit test cannot support two events with the same eventStart + the TSC on my machine sucks 
+		Thread.sleep((long)(Math.random() * 25) + 40);
 		
 		//even numbered events have an error.
 		if ( (index % 2) == 0 )

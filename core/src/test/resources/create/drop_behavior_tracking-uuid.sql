@@ -1,0 +1,1 @@
+drop table BEHAVIOR_TRACKING_EVENT;

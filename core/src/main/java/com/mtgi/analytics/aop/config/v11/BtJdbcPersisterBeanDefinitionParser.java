@@ -25,6 +25,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import com.mtgi.analytics.SequenceStyleJdbcBehaviorEventPersisterImpl;
+import com.mtgi.analytics.UuidJdbcBehaviorEventPersisterImpl;
 import com.mtgi.util.BeanDefinitionReaderUtilsWrapper;
 
 /** 
@@ -74,7 +75,16 @@ public class BtJdbcPersisterBeanDefinitionParser extends AbstractSingleBeanDefin
 
 	@Override
 	protected Class<?> getBeanClass(Element element) {
-		return SequenceStyleJdbcBehaviorEventPersisterImpl.class;
+		String dialect = element.hasAttribute("dialect") ? element.getAttribute("dialect") : "sequence";
+		if ("sequence".equals(dialect)) {
+			return SequenceStyleJdbcBehaviorEventPersisterImpl.class;
+
+		} else if ("uuid".equals(dialect))  {
+			return UuidJdbcBehaviorEventPersisterImpl.class;
+
+		} else {
+			throw new IllegalArgumentException("Incorrect dialect: " + dialect);
+		}
 	}
 
 	@Override

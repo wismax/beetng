@@ -1,3 +1,4 @@
+-- use with <jdbc-persister dialect="sequence" />
 create sequence SEQ_BEHAVIOR_TRACKING_EVENT increment by 25;
 create table BEHAVIOR_TRACKING_EVENT (
 	EVENT_ID 		NUMERIC(10)		PRIMARY KEY,

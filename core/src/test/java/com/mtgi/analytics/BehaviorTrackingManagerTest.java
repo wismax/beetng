@@ -27,6 +27,7 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.unitils.spring.annotation.SpringBeanByName;
 import org.unitils.spring.annotation.SpringBeanByType;
 
 public class BehaviorTrackingManagerTest extends JdbcEventTestCase {
@@ -37,8 +38,8 @@ public class BehaviorTrackingManagerTest extends JdbcEventTestCase {
 	private MockSessionContext sessionContext;
 	@SpringBeanByType
 	private BehaviorTrackingManagerImpl manager;
-	@SpringBeanByType
-	private BehaviorEventPersister persister;
+	@SpringBeanByName
+	private BehaviorEventPersister sequenceJdbcPersistenceManager;
 	
 	@After
 	public void waitForQueue() throws InterruptedException {
@@ -158,7 +159,7 @@ public class BehaviorTrackingManagerTest extends JdbcEventTestCase {
 		BehaviorTrackingManagerImpl impl = new BehaviorTrackingManagerImpl();
 		impl.setApplication(manager.getApplication());
 		impl.setExecutor(executor);
-		impl.setPersister(persister);
+		impl.setPersister(sequenceJdbcPersistenceManager);
 		impl.setFlushThreshold(5);
 		impl.afterPropertiesSet();
 		
@@ -461,7 +462,7 @@ public class BehaviorTrackingManagerTest extends JdbcEventTestCase {
 		BehaviorTrackingManagerImpl impl = new BehaviorTrackingManagerImpl();
 		impl.setExecutor(ste);
 		impl.setApplication(manager.getApplication());
-		impl.setPersister(persister);
+		impl.setPersister(sequenceJdbcPersistenceManager);
 		impl.setFlushThreshold(2);
 		impl.afterPropertiesSet();
 		
