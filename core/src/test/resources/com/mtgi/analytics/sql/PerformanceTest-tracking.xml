@@ -2,10 +2,10 @@
 
 <beans xmlns="http://www.springframework.org/schema/beans"
      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-     xmlns:bt="http://beet.sourceforge.net/schema/bt/1.1"
+     xmlns:bt="http://beet.sourceforge.net/schema/bt/1.2"
      xsi:schemaLocation="
 	     http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
-	     http://beet.sourceforge.net/schema/bt/1.1 com/mtgi/analytics/aop/mtgi-bt-1.1.xsd">
+	     http://beet.sourceforge.net/schema/bt/1.2 com/mtgi/analytics/aop/mtgi-bt-1.2.xsd">
 
 	<!-- used to measure affects of behavior tracking.  target is defined in PerformanceTest-basis.xml. -->
 	<bean id="instrumentedDataSource" class="com.mtgi.analytics.sql.BehaviorTrackingDataSource">
