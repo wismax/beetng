@@ -18,6 +18,7 @@ import static org.junit.Assert.*;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
@@ -82,7 +83,7 @@ public class XmlPersisterConfigurationTest {
 		List<String> triggers = Arrays.asList(testScheduler.getTriggerNames("beet"));
 		assertEquals("flush and rotate jobs scheduled in application scheduler", 2, triggers.size());
 		assertTrue("flush job scheduled", triggers.contains("xmlTracking_flush_trigger"));
-		assertTrue("rotate job scheduled", triggers.contains("org.springframework.scheduling.quartz.CronTriggerBean_rotate_trigger"));
+		assertTrue("rotate job scheduled", containsRegex(triggers, "org.springframework.scheduling.quartz.CronTriggerBean(#\\d+)?_rotate_trigger"));
 
 		SchedulerFactory factory = new StdSchedulerFactory();
 		assertEquals("private scheduler was not created", 1, factory.getAllSchedulers().size());
@@ -96,5 +97,15 @@ public class XmlPersisterConfigurationTest {
         
         assertEquals(persister.getFileSize(), server.getAttribute(logName, "FileSize"));
 	}
-	
+
+	private static boolean containsRegex(List<String> strings, String regex) {
+		Pattern pattern = Pattern.compile(regex);
+		for (String currString : strings) {
+			if (pattern.matcher(currString).matches())
+				return true;
+		}
+
+		return false;
+	}
+
 }
