@@ -119,7 +119,7 @@ public class StatisticsMBeanEventPersisterTest {
 			if (actual < count)
 				Thread.sleep(10);
 		} while (actual < count && (System.currentTimeMillis() - start) < 300000);
-		assertEquals("events received for " + id, actual, count);
+		assertEquals("events received for " + id, count, actual);
 	}
 	
 	private int countRecords() throws SQLException {
