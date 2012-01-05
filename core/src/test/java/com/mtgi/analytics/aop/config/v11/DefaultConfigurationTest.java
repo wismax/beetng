@@ -13,13 +13,18 @@
  
 package com.mtgi.analytics.aop.config.v11;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import org.junit.AfterClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.quartz.Scheduler;
@@ -36,6 +41,7 @@ import com.mtgi.analytics.BehaviorTrackingManagerImpl;
 import com.mtgi.analytics.JAASSessionContext;
 import com.mtgi.analytics.SessionContext;
 import com.mtgi.analytics.XmlBehaviorEventPersisterImpl;
+import com.mtgi.test.util.IOUtils;
 
 @SpringApplicationContext("com/mtgi/analytics/aop/config/v11/DefaultConfigurationTest-applicationContext.xml")
 @RunWith(UnitilsJUnit4TestClassRunner.class)
@@ -52,6 +58,11 @@ public class DefaultConfigurationTest {
 
 	@SpringApplicationContext
 	private ConfigurableApplicationContext spring;
+	
+	@AfterClass
+    public static void deletePersisterFiles() {
+	    IOUtils.deleteAllFilesStartingWith(new File("."), "beet.bxml.gz");
+	}
 
 	@Test
 	public void testDefaultConfiguration() throws Exception {
@@ -63,7 +74,7 @@ public class DefaultConfigurationTest {
 		XmlBehaviorEventPersisterImpl persister = (XmlBehaviorEventPersisterImpl)defaultTrackingManager.getPersister();
 		assertTrue(persister.isBinary());
 		assertTrue(persister.isCompress());
-		assertTrue("default file name [" + persister.getFile() + "]", new File(persister.getFile()).getName().startsWith("beet"));
+        assertTrue("default file name [" + persister.getFile() + "]", new File(persister.getFile()).getName().startsWith("beet"));
 
 		//verify proper configuration of log flush and rotation using private task executor and scheduler instances
 		TaskExecutor executor = defaultTrackingManager.getExecutor();

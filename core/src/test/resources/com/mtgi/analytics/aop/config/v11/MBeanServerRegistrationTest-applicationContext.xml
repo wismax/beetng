@@ -6,10 +6,12 @@
 	   		http://www.springframework.org/schema/beans		http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
 			http://beet.sourceforge.net/schema/bt/1.1			http://beet.sourceforge.net/schema/bt/mtgi-bt-1.1.xsd">
 
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" />
+
 	<bt:config>
 		<bt:manager id="manager1" application="testApp" register-mbeans="true" mbean-server="firstServer">
 			<bt:persister-chain>
-				<bt:xml-persister/>
+				<bt:xml-persister file="${java.io.tmpdir}/mbean-tracking.xml"/>
 				<bt:mbean-persister/>
 			</bt:persister-chain>
 		</bt:manager>

@@ -13,13 +13,17 @@
  
 package com.mtgi.analytics.aop.config.v11;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import org.junit.AfterClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.quartz.Scheduler;
@@ -34,6 +38,7 @@ import org.unitils.spring.annotation.SpringBeanByName;
 import com.mtgi.analytics.BehaviorTrackingManagerImpl;
 import com.mtgi.analytics.SessionContext;
 import com.mtgi.analytics.XmlBehaviorEventPersisterImpl;
+import com.mtgi.test.util.IOUtils;
 
 @SpringApplicationContext("com/mtgi/analytics/aop/config/v11/SessionContextConfigurationTest-applicationContext.xml")
 @RunWith(UnitilsJUnit4TestClassRunner.class)
@@ -44,6 +49,11 @@ public class SessionContextConfigurationTest {
 	
 	@SpringBeanByName
 	private TestBean testBean;
+
+    @AfterClass
+    public static void deletePersisterFiles() {
+        IOUtils.deleteAllFilesStartingWith(new File("."), "beet.bxml.gz");
+    }
 
 	@Test
 	public void testConfiguration() throws Exception {

@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,6 +39,7 @@ import com.mtgi.analytics.BehaviorTrackingManagerImpl;
 import com.mtgi.analytics.SessionContext;
 import com.mtgi.analytics.XmlBehaviorEventPersisterImpl;
 import com.mtgi.analytics.servlet.SpringSessionContext;
+import com.mtgi.test.util.IOUtils;
 
 @RunWith(UnitilsJUnit4TestClassRunner.class)
 public class WebContextConfigurationTest {
@@ -46,8 +48,13 @@ public class WebContextConfigurationTest {
 	private BehaviorTrackingManagerImpl defaultTrackingManager;
 	private Scheduler testScheduler;
 	private ConfigurableWebApplicationContext spring;
-
-	@Before
+	
+    @AfterClass
+    public static void deletePersisterFiles() {
+        IOUtils.deleteAllFilesStartingWith(new File("."), "beet.bxml.gz");
+    }
+	
+    @Before
 	public void setUp() {
 		//we shirk the usual Unitils spring initialization for us, so that we can select a non-default
 		//spring application context.  The web context should switch the default initialization behavior
