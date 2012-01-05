@@ -13,6 +13,7 @@
  
 package com.mtgi.analytics.aop;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.mtgi.analytics.aop.BehaviorAdviceTest.ServiceA;
@@ -46,6 +47,7 @@ public class PerformanceTest extends AbstractPerformanceTestCase {
 	}
 	
 	@Test
+	@Ignore
 	public void testPerformance() throws Throwable {
 		TestJob basisJob = new TestJob(BASIS_CONFIG);
 		TestJob testJob = new TestJob(TEST_CONFIG);

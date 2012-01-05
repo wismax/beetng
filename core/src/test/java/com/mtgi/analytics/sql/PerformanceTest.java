@@ -20,6 +20,7 @@ import java.sql.Statement;
 
 import javax.sql.DataSource;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.mtgi.analytics.test.AbstractPerformanceTestCase;
@@ -51,6 +52,7 @@ public class PerformanceTest extends AbstractPerformanceTestCase {
 	}
 	
 	@Test
+    @Ignore
 	public void testPerformance() throws Throwable {
 		TestJob basisJob = new TestJob("dataSource", BASIS_CONFIG);
 		TestJob testJob = new TestJob("instrumentedDataSource", TEST_CONFIG);

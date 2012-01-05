@@ -36,6 +36,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.httpclient.NameValuePair;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.gargoylesoftware.htmlunit.FormEncodingType;
@@ -67,6 +68,7 @@ public class PerformanceTest extends AbstractPerformanceTestCase {
 	}
 	
 	@Test
+    @Ignore
 	public void testPerformance() throws Throwable {
 		TestJob basisJob = new TestJob("/basis", "com/mtgi/analytics/servlet/PerformanceTest-web.xml");
 		TestJob testJob = new TestJob("/test", "com/mtgi/analytics/servlet/PerformanceTest-web-instrumented.xml");
