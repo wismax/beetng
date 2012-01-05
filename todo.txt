@@ -1,9 +1,0 @@
-- move all modules to maven build
-- remove all eclipse, ivy and easyant files
-- split core codebase from spring dependencies
-- create a spring based integration
-- create dedicated module for web jee implementation
-- create dedicated modules for persisters implementations
-- create new module for visualvm realtime monitoring
-- add new statistics module
-- add support for servlet 3.0 api with automatic servlet configuration

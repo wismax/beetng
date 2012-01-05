@@ -10,6 +10,7 @@ As Beet seems no longer maintained by its original authors, this fork was starte
 * add JEE6 support
 * replace the Easyant build tool by a more standard Maven integration
 
+
 ===Original description===
 
 ''This is the original description of the tool, as extracted from the sourceforge website.''
@@ -31,3 +32,14 @@ Features
 * Record data as XML, compressed binary XML, directly to an RDBMS, or write your own storage
 * Flexible ETL and log manipulation tools for compressed binary XML
 * Low resource overhead, appropriate for production systems
+
+===Todo list===
+* move all modules to maven build
+* remove all eclipse, ivy and easyant files
+* split core codebase from spring dependencies
+* create a spring based integration
+* create dedicated module for web jee implementation
+* create dedicated modules for persisters implementations
+* create new module for visualvm realtime monitoring
+* add new statistics module
+* add support for servlet 3.0 api with automatic servlet configuration
