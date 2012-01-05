@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+    
+    <parent>
+        <groupId>org.beet</groupId>
+        <artifactId>beet</artifactId>
+        <version>2.0.0-SNAPSHOT</version>
+    </parent>
+    
+    <artifactId>beet-test</artifactId>
+    <description>
+        Unit testing utilities developed as a corollary of the beet project.
+    </description>
+    
+    <dependencies>        
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>${dependencies.spring.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>catalina</artifactId>
+            <version>${dependencies.tomcat.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>coyote</artifactId>
+            <version>${dependencies.tomcat.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>jasper</artifactId>
+            <version>${dependencies.tomcat.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>jsp-api</artifactId>
+            <version>${dependencies.tomcat.version}</version>
+        </dependency>
+                
+        <dependency>
+            <groupId>org.unitils</groupId>
+            <artifactId>unitils</artifactId>
+            <version>2.3</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.4</version>
+            <scope>test</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>net.sourceforge.htmlunit</groupId>
+            <artifactId>htmlunit</artifactId>
+            <version>2.1</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    
+    <properties>
+        <dependencies.spring.version>2.0.8</dependencies.spring.version>
+        <dependencies.tomcat.version>6.0.18</dependencies.tomcat.version>
+    </properties>
+</project>

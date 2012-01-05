@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    
+    <modelVersion>4.0.0</modelVersion>
+    
+    <groupId>org.beet</groupId>
+    <artifactId>beet</artifactId>
+    <version>2.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    
+    <modules>
+        <module>test</module>
+        <module>core</module>
+    </modules>
+    
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>2.3.2</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-release-plugin</artifactId>
+                    <version>2.2.2</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>2.5</version>
+                </plugin>
+                <!--
+                <plugin>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>2.1.2</version>
+                </plugin>
+                -->
+            </plugins>
+        </pluginManagement>
+
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>
+            <!--
+            <plugin>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            -->
+        </plugins>
+    </build>
+
+    <developers>
+        <developer>
+            <id>tormp</id>
+            <name>Jason Trump</name>
+            <roles>
+                <role>Original Project Founder</role>
+                <role>Developer</role>
+            </roles>
+        </developer>
+        
+        <developer>
+            <id>wismax</id>
+            <name>Frédéric Chopard</name>
+            <email>frederic.chopard at minifig.ch</email>
+            <roles>
+                <role>Developer</role>
+            </roles>
+            <timezone>+1</timezone>
+        </developer>
+    </developers>
+
+    <licenses>
+        <license>
+            <name>Mozilla Public License, version 1.1</name>
+            <url>http://www.mozilla.org/MPL/MPL-1.1.html</url>
+            <comments>            
+            <![CDATA[
+            Copyright 2008-2009 the original author or authors.
+            The contents of this file are subject to the Mozilla Public License
+            Version 1.1 (the "License"); you may not use this file except in
+            compliance with the License. You may obtain a copy of the License at
+            http://www.mozilla.org/MPL/
+
+            Software distributed under the License is distributed on an "AS IS"
+            basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+            License for the specific language governing rights and limitations
+            under the License.
+            ]]>
+            </comments>
+        </license>
+    </licenses>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+</project>
