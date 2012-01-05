@@ -60,9 +60,9 @@ public abstract class AbstractPerformanceTestCase {
 	protected AbstractPerformanceTestCase(int testThreads, int testLoop, long expectedBasis, long averageOverhead, long maxOverhead) {
 		this.testThreads = testThreads;
 		this.testLoop = testLoop;
+		this.expectedBasis = expectedBasis;
 		this.averageOverhead = averageOverhead;
 		this.maxOverhead = maxOverhead;
-		this.expectedBasis = expectedBasis;
 	}
 	
 	protected void testPerformance(TestCase basisJob, TestCase testJob) throws Throwable {
@@ -70,7 +70,10 @@ public abstract class AbstractPerformanceTestCase {
 		//cache serialized form to save time on repeated test iterations
 		byte[] controlData = serializeJob(new TestProcess(testThreads, testLoop, basisJob));
 		byte[] testData = serializeJob(new TestProcess(testThreads, testLoop, testJob));
-		StatisticsMBean controlStats = new StatisticsMBean(),  testStats = new StatisticsMBean();
+		StatisticsMBean controlStats = new StatisticsMBean();
+		controlStats.setUnits("nanoseconds");
+		StatisticsMBean testStats = new StatisticsMBean();
+		testStats.setUnits("nanoseconds");
 		
 		ServerSocket listener = new ServerSocket(0);
 		try {
@@ -105,7 +108,7 @@ public abstract class AbstractPerformanceTestCase {
 		}
 			
 		double basisNanos = controlStats.getAverageTime();
-		double cpuCoefficient = basisNanos / expectedBasis;
+		double cpuCoefficient = basisNanos / (double) expectedBasis;
 		
 		double expectedAverage = cpuCoefficient * averageOverhead;
 		double expectedMax = cpuCoefficient * maxOverhead;
@@ -113,6 +116,7 @@ public abstract class AbstractPerformanceTestCase {
 		System.out.println("control:\n" + controlStats);
 		System.out.println("test:\n" + testStats);
 		System.out.println("CPU Coefficient: " + cpuCoefficient);
+		System.out.println("basisNanos: " + basisNanos);
 		
 		//compute the overhead as the difference between instrumented and uninstrumented
 		//runs.  we want the per-event overhead to be less than .5 ms.
@@ -120,7 +124,9 @@ public abstract class AbstractPerformanceTestCase {
 		//deltaWorst, my favorite sausage.  mmmmmm, dellltttaaaWwwwooorrsstt.
 		double deltaWorst = testStats.getMaxTime() - controlStats.getMaxTime();
 
+		System.out.println("Maximum expected average overhead: " + expectedAverage);
 		System.out.println("Average overhead: " + delta);
+		System.out.println("Maximum expected worst case overhead: " + expectedMax);
 		System.out.println("Worst case overhead: " + deltaWorst);
 		
 		assertTrue("Average overhead per method cannot exceed " + expectedAverage + "ns [ " + delta + " ]",
