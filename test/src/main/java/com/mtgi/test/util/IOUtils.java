@@ -2,6 +2,7 @@ package com.mtgi.test.util;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -34,6 +35,21 @@ public abstract class IOUtils {
 		
 		if (dir.exists() && !dir.delete())
 			throw new IOException("Unable to delete " + dir.getAbsolutePath());
+	}
+	
+	/**
+	 * Delete all files in dir whose name start with with the provided namePrefix.
+	 */
+	public static void deleteAllFilesStartingWith(final File dir, final String namePrefix) {
+	    File[] files = dir.listFiles(new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                return name.equals(namePrefix) || name.startsWith(namePrefix);
+            }
+        });
+	    
+	    for (File file : files) {
+            file.delete();
+        }
 	}
 
 	/**
