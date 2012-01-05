@@ -15,6 +15,7 @@ package com.mtgi.analytics.servlet;
 
 import static org.junit.Assert.*;
 import static com.mtgi.test.unitils.tomcat.EmbeddedTomcatManager.getDeployableResource;
+import static com.mtgi.test.util.IOUtils.createTempDir;
 import static java.util.Arrays.asList;
 
 import java.io.File;
@@ -45,6 +46,8 @@ import com.gargoylesoftware.htmlunit.WebRequestSettings;
 import com.mtgi.analytics.test.AbstractPerformanceTestCase;
 import com.mtgi.analytics.test.InstrumentedTestCase;
 import com.mtgi.test.unitils.tomcat.EmbeddedTomcatServer;
+import com.mtgi.test.unitils.tomcat.v6_0.EmbeddedTomcatServerImpl;
+import com.mtgi.test.util.IOUtils;
 
 /**
  * Performs some timed tests to verify that behavior tracking doesn't
@@ -109,6 +112,7 @@ public class PerformanceTest extends AbstractPerformanceTestCase {
 
 		private String deploymentDir;
 		private String contextPath;
+		private File tomcatHomeDir;
 
 		private transient URL url;
 		private transient EmbeddedTomcatServer tomcat;
@@ -119,20 +123,21 @@ public class PerformanceTest extends AbstractPerformanceTestCase {
 		private transient NameValuePair countParam;
 		private transient Long runtime;
 		
-		public TestJob(String contextPath, String deploymentDir) throws MalformedURLException {
+		public TestJob(String contextPath, String deploymentDir) throws MalformedURLException, IOException {
 			this.contextPath = contextPath;
 			this.deploymentDir = deploymentDir;
+			this.tomcatHomeDir = createTempDir("ServletPerformanceTest_" + contextPath.substring(1));
 		}
 
 		public void setUp() throws Exception {
-			url = new URL("http://localhost:8888" + contextPath + "/ping");
-			
 			//startup embedded tomcat server with test application
-			File dir = getDeployableResource(deploymentDir);
+			tomcat = new EmbeddedTomcatServerImpl(tomcatHomeDir, false);
+			File dir = getDeployableResource(deploymentDir);			
 			tomcat.deployDescriptor(contextPath, dir);
 			tomcat.start();
 
 			//configure client to send ping requests to server
+			url = new URL("http://localhost:" + tomcat.getHttpPort() + contextPath + "/ping");
 			webClient = new WebClient();
 			webClient.setJavaScriptEnabled(false);
 			request = new WebRequestSettings(url);
@@ -151,8 +156,10 @@ public class PerformanceTest extends AbstractPerformanceTestCase {
 		public void tearDown() throws Exception {
 			try {
 				tomcat.destroy();
+				IOUtils.delete(tomcatHomeDir);
 			} finally {
 				tomcat = null;
+				tomcatHomeDir = null;
 				url = null;
 				webClient = null;
 				request = null;
