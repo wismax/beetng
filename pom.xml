@@ -13,6 +13,7 @@
         <module>test</module>
         <module>core</module>
         <module>utils</module>
+        <module>integration/spring-security</module>
     </modules>
     
     <build>
