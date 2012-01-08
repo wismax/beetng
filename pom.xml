@@ -15,6 +15,7 @@
         <module>utils</module>
         <module>integration/spring-security</module>
         <module>integration/spring-webmvc</module>
+        <module>integration/web</module>
     </modules>
     
     <build>
