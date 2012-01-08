@@ -11,11 +11,11 @@
 
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" />
 
-	<bt:config>
-	  <bt:manager application="testApp" 
-	  			  track-method-expression="execution(* com.mtgi.analytics.integration..*Tracked(..))"/>
+    <bt:manager application="testApp" 
+  			  track-method-expression="execution(* com.mtgi.analytics.integration..*Tracked(..))">
+        <bt:custom-persister class="com.mtgi.analytics.integration.SpringSecurityIntegrationTest$TestPersister"/>
+    </bt:manager>
                   
-	</bt:config>
 	
 	<security:authentication-provider user-service-ref="mockUserService"/>
 	
