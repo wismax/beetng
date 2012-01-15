@@ -38,7 +38,7 @@ import com.mtgi.test.unitils.tomcat.EmbeddedTomcatServer;
 import com.mtgi.test.unitils.tomcat.annotations.EmbeddedTomcat;
 
 @RunWith(UnitilsJUnit4TestClassRunner.class)
-public class WebIntegrationTest {
+public class WebIT {
 
 	@EmbeddedTomcat
 	private EmbeddedTomcatServer server;
@@ -65,7 +65,7 @@ public class WebIntegrationTest {
 
 		//create exploded deployment dir, including the beet-web module in WEB-INF/lib
 		appDir = createTempDir("webIntegrationTest");
-		File src = getDeployableResource(WebIntegrationTest.class, "webIntegrationTest");
+		File src = getDeployableResource(WebIT.class, "webIntegrationTest");
 		copyDirectory(src, appDir);
 
 		File libDir = new File(appDir, "WEB-INF/lib");

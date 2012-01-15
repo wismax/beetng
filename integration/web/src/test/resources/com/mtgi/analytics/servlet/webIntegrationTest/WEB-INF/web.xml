@@ -12,7 +12,7 @@
 	<!-- a trivial servlet that helps us verify behavior tracking of http requests -->	
 	<servlet>
 		<servlet-name>test</servlet-name>
-		<servlet-class>com.mtgi.analytics.servlet.WebIntegrationTest$TestServlet</servlet-class>
+		<servlet-class>com.mtgi.analytics.servlet.WebIT$TestServlet</servlet-class>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 
