@@ -10,6 +10,7 @@ import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.copyDirecto
 import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.copyFileToDirectory;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -48,7 +49,14 @@ public class WebIntegrationTest {
 	public void setUp() throws Exception {
 		
 		//locate beet-web archive
-		File library = new File("target/artifacts", "beet-web.jar");
+	    File targetDir = new File("target");
+	    File[] jars = targetDir.listFiles(new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                return name.startsWith("beet-web-") && name.endsWith(".jar");
+            }
+        });
+	    assertEquals("one beet-web-*.jar file found in target directory", 1, jars.length);
+		File library = jars[0];
 		assertTrue("found beet-web archive in local build directory " + library.getAbsolutePath(), library.isFile());
 
 		//install test class loader to filter out global beet configuration files, simulating the situation
