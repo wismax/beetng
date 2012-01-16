@@ -32,10 +32,10 @@ import org.apache.commons.logging.LogFactory;
  * in {@link #getData()}.  Generally the structure of the event data and
  * the meaning of the {@link #getName()} should depend on the {@link #getType() type}.
  * BehaviorEvents may be composed of smaller child events, which themselves
- * may be composed of child events, and so on; an event's children are
- * accessed with {@link #getChildren()}.
+ * may be composed of child events, and so on; an event's parent is
+ * accessed with {@link #getParent()}.
  * 
- * @see BehaviorEventManager
+ * @see BehaviorTrackingManager
  */
 public class BehaviorEvent implements Serializable {
 

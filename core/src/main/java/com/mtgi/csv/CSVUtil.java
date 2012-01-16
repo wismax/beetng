@@ -18,7 +18,7 @@ import java.io.IOException;
 public class CSVUtil {
 
 	/**
-	 * Calls {@link #quoteCSV(String, Appendable)} to construct a new
+	 * Calls {@link #quoteCSVInner(String, Appendable)} to construct a new
 	 * escaped string based on <code>str</code>.
 	 * @return the escaped string
 	 */
@@ -36,7 +36,7 @@ public class CSVUtil {
 	/**
 	 * Add double quotes around <code>str</code>, stuttering any internal
 	 * quotation marks in the manner expected by most CSV parsers.
-	 * @param str the input string, to be quoted.
+	 * @param value the input object, to be quoted.
 	 * @param escaped destination to which the escaped text is written
 	 * @return a reference to <code>escaped</code>, for syntactic convenience
 	 * @throws IOException if <code>escaped</code> raises errors while the data is being written.

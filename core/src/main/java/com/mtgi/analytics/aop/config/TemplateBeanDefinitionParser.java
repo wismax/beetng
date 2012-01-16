@@ -17,7 +17,6 @@ import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.parsing.CompositeComponentDefinition;
@@ -44,7 +43,8 @@ import org.w3c.dom.NodeList;
  * 
  * <p>Subclasses specify a classpath resource containing the template XML bean definitions in the constructor.
  * This is just a standard Spring XML application context configuration file.
- * Subclasses should then override {@link #transform(ConfigurableBeanFactory, BeanDefinition, Element, ParserContext)}
+ * 
+ * Subclasses should then override {@link #transform(ConfigurableListableBeanFactory, BeanDefinition, Element, ParserContext)}
  * to transform the template bean definition according to runtime values.</p>
  * 
  * <p>We also make use of {@link ChainingBeanFactoryPostProcessor} so that factory post-processing
@@ -76,10 +76,10 @@ public class TemplateBeanDefinitionParser extends AbstractSingleBeanDefinitionPa
 	 * to apply runtime configuration value to it.  <code>builder</code> will be configured to instantiate the bean
 	 * in the Spring context that we are parsing.</p>
 	 * 
-	 * <p>During parsing, an instance of {@link TemplateComponentDefinition} is pushed onto <code>ParserContext</code> so
+	 * <p>During parsing, an instance of {@link TemplateBeanDefinitionParser.TemplateComponentDefinition} is pushed onto <code>ParserContext</code> so
 	 * that nested tags can access the enclosing template configuration with a call to {@link #findEnclosingTemplateFactory(ParserContext)}.
 	 * Subclasses can override {@link #newComponentDefinition(String, Object, DefaultListableBeanFactory)} to provide a 
-	 * subclass of {@link TemplateComponentDefinition} to the parser context if necessary.</p>
+	 * subclass of {@link TemplateBeanDefinitionParser.TemplateComponentDefinition} to the parser context if necessary.</p>
 	 */
 	@Override
 	protected final void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
@@ -216,7 +216,7 @@ public class TemplateBeanDefinitionParser extends AbstractSingleBeanDefinitionPa
 	}
 
 	/** 
-	 * If the given parse operation is nested inside an instance of {@link TemplateComponentDefinition}, return
+	 * If the given parse operation is nested inside an instance of {@link TemplateBeanDefinitionParser.TemplateComponentDefinition}, return
 	 * the template bean configuration associated with that component.  Otherwise return null.
 	 */
 	public static DefaultListableBeanFactory findEnclosingTemplateFactory(ParserContext context) {

@@ -28,7 +28,7 @@ import com.mtgi.analytics.EventDataElement;
 /**
  * <p>Facilitates behavior tracking for servlet requests via calls to 
  * {@link #start(ServletRequest)} and {@link #stop(BehaviorEvent)}.  The relative
- * verbosity of event logging is configured in the {@link #ServletRequestBehaviorTrackingAdapter(String, BehaviorTrackingManager, String[]) constructor}.</p>
+ * verbosity of event logging is configured in the {@link #ServletRequestBehaviorTrackingAdapter(String, BehaviorTrackingManager, String[], String[], Pattern[]) constructor}.</p>
  * 
  * <p>This class abstracts the details of tracking servlet requests, so that
  * it can be reused by delegation in both listeners and filters.</p>

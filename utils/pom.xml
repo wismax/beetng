@@ -14,6 +14,10 @@
         Utilities for working with behavior tracking log files.        
     </description>
 
+    <properties>
+        <dependency.saxon.version>8.7</dependency.saxon.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -80,7 +84,27 @@
         </dependency>
     </dependencies>
 
-    <properties>
-        <dependency.saxon.version>8.7</dependency.saxon.version>
-    </properties>
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                
+                <configuration>
+                    <links>
+                        <link>http://static.springsource.org/spring/docs/2.0.x/api/</link>
+                    </links>
+                </configuration>
+
+                <executions>
+                    <execution>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>javadoc</goal>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>
