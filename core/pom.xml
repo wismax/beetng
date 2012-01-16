@@ -16,6 +16,11 @@
         designed for use with Spring-based applications.        
     </description>
 
+    <properties>
+        <dependency.spring.version>2.0.8</dependency.spring.version>
+        <dependency.aspectj.version>1.6.4</dependency.aspectj.version>
+    </properties>
+
     <dependencies>
         <!-- TODO remove this dependency from core -->
         <dependency>
@@ -223,8 +228,37 @@
         </dependency>
     </dependencies>
 
-    <properties>
-        <dependency.spring.version>2.0.8</dependency.spring.version>
-        <dependency.aspectj.version>1.6.4</dependency.aspectj.version>
-    </properties>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.agilejava.docbkx</groupId>
+                <artifactId>docbkx-maven-plugin</artifactId>
+                <version>2.0.13</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.docbook</groupId>
+                        <artifactId>docbook-xml</artifactId>
+                        <version>4.4</version>
+                        <scope>runtime</scope>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <includes>userguide/manual.xml</includes>
+                    <htmlStylesheet>css/stylesheet.css</htmlStylesheet>
+                    <tableBordersWithCss>true</tableBordersWithCss>
+                    <xincludeSupported>true</xincludeSupported>
+                    <chunkedOutput>true</chunkedOutput>
+                </configuration>
+
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>generate-html</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>
