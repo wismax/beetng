@@ -231,8 +231,19 @@
     <build>
         <plugins>
             <plugin>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                
                 <executions>
                     <execution>
                         <phase>verify</phase>
@@ -242,7 +253,8 @@
                         </goals>
                     </execution>
                 </executions>
-      </plugin>
+            </plugin>
+
             <plugin>
                 <groupId>com.agilejava.docbkx</groupId>
                 <artifactId>docbkx-maven-plugin</artifactId>
@@ -261,7 +273,6 @@
                     <xincludeSupported>true</xincludeSupported>
                     <chunkedOutput>true</chunkedOutput>
                 </configuration>
-
                 <executions>
                     <execution>
                         <phase>verify</phase>

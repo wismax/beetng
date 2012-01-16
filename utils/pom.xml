@@ -87,14 +87,24 @@
     <build>
         <plugins>
             <plugin>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            
+            <plugin>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                
                 <configuration>
                     <links>
                         <link>http://static.springsource.org/spring/docs/2.0.x/api/</link>
                     </links>
                 </configuration>
-
                 <executions>
                     <execution>
                         <phase>verify</phase>
