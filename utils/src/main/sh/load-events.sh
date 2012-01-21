@@ -51,20 +51,20 @@ echo "Start: " $(date)
 case "`uname`" in
 CYGWIN*)
 	TEMPFILE=`mktemp --tmpdir=.`
-	zcat "$2" | "$JAVA" -jar beet-utils.jar -tool csv > $TEMPFILE
+	zcat "$2" | "$JAVA" -jar dist/beet-utils-${project.version}.jar -tool csv > $TEMPFILE
 	sqlldr $1 control=sql/etl/load_event_csv.ctl,direct=true,silent=FEEDBACK,data="$TEMPFILE"
 	rm $TEMPFILE
 	;;
 
 SunOS*)
 	gzcat "$2" | 
-		"$JAVA" -jar beet-utils.jar -tool csv | 
+		"$JAVA" -jar beet-utils-${project.version}.jar -tool csv | 
 		sqlldr $1 control=sql/etl/load_event_csv.ctl,direct=true,silent=FEEDBACK
 	;;
 
 *)
 	zcat "$2" | 
-		"$JAVA" -jar beet-utils.jar -tool csv | 
+		"$JAVA" -jar beet-utils-${project.version}.jar -tool csv | 
 		sqlldr $1 control=sql/etl/load_event_csv.ctl,direct=true,silent=FEEDBACK
 	;;
 esac

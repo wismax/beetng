@@ -234,7 +234,7 @@
                 <artifactId>maven-source-plugin</artifactId>
                 <executions>
                     <execution>
-                        <phase>verify</phase>
+                        <phase>${build.distribution.bind.phase}</phase>
                         <goals>
                             <goal>jar-no-fork</goal>
                         </goals>
@@ -246,7 +246,7 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <executions>
                     <execution>
-                        <phase>verify</phase>
+                        <phase>${build.distribution.bind.phase}</phase>
                         <goals>
                             <goal>javadoc</goal>
                             <goal>jar</goal>
@@ -267,7 +267,7 @@
                     </dependency>
                 </dependencies>
                 <configuration>
-                    <includes>userguide/manual.xml</includes>
+                    <includes>reference/index.xml</includes>
                     <htmlStylesheet>css/stylesheet.css</htmlStylesheet>
                     <tableBordersWithCss>true</tableBordersWithCss>
                     <xincludeSupported>true</xincludeSupported>
@@ -275,9 +275,40 @@
                 </configuration>
                 <executions>
                     <execution>
-                        <phase>verify</phase>
+                        <phase>${build.distribution.bind.phase}</phase>
                         <goals>
                             <goal>generate-html</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>${build.distribution.bind.phase}</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/main/assembly/reference.xml</descriptor>
+                        <descriptor>src/main/assembly/scripts-sql.xml</descriptor>
+                        <descriptor>src/main/assembly/lib.xml</descriptor>
+                    </descriptors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>${build.distribution.bind.phase}</phase>
+                        <goals>
+                            <goal>single</goal>
                         </goals>
                     </execution>
                 </executions>

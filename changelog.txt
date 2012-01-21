@@ -1,3 +1,10 @@
+since 1.4.0_rc1
+
+  * project fork from sourceforge
+  
+  * migration of build system to maven (easyant is not widely use enough)
+  
+
 since 1.4.0_b3
 
  features:

@@ -8,7 +8,6 @@ As Beet seems no longer maintained by its original authors, this fork was starte
 * add tools to ease data analysis
 * implement a VisualVM integration
 * add JEE6 support
-* replace the Easyant build tool by a more standard Maven integration
 
 
 ===Original description===
@@ -36,6 +35,7 @@ Features
 ===Todo list===
 * move all modules to maven build
 * remove all eclipse, ivy and easyant files
+* create an abstraction on the logging library to remove mandatory dependency
 * split core codebase from spring dependencies
 * create a spring based integration
 * create dedicated module for web jee implementation
@@ -43,3 +43,4 @@ Features
 * create new module for visualvm realtime monitoring
 * add new statistics module
 * add support for servlet 3.0 api with automatic servlet configuration
+* refactor the suspend mode to reduce to the maximum the beet cpu usage (don't create event, don't convert method args, etc...)

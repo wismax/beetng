@@ -1,7 +1,7 @@
 Original Project Team:
 Jason Trump
 
-BeetNG Project Team (current):
+Beet Project Team (current):
 Frederic Chopard
 
 The following individuals have contributed code or other materials:
