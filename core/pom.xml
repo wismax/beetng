@@ -267,7 +267,7 @@
                     </dependency>
                 </dependencies>
                 <configuration>
-                    <includes>reference/index.xml</includes>
+                    <includes>**/index.xml</includes>
                     <htmlStylesheet>css/stylesheet.css</htmlStylesheet>
                     <tableBordersWithCss>true</tableBordersWithCss>
                     <xincludeSupported>true</xincludeSupported>
@@ -300,6 +300,7 @@
                 <configuration>
                     <descriptors>
                         <descriptor>src/main/assembly/reference.xml</descriptor>
+                        <descriptor>src/main/assembly/tutorial.xml</descriptor>
                         <descriptor>src/main/assembly/scripts-sql.xml</descriptor>
                         <descriptor>src/main/assembly/lib.xml</descriptor>
                     </descriptors>

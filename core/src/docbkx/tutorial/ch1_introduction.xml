@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter id="introduction">
+  <title>Introduction</title>
+
+    <para>This is a multi-part tutorial, which will take you
+    through:<orderedlist>
+        <listitem>Installing beet in an existing Spring web
+        application.</listitem>
+        <listitem>Administering beet from a JMX console</listitem>
+        <listitem>Processing beet logs with the beet-utils command line
+        package</listitem>
+      </orderedlist>
+	</para>
+
+    <para>For this tutorial we assume:
+	<orderedlist>
+        <listitem>You already have a working instance of the Java 6 SDK installed</listitem>
+        <listitem>You have administrative privileges on your system, such that you can install and run server software</listitem>
+        <listitem>You are familiar with Java-based web application development in general (Servlet 2.4 and up), and Spring-based applications in particular (Spring 2 and up).</listitem>
+        <listitem>You are comfortable with Java 5+ language features and SDK tools.</listitem>
+      </orderedlist>
+	</para>
+
+    <para>
+	The User Guide (available in any beet release package) contains full
+	instructions for configuring beet, with many options, details, and examples not covered here.  This document
+	will take you through the installation on a very simple application before you decide to dive in on your own.
+	</para>
+</chapter>

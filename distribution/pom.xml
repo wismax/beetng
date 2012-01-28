@@ -124,6 +124,15 @@
                                     <groupId>${project.groupId}</groupId>
                                     <artifactId>beet-core</artifactId>
                                     <version>${project.version}</version>
+                                    <classifier>tutorial</classifier>
+                                    <type>zip</type>
+                                    <outputDirectory>${project.build.directory}/deps/docs/beet-tutorial</outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>beet-core</artifactId>
+                                    <version>${project.version}</version>
                                     <classifier>javadoc</classifier>
                                     <type>jar</type>
                                     <outputDirectory>${project.build.directory}/deps/docs/javadoc-api/core</outputDirectory>
@@ -233,6 +242,26 @@
                             </artifactItems>
                         </configuration>
                     </execution>
+
+                    <execution>
+                        <id>copy-war</id>
+                        <phase>${build.distribution.bind.phase}</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>beet-hello</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>war</type>
+                                    <outputDirectory>${project.build.directory}/deps/examples</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                            <stripVersion>true</stripVersion>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
 
@@ -240,7 +269,7 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <inherited>false</inherited>
                 <configuration>
-                    <finalName>beet-${project.version}-dist.zip</finalName>
+                    <finalName>beet-${project.version}</finalName>
                     <descriptors>
                         <descriptor>src/main/assembly/distribution.xml</descriptor>
                     </descriptors>

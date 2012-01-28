@@ -35,6 +35,7 @@ Features
 ===Todo list===
 * move all modules to maven build
 * remove all eclipse, ivy and easyant files
+* add beet-hello.war to distribution
 * create an abstraction on the logging library to remove mandatory dependency
 * split core codebase from spring dependencies
 * create a spring based integration

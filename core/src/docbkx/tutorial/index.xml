@@ -1,0 +1,995 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<book>
+  <title>Beet 2.x Tutorial</title>
+
+  <bookinfo>
+    <authorgroup>
+      <author>
+        <firstname>Jason</firstname>
+
+        <surname>Trump</surname>
+
+        <contrib>Original author</contrib>
+      </author>
+
+      <author>
+        <firstname>Frédéric</firstname>
+
+        <surname>Chopard</surname>
+
+        <contrib>New project maintainer</contrib>
+      </author>
+    </authorgroup>
+
+    <date>24 January 2012</date>
+
+    <keywordset>
+      <keyword>behavior tracking</keyword>
+
+      <keyword>performance monitoring</keyword>
+
+      <keyword>java programming</keyword>
+
+      <keyword>behavior analytics</keyword>
+
+      <keyword>spring framework</keyword>
+    </keywordset>
+  </bookinfo>
+
+  <chapter id="introduction">
+    <title>Introduction</title>
+
+    <para>This is a multi-part tutorial, which will take you
+    through:<orderedlist>
+        <listitem>
+           Installing beet in an existing Spring web application. 
+        </listitem>
+
+        <listitem>
+           Administering beet from a JMX console 
+        </listitem>
+
+        <listitem>
+           Processing beet logs with the beet-utils command line package 
+        </listitem>
+      </orderedlist></para>
+
+    <para>For this tutorial we assume: <orderedlist>
+        <listitem>
+           You already have a working instance of the Java 6 SDK installed 
+        </listitem>
+
+        <listitem>
+           You have administrative privileges on your system, such that you can install and run server software 
+        </listitem>
+
+        <listitem>
+           You are familiar with Java-based web application development in general (Servlet 2.4 and up), and Spring-based applications in particular (Spring 2 and up). 
+        </listitem>
+
+        <listitem>
+           You are comfortable with Java 5+ language features and SDK tools. 
+        </listitem>
+      </orderedlist></para>
+
+    <para>The User Guide (available in any beet release package) contains full
+    instructions for configuring beet, with many options, details, and
+    examples not covered here. This document will take you through the
+    installation on a very simple application before you decide to dive in on
+    your own.</para>
+  </chapter>
+
+  <chapter>
+    <title>Tutorial Setup</title>
+
+    <para>Before we get to installing beet, we first need a target Spring
+    application. We have a simple 3-tier "hello-world" style web application
+    built on of the following components:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>JSP 2.0 pages for the view</para>
+      </listitem>
+
+      <listitem>
+        <para>Spring WebMVC 2.5.6 for the controller</para>
+      </listitem>
+
+      <listitem>
+        <para>Spring 2.5.6 for the middle tier</para>
+      </listitem>
+
+      <listitem>
+        <para>Hibernate 3.2 for data access</para>
+      </listitem>
+
+      <listitem>
+        <para>HSQLDB 1.8 for our in-memory SQL data store</para>
+      </listitem>
+    </itemizedlist>
+
+    <para>The tutorial involves installing this application in a clean Tomcat
+    6 server, verifying that it works, and then adding beet.</para>
+
+    <section>
+      <title>Install Tomcat 6</title>
+
+      <para>Tomcat 6 is available for download <ulink
+      url="http://tomcat.apache.org/download-60.cgi">here</ulink>. For the
+      purposes of this tutorial, all you need to do is download one of the
+      Tomcat archives (at time of this writing, apache-tomcat-6.0.18.zip or
+      .tar.gz) and unpack it. From here forward we'll refer to the directory
+      where you unpacked the archive as [TOMCAT].</para>
+
+      <para>To verify your installation, <emphasis role="bold">start the
+      server</emphasis> by executing [TOMCAT]/bin/startup.bat (Windows) or
+      [TOMCAT]/bin/startup.sh (*nix). Point your browser at <ulink
+      url="http://localhost:8080/">http://localhost:8080/</ulink> and you
+      should see a default index page for your server.</para>
+
+      <para><emphasis role="bold">Stop your server</emphasis> by executing
+      [TOMCAT]/bin/shutdown before proceeding.</para>
+    </section>
+
+    <section>
+      <title>Install the tutorial app</title>
+
+      <para>Get beet-hello.war from distribution. Copy it into the
+      [TOMCAT]/webapps directory. <emphasis role="bold">Start the Tomcat
+      server</emphasis>.</para>
+
+      <para>Verify the installation by pointing your browser at <ulink
+      url="http://localhost:8080/beet-hello">http://localhost:8080/beet-hello</ulink>.
+      You should see a page that looks like this:</para>
+
+      <mediaobject>
+        <imageobject>
+          <imagedata align="center"
+                     fileref="images/tutorial/beet-hello-new.png" format="PNG" />
+        </imageobject>
+
+        <textobject>
+          <para>Beet Hello World application</para>
+        </textobject>
+      </mediaobject>
+
+      <para>Take a minute to familiarize yourself with the app (there's only
+      one page):</para>
+
+      <orderedlist>
+        <listitem>
+          <para>Click the 'create' button to insert some data.</para>
+        </listitem>
+
+        <listitem>
+          <para>Click a few 'delete' buttons to remove some of the
+          rows.</para>
+        </listitem>
+
+        <listitem>
+          <para>Enter text into the two form fields at the bottom of the page,
+          and click the 'update' button.</para>
+        </listitem>
+
+        <listitem>
+          <para>Click the 'clear' button to clear all data.</para>
+        </listitem>
+      </orderedlist>
+
+      <para><emphasis role="bold">Stop the Tomcat server</emphasis> before
+      proceeding.</para>
+    </section>
+  </chapter>
+
+  <chapter>
+    <title>Install Beet</title>
+
+    <para>Installation is basically two steps: dropping in the libraries, and
+    minor edits to the Spring configuration. We'll break the latter part down
+    into very small steps for clarity.</para>
+
+    <para></para>
+
+    <section>
+      <title>Add beet and dependencies to the application's lib
+      directory</title>
+
+      <para>Download a beet release distribution. This tutorial requires
+      <emphasis role="bold">2.0</emphasis> or higher. Unpack the archive. This
+      will create a package directory called beet-[version]-dist/.</para>
+
+      <para>From the beet package directory, copy the file <emphasis
+      role="bold">beet-core.jar and all of the jars from lib/core</emphasis>
+      into the [TOMCAT]/webapps/beet-hello/WEB-INF/lib.</para>
+    </section>
+
+    <section>
+      <title>Activate HTTP request behavior tracking</title>
+
+      <para>Open the file
+      [TOMCAT]/webapps/beet-hello/WEB-INF/beet-hello-servlet.xml in your
+      favorite text or XML document editor. You should see something that
+      starts like this: <example>
+          <title></title>
+
+          <programlisting>&lt;beans xmlns="http://www.springframework.org/schema/beans" 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemalocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd"&gt;
+
+  &lt;!-- BEGIN APPLICATION LAYER BEANS --&gt;
+  &lt;bean class="org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor"&gt;&lt;/bean&gt;
+
+  &lt;!-- dao layer --&gt;
+  &lt;bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"&gt;
+
+  ... snip ... </programlisting>
+        </example></para>
+
+      <para>Add the highlighted code as below:</para>
+
+      <para><example>
+          <title></title>
+
+          <programlisting>&lt;beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  <emphasis role="bold">xmlns:bt="http://beet.sourceforge.net/schema/bt/1.1"</emphasis>
+  xsi:schemaLocation="
+    http://www.springframework.org/schema/beans  http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    <emphasis role="bold">http://beet.sourceforge.net/schema/bt/1.1 http://beet.sourceforge.net/schema/bt/mtgi-bt-1.1.xsd</emphasis>"&gt;
+
+  <emphasis role="bold">&lt;bt:manager application="beet-hello"&gt;
+    &lt;bt:http-requests parameters="command"/&gt;
+  &lt;/bt:manager&gt;</emphasis>
+
+  ... snip ...</programlisting>
+        </example></para>
+
+      <para>We've now configured HTTP request tracking. This wouldn't be
+      terribly useful in itself (you already get access logging with Tomcat),
+      so...</para>
+    </section>
+
+    <section>
+      <title>Activate Java Method call tracking</title>
+
+      <para>For this we just have to add the track-method-expression attribute
+      to bt:manager:<example>
+          <title></title>
+
+          <programlisting>&lt;beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:bt="http://beet.sourceforge.net/schema/bt/1.1"
+  xsi:schemaLocation="
+    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://beet.sourceforge.net/schema/bt/1.1 http://beet.sourceforge.net/schema/bt/mtgi-bt-1.1.xsd"&gt;
+
+  &lt;bt:manager application="beet-hello" 
+    <emphasis role="bold">  track-method-expression="execution(* com.mtgi.analytics.example.service..*(..))"</emphasis>&gt;
+    &lt;bt:http-requests parameters="command"/&gt;
+  &lt;/bt:manager&gt;
+
+  ... snip ...</programlisting>
+        </example></para>
+
+      <para>This expression identifies "all methods of all classes in the
+      com.mtgi.analytics.example.service package". So now for each HTTP
+      request, we'll know how much processing time was used executing methods
+      in this package. To get more detail,</para>
+    </section>
+
+    <section>
+      <title>Activate JDBC Statement tracking</title>
+
+      <para>We add the bt:tracking-manager attribute to any data source we
+      want to track:<example>
+          <title></title>
+
+          <programlisting>&lt;beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:bt="http://beet.sourceforge.net/schema/bt/1.1"
+  xsi:schemaLocation="
+    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://beet.sourceforge.net/schema/bt/1.1 http://beet.sourceforge.net/schema/bt/mtgi-bt-1.1.xsd"&gt;
+
+  &lt;bt:manager application="beet-hello" 
+      track-method-expression="execution(* com.mtgi.analytics.example.service..*(..))"&gt;
+    &lt;bt:http-requests parameters="command"/&gt;
+  &lt;/bt:manager&gt;
+      
+  &lt;!-- BEGIN APPLICATION LAYER BEANS --&gt;
+  &lt;bean class="org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor"/&gt;
+
+  &lt;!-- dao layer --&gt;
+  &lt;bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+      <emphasis role="bold">bt:tracking-manager="defaultTrackingManager"</emphasis>&gt;
+    &lt;property name="dataSourceName" value="helloData"/&gt;
+    &lt;property name="driverClass" value="org.hsqldb.jdbcDriver"/&gt;
+    &lt;property name="jdbcUrl" value="jdbc:hsqldb:mem:helloData"/&gt;
+    &lt;property name="maxPoolSize" value="2"/&gt;
+    &lt;property name="maxIdleTime" value="30"/&gt;
+  &lt;/bean&gt;
+  
+  ... snip ...</programlisting>
+        </example></para>
+
+      <para>In our application we are using a c3p0 connection-pooling
+      DataSource, but any implementation of javax.sql.DataSource can use the
+      bt:tracking-manager attribute.</para>
+
+      <para>At this point we've added the monitoring we want (HTTP, methods,
+      SQL), but we'll make a few final adjustments so that the log output is
+      easy to read:</para>
+    </section>
+
+    <section>
+      <title>Plain text logging in the [TOMCAT]/logs directory</title>
+
+      <para>The default binary log format is good for production, but for our
+      tutorial we'll switch to plain text XML logging, and put the log in a
+      sensible location relative to the Tomcat install.<example>
+          <title></title>
+
+          <programlisting>&lt;beans xmlns="http://www.springframework.org/schema/beans
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:bt="http://beet.sourceforge.net/schema/bt/1.1"
+  xsi:schemaLocation="
+    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://beet.sourceforge.net/schema/bt/1.1 http://beet.sourceforge.net/schema/bt/mtgi-bt-1.1.xsd"&gt;
+
+  <emphasis role="bold">&lt;bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/&gt;</emphasis>
+
+  &lt;bt:manager application="beet-hello" <emphasis role="bold">flush-schedule="0/30 * * * * ?"</emphasis>
+      track-method-expression="execution(* com.mtgi.analytics.example.service..*(..))"&gt;
+    <emphasis role="bold">&lt;bt:xml-persister binary="false" compress="false" file="${catalina.home}/logs/beet-hello-perf.xml"/&gt;</emphasis>
+    &lt;bt:http-requests parameters="command"/&gt;
+  &lt;/bt:manager&gt;
+
+  ... snip ...</programlisting>
+        </example></para>
+
+      <para>The Spring utility class <emphasis
+      role="bold">PropertyPlaceHolderConfigurer</emphasis> lets us use system
+      properties like ${catalina.home} to locate the Tomcat root
+      directory.</para>
+
+      <para>The <emphasis role="bold">flush-schedule</emphasis> attribute is a
+      cron expression that schedules beet log flushes every 30 seconds; the
+      default of 5 minutes is good for production but a little inconvenient
+      for our tutorial.</para>
+
+      <para>Finally, bt:xml-persister switches off binary XML and compression,
+      so our log will be plain old UTF8 XML, and specifies an easy-to-locate
+      log file location of [TOMCAT]/logs/beet-hello-perf.xml.</para>
+    </section>
+  </chapter>
+
+  <chapter>
+    <title>Examine the data</title>
+
+    <para><emphasis role="bold">Start your Tomcat server</emphasis> back up.
+    Wait about 30 seconds to 1 minute, and then open up
+    [TOMCAT]/logs/beet-hello-perf.xml. You should already see some data
+    (formatted here for legibility):<example>
+        <title></title>
+
+        <programlisting>&lt;event id="6dc8bd6c-c63c-4ecc-803c-9a1bc7dcf4c7"&gt;&lt;type&gt;jdbc&lt;/type&gt;&lt;name&gt;executeUpdate&lt;/name&gt;
+   &lt;application&gt;beet-hello&lt;/application&gt;&lt;start&gt;2009-04-23T12:40:03.547-07:00&lt;/start&gt;&lt;duration-ns&gt;0&lt;/duration-ns&gt;
+   &lt;event-data&gt;&lt;sql&gt;drop table HelloData if exists&lt;/sql&gt;&lt;/event-data&gt;
+&lt;/event&gt;
+&lt;event id="a3085baf-49a0-4a5b-90c1-d210e4524786"&gt;&lt;type&gt;jdbc&lt;/type&gt;&lt;name&gt;executeUpdate&lt;/name&gt;
+   &lt;application&gt;beet-hello&lt;/application&gt;&lt;start&gt;2009-04-23T12:40:03.547-07:00&lt;/start&gt;&lt;duration-ns&gt;0&lt;/duration-ns&gt;
+   &lt;event-data&gt;&lt;sql&gt;create table HelloData (id bigint generated by default as identity (start with 1), AField varchar(255), anotherField varchar(255), primary key (id))&lt;/sql&gt;&lt;/event-data&gt;
+&lt;/event&gt;</programlisting>
+      </example></para>
+
+    <para>We're using the Hibernate "schema create" feature to create our
+    backend database at system startup. Hibernate used the Spring dataSource
+    bean for data access, so those statements were logged.</para>
+
+    <para><emphasis role="bold">Point your browser again at </emphasis><ulink
+    url="http://localhost:8080/beet-hello"><emphasis
+    role="bold">http://localhost:8080/beet-hello</emphasis></ulink>. As
+    before, click 'create', delete some records, add some records. Wait at
+    least another 30 seconds, and revisit the beet log. It should have a host
+    of new data. Here's some data for a single press of the 'delete' button,
+    again formatted for legibility:<example>
+        <title></title>
+
+        <programlisting>&lt;event id="244f5f4e-21d0-4044-b71f-ba39bb96cfbd" parent-id="778e4a40-48a8-4386-b93c-72e322663a90"&gt;
+    &lt;type&gt;jdbc&lt;/type&gt;&lt;name&gt;executeBatch&lt;/name&gt;&lt;application&gt;beet-hello&lt;/application&gt;
+    &lt;start&gt;2009-04-23T13:50:37.625-07:00&lt;/start&gt;&lt;duration-ns&gt;0&lt;/duration-ns&gt;
+    &lt;session-id&gt;53FAB2406DB3CFAE8BD4201D6DD60D73&lt;/session-id&gt;
+    &lt;event-data&gt;&lt;sql&gt;delete from HelloData where id=?&lt;/sql&gt;
+        &lt;batch&gt;&lt;parameters&gt;&lt;param&gt;1&lt;/param&gt;&lt;/parameters&gt;&lt;/batch&gt;
+    &lt;/event-data&gt;
+&lt;/event&gt;
+&lt;event id="778e4a40-48a8-4386-b93c-72e322663a90" parent-id="9d2f5856-193f-4fe7-a7d5-51b5a355e4cf"&gt;
+    &lt;type&gt;method&lt;/type&gt;&lt;name&gt;com.mtgi.analytics.example.service.HelloService.delete&lt;/name&gt;&lt;application&gt;beet-hello&lt;/application&gt;
+    &lt;start&gt;2009-04-23T13:50:37.531-07:00&lt;/start&gt;&lt;duration-ns&gt;109&lt;/duration-ns&gt;
+    &lt;session-id&gt;53FAB2406DB3CFAE8BD4201D6DD60D73&lt;/session-id&gt;
+    &lt;event-data&gt;&lt;parameters&gt;&lt;param&gt;{object}&lt;/param&gt;&lt;/parameters&gt;&lt;result/&gt;&lt;/event-data&gt;
+&lt;/event&gt;
+&lt;event id="a80fa0c7-5902-4905-a785-8a7420d98b67" parent-id="607e7fb6-6c11-4c54-ae25-a2aac1ab9336"&gt;
+    &lt;type&gt;jdbc&lt;/type&gt;&lt;name&gt;executeQuery&lt;/name&gt;&lt;application&gt;beet-hello&lt;/application&gt;
+    &lt;start&gt;2009-04-23T13:50:37.640-07:00&lt;/start&gt;&lt;duration-ns&gt;0&lt;/duration-ns&gt;
+    &lt;session-id&gt;53FAB2406DB3CFAE8BD4201D6DD60D73&lt;/session-id&gt;
+    &lt;event-data&gt;&lt;sql&gt;select hellodata0_.id as id0_, hellodata0_.AField as AField0_, hellodata0_.anotherField as anotherF3_0_ from HelloData hellodata0_ order by hellodata0_.id&lt;/sql&gt;&lt;/event-data&gt;
+&lt;/event&gt;
+&lt;event id="607e7fb6-6c11-4c54-ae25-a2aac1ab9336" parent-id="9d2f5856-193f-4fe7-a7d5-51b5a355e4cf"&gt;
+    &lt;type&gt;method&lt;/type&gt;&lt;name&gt;com.mtgi.analytics.example.service.HelloService.list&lt;/name&gt;&lt;application&gt;beet-hello&lt;/application&gt;
+    &lt;start&gt;2009-04-23T13:50:37.640-07:00&lt;/start&gt;&lt;duration-ns&gt;0&lt;/duration-ns&gt;
+    &lt;session-id&gt;53FAB2406DB3CFAE8BD4201D6DD60D73&lt;/session-id&gt;
+    &lt;event-data&gt;&lt;parameters&gt;&lt;param&gt;id&lt;/param&gt;&lt;/parameters&gt;
+    &lt;result type="java.util.ArrayList"&gt;{object}&lt;/result&gt;&lt;/event-data&gt;
+&lt;/event&gt;
+&lt;event id="9d2f5856-193f-4fe7-a7d5-51b5a355e4cf"&gt;
+    &lt;type&gt;http-request&lt;/type&gt;&lt;name&gt;/beet-hello/&lt;/name&gt;&lt;application&gt;beet-hello&lt;/application&gt;
+    &lt;start&gt;2009-04-23T13:50:37.515-07:00&lt;/start&gt;&lt;duration-ns&gt;157&lt;/duration-ns&gt;
+    &lt;event-data uri="/beet-hello/" protocol="HTTP/1.1" method="POST" remote-address="127.0.0.1" remote-host="127.0.0.1"&gt;
+        &lt;parameters&gt;&lt;param name="command"&gt;&lt;value&gt;delete&lt;/value&gt;&lt;/param&gt;&lt;/parameters&gt;
+    &lt;/event-data&gt;
+&lt;/event&gt;</programlisting>
+      </example></para>
+
+    <para>A few things are worth calling out:<orderedlist>
+        <listitem>
+          <para>Each event has a globally unique ID (the "id" attribute), and
+          if it is a nested event, a parent ID.</para>
+
+          <para>For example, the first event is the SQL statement "delete from
+          HelloData where id=?" with
+          parent-id="778e4a40-48a8-4386-b93c-72e322663a90". Further down the
+          log we can find the parent event, which was the method call
+          "com.mtgi.analytics.example.service.HelloService.delete".</para>
+        </listitem>
+
+        <listitem>
+          <para>Events are persisted in the order in which they are completed,
+          so child events appear before parent events. Therefore the root of
+          all these events, the "http-request" event with name "/beet-hello/",
+          appears at the bottom of the log snippet.</para>
+        </listitem>
+
+        <listitem>
+          <para>Each event is identified by type, name, and application. All
+          of our events are in the "beet-hello" application. We have three
+          types of events, "method", "jdbc", and "http-request". The meaning
+          of name depends on type.<orderedlist>
+              <listitem>
+                <para>The name for "method" events is
+                "package.class.methodName".</para>
+              </listitem>
+
+              <listitem>
+                <para>The name for "http-request" events is
+                "/context-relative-uri".</para>
+              </listitem>
+
+              <listitem>
+                <para>The name for "jdbc" events is the JDBC Statement method
+                used to execute the SQL, e.g. "executeBatch", "executeQuery",
+                etc. The actual SQL statement can be found in the nested
+                &lt;event-data&gt; element.</para>
+              </listitem>
+            </orderedlist></para>
+        </listitem>
+      </orderedlist></para>
+  </chapter>
+
+  <chapter>
+    <title>JMX Administration</title>
+
+    <para>Beet provides some basic diagnostic information to any JMX console
+    such as JConsole or JVisualVM. For this tutorial we'll be using JVisualVM,
+    which comes standard with any Java 6 SDK installation.</para>
+
+    <section>
+      <title>Enable JMX on your Tomcat server</title>
+
+      <para><emphasis>Please note that this configuration is not necessary
+      when using a local JVisualVM to connect to the Tomcat server, however
+      for a remote connection or when using another JMX console, this is
+      mandatory.</emphasis></para>
+
+      <para>We will configure your Tomcat server for unauthenticated JMX
+      access. <emphasis role="bold">Never do this on a production
+      system!</emphasis> For obvious reasons it is a huge security risk. When
+      you want to enable JMX on your production server, read both the <ulink
+      url="http://tomcat.apache.org/tomcat-6.0-doc/monitoring.html">Tomcat
+      monitoring instructions</ulink> and <ulink
+      url="http://docs.oracle.com/javase/6/docs/technotes/guides/management/agent.html">Oracle's
+      administration guide</ulink> to protect against unauthorized access. On
+      to business:</para>
+
+      <para><emphasis role="bold">Stop your server if it is
+      running</emphasis>. Open your [TOMCAT]/bin/startup script in a text
+      editor, and insert the following text near the top:</para>
+
+      <para>Windows users:<example>
+          <title></title>
+
+          <programlisting>set JAVA_OPTS=-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=12345 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false</programlisting>
+        </example></para>
+
+      <para>*nix users:</para>
+
+      <example>
+        <title></title>
+
+        <programlisting>JAVA_OPTS=-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=12345 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false</programlisting>
+      </example>
+    </section>
+
+    <section>
+      <title>Activate Beet's JMX support</title>
+
+      <para>Once again open our spring configuration file
+      beet-hello-servlet.xml in a text editor, and add the register-mbeans
+      attribute to &lt;bt:manager&gt;:<example>
+          <title></title>
+
+          <programlisting>&lt;beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:bt="http://beet.sourceforge.net/schema/bt/1.1"
+  xsi:schemaLocation="
+    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://beet.sourceforge.net/schema/bt/1.1 http://beet.sourceforge.net/schema/bt/mtgi-bt-1.1.xsd"&gt;
+
+  &lt;bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/&gt;
+
+  &lt;bt:manager application="beet-hello" <emphasis role="bold">register-mbeans="true"</emphasis> flush-schedule="0/30 * * * * ?"
+      track-method-expression="execution(* com.mtgi.analytics.example.service..*(..))"&gt;
+    &lt;bt:xml-persister binary="false" compress="false" file="${catalina.home}/logs/beet-hello-perf.xml"/&gt;
+    &lt;bt:http-requests parameters="command"/&gt;
+  &lt;/bt:manager&gt;
+
+  ... snip ...</programlisting>
+        </example></para>
+
+      <para>This is a shorthand way to export Beet's MBeans using Spring's
+      powerful JMX support. You can alternatively use standard Spring JMX
+      MBean detection if you want more control over how the MBeans are
+      registered. See the <ulink
+      url="http://static.springsource.org/spring/docs/2.0.x/reference/jmx.html">Spring
+      User Guide</ulink> for more detailed information about how this
+      works.</para>
+    </section>
+
+    <section>
+      <title>Connect with Java VisualVM</title>
+
+      <para><emphasis role="bold">Start your Tomcat server</emphasis>. Once it
+      is up and running, fire up a jvisualvm process. jvisualvm is usually
+      located in [JAVA SDK HOME]/bin/jvisualvm. You should see something that
+      looks like this:te<mediaobject>
+          <imageobject>
+            <imagedata align="center" fileref="images/tutorial/visualvm-1.png"
+                       format="PNG" />
+          </imageobject>
+
+          <textobject>
+            <para>VisualVM</para>
+          </textobject>
+        </mediaobject></para>
+
+      <para>First ensure that the MBeans plugin is installed. Open the
+      <emphasis role="bold">Tools</emphasis> menu and select <emphasis
+      role="bold">Plugins</emphasis> (1), if the plugin is not listed on the
+      <emphasis role="bold">Installed</emphasis> tabs, go to the <emphasis
+      role="bold">Available Plugins</emphasis> tab (2) and select the
+      VisualVM-MBeans plugin. Finally clic the <emphasis
+      role="bold">Install</emphasis> button and follow the
+      instructions.<mediaobject>
+          <imageobject>
+            <imagedata align="center"
+                       fileref="images/tutorial/jvisualvm-2.png" format="PNG" />
+          </imageobject>
+
+          <textobject>
+            <para>VisualVM - Install MBeans plugin</para>
+          </textobject>
+        </mediaobject></para>
+
+      <para>Double clic on the <emphasis role="bold">Tomcat</emphasis>
+      application on the left part of the panel, this will open a new Tomcat
+      tab on the right part. Now go to the <emphasis
+      role="bold">MBeans</emphasis> tab. Expand the tree nodes for <emphasis
+      role="bold">beet-hello</emphasis>, <emphasis
+      role="bold">com.mtgi.analytics</emphasis>, and then <emphasis
+      role="bold">defaultTrackingManager</emphasis>. You should see something
+      like this:<mediaobject>
+          <imageobject>
+            <imagedata align="center"
+                       fileref="images/tutorial/jvisualvm-3.png" format="PNG" />
+          </imageobject>
+
+          <textobject>
+            <para>VisualVM - Beet MBeans</para>
+          </textobject>
+        </mediaobject>The <emphasis role="bold">BeetManager</emphasis> bean
+      can be used to<itemizedlist>
+          <listitem>
+            <para>resume or suspend beet monitoring (via the <emphasis
+            role="bold">resume</emphasis> and <emphasis
+            role="bold">suspend</emphasis> operations),</para>
+          </listitem>
+
+          <listitem>
+            <para>see how many unlogged events are in memory (via the
+            <emphasis role="bold">EventsPendingFlush</emphasis> attribute),
+            and optionally</para>
+          </listitem>
+
+          <listitem>
+            <para>flush these events to the log via the <emphasis
+            role="bold">flush</emphasis> operation.</para>
+          </listitem>
+        </itemizedlist></para>
+
+      <para>The BeetLog bean can be used to<itemizedlist>
+          <listitem>
+            <para>View the size of the current log file via the <emphasis
+            role="bold">FileSize</emphasis> attribute</para>
+          </listitem>
+
+          <listitem>
+            <para>View and change the log compression and format settings via
+            the <emphasis role="bold">Binary</emphasis> and <emphasis
+            role="bold">Compress</emphasis> attributes</para>
+          </listitem>
+
+          <listitem>
+            <para>Force an ahead-of-schedule log rotation view that <emphasis
+            role="bold">rotateLog</emphasis> operation.</para>
+          </listitem>
+        </itemizedlist></para>
+
+      <para>The next chapter of the tutorial will use some of these controls
+      to change the logging format. Before that, we'll explore monitoring your
+      application's performance from a JMX console.</para>
+    </section>
+
+    <section>
+      <title>Enable Statistics MBeans</title>
+
+      <para>Once again <emphasis role="bold">stop your Tomcat
+      server</emphasis>. Open beet-hello-servlet.xml for editing:<example>
+          <title></title>
+
+          <programlisting>&lt;beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:bt="http://beet.sourceforge.net/schema/bt/1.1"
+  xsi:schemaLocation="
+    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://beet.sourceforge.net/schema/bt/1.1 http://beet.sourceforge.net/schema/bt/mtgi-bt-1.1.xsd"&gt;
+
+  &lt;bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/&gt;
+
+  &lt;bt:manager application="beet-hello" register-mbeans="true" flush-schedule="0/30 * * * * ?"
+      track-method-expression="execution(* com.mtgi.analytics.example.service..*(..))"&gt;
+    <emphasis role="bold">&lt;bt:persister-chain&gt;</emphasis>
+      &lt;bt:xml-persister binary="false" compress="false" file="${catalina.home}/logs/beet-hello-perf.xml"/&gt;
+      <emphasis role="bold">&lt;bt:mbean-persister/&gt;
+    &lt;/bt:persister-chain&gt;</emphasis>
+    &lt;bt:http-requests parameters="command"/&gt;
+  &lt;/bt:manager&gt;
+
+  ... snip ...</programlisting>
+        </example></para>
+
+      <para>We've done two things:<orderedlist>
+          <listitem>
+            <para><literal>&lt;bt:persister-chain&gt;</literal> allows us to
+            send behavior events to multiple persister instances. So we're
+            still writing to the XML log, but we're also sending event data to
+            a new persister type:</para>
+          </listitem>
+
+          <listitem>
+            <para><literal>&lt;bt:mbean-persister&gt;</literal> aggregates
+            event statistics in MBeans so that you can monitor your
+            application from a JMX client.</para>
+          </listitem>
+        </orderedlist></para>
+    </section>
+
+    <section>
+      <title>Use the application</title>
+
+      <para><emphasis role="bold">Start the Tomcat server</emphasis>. As
+      before, point your browser at <ulink
+      url="http://localhost:8080/beet-hello">http://localhost:8080/beet-hello</ulink>
+      and create some data in the test application.</para>
+    </section>
+
+    <section>
+      <title>Examine Statistics in VisualVM</title>
+
+      <para>When you navigate to our beet-hello domain in VisualVM, you'll see
+      there are some new MBeans available:<mediaobject>
+          <imageobject>
+            <imagedata align="center"
+                       fileref="images/tutorial/jvisualvm-4.png" format="PNG" />
+          </imageobject>
+
+          <textobject>
+            <para>VisualVM - Statistics MBeans</para>
+          </textobject>
+        </mediaobject></para>
+
+      <para>The attributes of the <emphasis
+      role="bold">/beet-hello/</emphasis> MBean describe aggregate performance
+      statistics for requests against that URI. But more significantly, we can
+      drill down into Java method calls invoked during request processing, and
+      further into JDBC SQL statements executed during those methods.</para>
+
+      <para>You'll notice that /beet-hello is rather coarse-grained; our
+      application has several discrete actions (create, delete, update, clear)
+      but only one URI provides all of them. We'll refine our event tracking
+      to group events according to key request parameter values.</para>
+    </section>
+
+    <section>
+      <title>Refine event groupings</title>
+
+      <para>Stop your server and edit beet-hello-servlet.xml:<example>
+          <title></title>
+
+          <programlisting>&lt;beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:bt="http://beet.sourceforge.net/schema/bt/1.1"
+  xsi:schemaLocation="
+    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://beet.sourceforge.net/schema/bt/1.1 http://beet.sourceforge.net/schema/bt/mtgi-bt-1.1.xsd"&gt;
+
+  &lt;bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/&gt;
+
+  &lt;bt:manager application="beet-hello" register-mbeans="true" flush-schedule="0/30 * * * * ?"
+      track-method-expression="execution(* com.mtgi.analytics.example.service..*(..))"&gt;
+    &lt;bt:persister-chain&gt;
+      &lt;bt:xml-persister binary="false" compress="false" file="${catalina.home}/logs/beet-hello-perf.xml"/&gt;
+      &lt;bt:mbean-persister/&gt;
+    &lt;/bt:persister-chain&gt;
+    &lt;bt:http-requests <emphasis role="bold">name-parameters="command" uri-pattern="/beet-hello/?"</emphasis> /&gt;
+  &lt;/bt:manager&gt;
+
+  ... snip ...</programlisting>
+        </example></para>
+
+      <para>Now after interacting with your application and viewing the
+      results in VisualVM, things are a little different:<mediaobject>
+          <imageobject>
+            <imagedata align="center" fileref="images/tutorial/visualvm-5.png"
+                       format="PNG" />
+          </imageobject>
+        </mediaobject></para>
+
+      <para>The <emphasis role="bold">name-parameters</emphasis> attribute
+      allowed us to divide events based on the value of the "command"
+      parameter, an HTTP post parameter identifying the action taken by the
+      user on each request. For more complicated applications we could add
+      more parameters here, separated by commas.</para>
+
+      <para>The <emphasis role="bold">uri-pattern</emphasis> attribute is a
+      regular expression identifying which requests interest us. This filtered
+      out statistics for static resources like png images and CSS files. You
+      can specify multiple uri-patterns as nested elements, see the User's
+      Guide for more information.</para>
+    </section>
+  </chapter>
+
+  <chapter>
+    <title>Log analysis with beet-utils</title>
+
+    <para>The beet-utils command line utilities are primarily for the default
+    compressed binary log format. Thus far in the tutorial we've been working
+    with plain text logging, so first we'll use the JMX console to switch back
+    to the default behavior.</para>
+
+    <para>For this tutorial we assume you have the command line utility
+    <emphasis role="bold">zcat</emphasis> installed on your system. For
+    Windows users this means Cygwin or a similar *nix-like utilities package.
+    If you don't have zcat, you can still try the tutorial, but skip the part
+    in Step 2 that tells you to enable Compression.</para>
+
+    <section>
+      <title>Verify beet-utils setup</title>
+
+      <para>Open your favorite command interpreter (e.g. Cygwin or cmd on
+      Windows, xterm on *nix) and change into your beet installation
+      directory. Test the installation by running "java -jar beet-utils.jar".
+      You should see a terse usage message:<mediaobject>
+          <imageobject>
+            <imagedata align="center"
+                       fileref="images/tutorial/beet-utils-usage.png"
+                       format="PNG" />
+          </imageobject>
+
+          <textobject>
+            <para>Command interpreter</para>
+          </textobject>
+        </mediaobject></para>
+
+      <para>Leave the terminal window open.</para>
+    </section>
+
+    <section>
+      <title>Use VisualVM to change logging format</title>
+
+      <para>Connect to Tomcat with VisualVM and examine the <emphasis
+      role="bold">beet-hello/com.mtgi.analytics/defaultTrackingManager/BeetLog</emphasis>
+      mbean as described in previous chapter of the tutorial. Select the
+      <emphasis role="bold">Attributes</emphasis> tab under <emphasis
+      role="bold">BeetLog</emphasis> and change both <emphasis
+      role="bold">Binary</emphasis> and <emphasis
+      role="bold">Compress</emphasis> attributes to true:</para>
+
+      <mediaobject>
+        <imageobject>
+          <imagedata align="center" fileref="images/tutorial/jvisualvm-6.png"
+                     format="PNG" />
+        </imageobject>
+
+        <textobject>
+          <para>VisualVM - Change logging format</para>
+        </textobject>
+      </mediaobject>
+
+      <para>Since we're changing the log format, these changes only take
+      effect after the next log rotation. By default this happens every night
+      at midnight. If you don't want to stay awake late at night, you can
+      wait. Otherwise, select the <emphasis role="bold">Operations</emphasis>
+      tab under <emphasis role="bold">BeetLog</emphasis>:<mediaobject>
+          <imageobject>
+            <imagedata align="center"
+                       fileref="images/tutorial/jvisualvm-7.png" format="PNG" />
+          </imageobject>
+
+          <textobject>
+            <para>VisualVM - Rotate log operation</para>
+          </textobject>
+        </mediaobject></para>
+
+      <para>Click the <emphasis role="bold">rotateLog</emphasis> button; you
+      should see a window indicating the name of the newly archived log
+      file.<mediaobject>
+          <imageobject>
+            <imagedata fileref="images/tutorial/jvisualvm-8.png" />
+          </imageobject>
+
+          <textobject>
+            <para>VisualVM - Rotate log operation result</para>
+          </textobject>
+        </mediaobject></para>
+
+      <para>Use a filesystem browser to examine the [TOMCAT]\logs directory.
+      You should see both the newly archived log file (named like
+      beet-hello-perf.xml.TIMESTAMP), and the new current log file, <emphasis
+      role="bold">beet-hello-perf.bxml.gz</emphasis>. The file extension has
+      been changed to .bxml.gz to reflect the new format.</para>
+    </section>
+
+    <section>
+      <title>Click around beet-hello</title>
+
+      <para>Once again point your browser at <ulink
+      url="http://localhost:8080/beet-hello">http://localhost:8080/beet-hello</ulink>.
+      Click around on create, delete, update, clear buttons. Let the app know
+      that you are there.</para>
+    </section>
+
+    <section>
+      <title>Use VisualVM to flush any in-memory events</title>
+
+      <para>Back in VisualVM, select the <emphasis
+      role="bold">Operations</emphasis> tab under <emphasis
+      role="bold">beet-hello/com.mtgi.analytics/defaultTrackingManager/BeetManager</emphasis>.
+      Click the <emphasis role="bold">flush</emphasis> button to force any
+      accumulated events to be written to the log.<mediaobject>
+          <imageobject>
+            <imagedata align="center"
+                       fileref="images/tutorial/jvisualvm-9.png" format="PNG" />
+          </imageobject>
+
+          <textobject>
+            <para>VisualVM - Flush in-memory events</para>
+          </textobject>
+        </mediaobject></para>
+
+      <para>The result window indicates the number of events flushed to the
+      log. Because early in the tutorial we configured our flush interval very
+      low (30 seconds), this will likely be 0, unless your window-changing and
+      mouse-clicking skills are unusually well-honed.</para>
+
+      <para>Again use the <emphasis role="bold">rotateLog</emphasis> operation
+      to rotate our log. This should create a new log named <emphasis
+      role="bold">beet-hello-perf.bxml.gz.[TIMESTAMP]</emphasis> to use in the
+      following steps.</para>
+    </section>
+
+    <section>
+      <title>Convert the current log to other formats</title>
+
+      <para>Back in your command prompt window, you can convert the log to
+      various formats using the beet-utils jar. Try the following
+      commands:<programlisting>&gt; zcat [TOMCAT]/logs/beet-hello-perf.bxml.gz.[TIMESTAMP] | java -jar beet-utils.jar -tool xml
+
+&gt; zcat [TOMCAT]/logs/beet-hello-perf.bxml.gz.[TIMESTAMP] | java -jar beet-utils.jar -tool csv
+
+&gt; zcat [TOMCAT]/logs/beet-hello-perf.bxml.gz.[TIMESTAMP] | java -jar beet-utils.jar -tool xslt -format text -split event -xsl sql/etl/insert-events.xsl</programlisting></para>
+
+      <para>Where of course you should replace [TOMCAT] with your Tomcat
+      install directory, [TIMESTAMP] with the actual file extension, and use
+      '\' instead of '/' if you are a Windows user. The last example, which
+      applies a custom XSLT stylesheet to the event data, is a powerful way to
+      customize event log processing. The provided XSL produces the same
+      output as the '-tool csv' variant, but you can obviously customize its
+      behavior.</para>
+    </section>
+  </chapter>
+
+  <chapter>
+    <title>Following Up</title>
+
+    <para>You now have a basic understanding of how to install beet, control
+    its behavior, and work with the default logging formats. Some activities
+    not covered in this tutorial that you can pursue with the Reference
+    documentation:<itemizedlist>
+        <listitem>
+          <para>persist events directly to a relational database instead of
+          log files</para>
+        </listitem>
+
+        <listitem>
+          <para>efficiently bulk load log file data to an Oracle
+          database</para>
+        </listitem>
+
+        <listitem>
+          <para>filter http-request logging by URI</para>
+        </listitem>
+
+        <listitem>
+          <para>change log rotation and flush schedules</para>
+        </listitem>
+
+        <listitem>
+          <para>control thread pool and schedule implementations used by
+          beet</para>
+        </listitem>
+
+        <listitem>
+          <para>integrate event logging with your custom authentication
+          methods</para>
+        </listitem>
+      </itemizedlist></para>
+
+    <para>The following reference materials are also likely to be useful to
+    you:<itemizedlist>
+        <listitem>
+          <para>The <ulink
+          url="http://www.springsource.org/spring-framework#documentation">Spring
+          User Guide</ulink> for more information about configuring Spring
+          beans, Spring JMX and AOP support, and authoring your own Spring
+          configuration tags (like &lt;bt:manager&gt;)</para>
+        </listitem>
+
+        <listitem>
+          <para>The <ulink
+          url="http://tomcat.apache.org/tomcat-6.0-doc/index.html">Tomcat
+          Manual</ulink> for insight into administering a production Tomcat
+          server, though often Google helps about as much</para>
+        </listitem>
+
+        <listitem>
+          <para>Oracle's <ulink
+          url="http://docs.oracle.com/javase/6/docs/technotes/guides/visualvm/index.html">VisualVM
+          documentation</ulink></para>
+        </listitem>
+      </itemizedlist></para>
+
+    <para>Have fun !</para>
+  </chapter>
+</book>

@@ -4,18 +4,29 @@
                  "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
 
 <book>
-	<title>Beet 1.x User's Guide</title>
-	<bookinfo>
-		<author><firstname>Jason</firstname><surname>Trump</surname></author>
-		<date>24 March 2009</date>
-		<keywordset>
-			<keyword>behavior tracking</keyword>
-			<keyword>performance monitoring</keyword>
-			<keyword>java programming</keyword>
-			<keyword>behavior analytics</keyword>
-			<keyword>spring framework</keyword>
-		</keywordset>
-	</bookinfo>
+    <title>Beet 1.x User's Guide</title>
+    <bookinfo>
+        <authorgroup>
+            <author>
+                <firstname>Jason</firstname>
+                <surname>Trump</surname>
+                <contrib>Original author</contrib>
+            </author>
+            <author>
+                <firstname>Frédéric</firstname>
+                <surname>Chopard</surname>
+                <contrib>New project maintainer</contrib>
+            </author>
+        </authorgroup>
+        <date>24 March 2009</date>
+        <keywordset>
+            <keyword>behavior tracking</keyword>
+            <keyword>performance monitoring</keyword>
+            <keyword>java programming</keyword>
+            <keyword>behavior analytics</keyword>
+            <keyword>spring framework</keyword>
+        </keywordset>
+    </bookinfo>
 
     <xi:include href="ch1_quickstart.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="ch2_justification.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
