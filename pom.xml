@@ -22,6 +22,7 @@
         <module>integration/spring-webmvc</module>
         <module>integration/web</module>
         <module>example/beet-hello</module>
+        <module>documentation</module>
         <module>distribution</module>
     </modules>
 
