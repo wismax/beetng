@@ -2,7 +2,7 @@
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
 "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
 <book>
-  <title>Beet 2.x Tutorial</title>
+  <title>Beet ${project.version} Tutorial</title>
 
   <bookinfo>
     <authorgroup>

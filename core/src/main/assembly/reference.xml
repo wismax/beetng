@@ -18,13 +18,14 @@
                 <include>**/*</include>
             </includes>
             <outputDirectory></outputDirectory>
+            <filtered>true</filtered>
         </fileSet>
 
         <fileSet>
             <directory>src/docbkx/html</directory>
-            <includes>
-                <include>**/*</include>
-            </includes>
+            <excludes>
+                <exclude>**/tutorial/</exclude>
+            </excludes>
             <outputDirectory></outputDirectory>
         </fileSet>
     </fileSets>

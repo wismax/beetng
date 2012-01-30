@@ -1,10 +1,8 @@
-<?xml version="1.0" ?>
-
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
                  "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
-
 <book>
-    <title>Beet 1.x User's Guide</title>
+    <title>Beet ${project.version} User's Guide</title>
     <bookinfo>
         <authorgroup>
             <author>
@@ -28,10 +26,1067 @@
         </keywordset>
     </bookinfo>
 
-    <xi:include href="ch1_quickstart.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-    <xi:include href="ch2_justification.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-    <xi:include href="ch3_configuration.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-    <xi:include href="ch4_jmx_administration.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-    <xi:include href="ch5_programmer_reference.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+<chapter id="chapter_getting_started">
+    <title>Quick Start</title>
+    <section>
+        <title>Overview</title>
+        <para>Beet (from B.T., short for Behavior Tracking) records application metrics 
+        as a user (or programmatic agent) interacts with a <ulink url="http://www.springframework.org">Spring-based</ulink> 
+        Java application.</para>
+        
+        <para>No source-level modification is required in the instrumented application; measurement 
+        is enabled completely at runtime. Metrics are tied to a specific user and session, and can be  
+        collected for servlet requests, Java method calls, and/or SQL statements.  Metrics  
+        can be stored in various file formats or directly in a relational database.  The API is  
+        extensible to support other persistence mechanisms and metrics gathering at other   
+        layers of an application.</para>
+        
+        <para><xref linkend="chapter_justification"/> contains a more detailed discussion of where 
+        beet belongs in the broader picture of production monitoring.</para>
+    </section>
+    <section id="section_simple_installation">
+        <title>Simplified Installation</title> 
+        <para>These steps should get you up and running directly.  You can find a more verbose version
+        of these instructions online at <ulink url="http://beet.sourceforge.net/documentation/tutorial">The Beet Tutorial</ulink>.  
+        This configuration can be expanded and fine-tuned in many ways, see <xref linkend="chapter_configuration"/> for details.  
+        The steps for a basic installation into an existing Spring application are:
+        <orderedlist>
+            <listitem><para>Download an appropriate release package from <ulink url="http://beet.sourceforge.net/downloads">SourceForge</ulink>.</para></listitem>
+            <listitem><para>Add <literal>beet-core.jar</literal> and its dependency jars in <literal>lib/</literal> to your application
+            (e.g. in the WEB-INF/lib directory for WAR archives).</para></listitem>
+            <listitem>
+                <para>Add behavior tracking markup to your Spring applicationContext.xml file
+                (modify values to suit your application): 
+                <example>
+                    <title>Adding method and http tracking to applicationContext.xml</title>
+                    <programlisting><![CDATA[<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:bt="http://beet.sourceforge.net/schema/bt/1.1"
+       xsi:schemaLocation="
+          http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+          http://beet.sourceforge.net/schema/bt/1.1         http://beet.sourceforge.net/schema/bt/mtgi-bt-1.1.xsd">
+
+      <bt:manager application="myapp"]]><co id="appname"/><![CDATA[
+                  register-mbeans="true"]]><co id="mbeans"/><![CDATA[
+                  track-method-expression="execution(* com.mtgi.analytics..*Tracked(..))"]]><co id="pattern"/><![CDATA[>
+         <bt:http-requests parameters="dispatch"/>]]><co id="http-requests"/><![CDATA[
+      </bt:manager>]]></programlisting>
+                    <calloutlist>
+                        <callout arearefs="appname"><para>The name of this application, as it will
+                        appear in behavior tracking logs.</para></callout>
+                        <callout arearefs="mbeans"><para>Optional mbean registration, if you plan
+                        to use a JMX tool like JConsole to monitor your application.</para></callout>
+                        <callout arearefs="pattern"><para>(optional) An AspectJ pointcut expression identifying which
+                        methods you want to track in your application.  This example identifies "all methods
+                        in the com.mtgi.analytics package with names ending in "Tracked".  For a detailed 
+                        description of this grammar, see the 
+                        <ulink url="http://www.eclipse.org/aspectj/doc/released/progguide/semantics-pointcuts.html">AspectJ programming guide</ulink>.</para>
+                        </callout>
+                        <callout arearefs="http-requests"><para>(optional) Enable limited HTTP request tracking.  
+                        HTTP request tracking can also be enabled as a servlet filter with more fine-grained
+                        control.  The "parameters" attribute is a comma-separated list of request parameters logged with each event.</para>
+                        </callout>
+                    </calloutlist>
+                </example>
+                </para>
+            </listitem>
+            <listitem><para><emphasis role="bold">(optional)</emphasis> To enable behavior tracking at the 
+                <emphasis role="bold">SQL</emphasis> level, add a custom attribute to the data  
+                source declaration in your spring configuration:  
+                <example>
+                    <title>Adding SQL tracking to applicationContext.xml</title>
+                    <programlisting><![CDATA[<bean id="myDataSource" class="..." 
+      ]]><emphasis role="bold"><![CDATA[bt:tracking-manager="defaultTrackingManager">]]></emphasis><co id="managerid"/><![CDATA[
+
+   ... normal datasource configuration ... 
+
+</bean>]]></programlisting>
+                    <calloutlist>
+                        <callout arearefs="managerid"><para>This name points back to
+                        an instance of the <literal>bt:manager</literal> element
+                        as described above, which is used to configure application-wide
+                        behavior tracking settings.  This name is the <literal>id</literal>
+                        attribute of your <literal>bt:manager</literal> element, or <literal>defaultTrackingManager</literal>
+                        if <literal>bt:manager</literal> does not have an id.</para></callout>
+                    </calloutlist>
+                </example>
+            </para></listitem>
+        </orderedlist>
+        </para>
+        
+        <section>
+            <title>EAR Deployments</title>
+            <para>Beet libraries can be deployed to a shared library location, either in the EAR or
+            in your application server.  If you want to include HTTP request tracking to a WAR module
+            in your application, you should also add <literal>beet-web.jar</literal> to the WAR's
+            <literal>WEB-INF/lib</literal> directory.  <literal>beet-web.jar</literal> can be found
+            in the beet distribution under <literal>web/</literal>.  This step is not necessary if
+            beet libraries are included directly in <literal>WEB-INF/lib</literal>.</para>
+        </section>
+    </section>
+
+    <section id="section_log_analysis">
+        <title>Log Analysis</title>
+        <para>The beet distribution includes a command-line tool suite for 
+        analyzing beet logs. The tool suite can be used to convert binary 
+        logs to CSV or XML, apply custom XSL transforms, and perform efficient bulk 
+        loads of beet data to an Oracle database. The tools require the 
+        following:
+        <itemizedlist>
+            <listitem><simpara>Solaris, Linux, or Cygwin environment</simpara></listitem>
+            <listitem><simpara>Local Java 5 or Java 6 SDK installation</simpara></listitem>
+            <listitem><simpara>If you plan to use the Oracle ETL scripts, an Oracle 9i or 
+            higher client install</simpara></listitem>
+        </itemizedlist>
+        </para>
+
+        <para>You can run any of the following utilities from a command prompt within the created 
+        <literal>beet</literal> directory.  All of these instructions assume you are logging in 
+        the default format, GZIP-compressed FastInfoSet (i.e. binary XML).</para>
+
+        <section>
+            <title>Upload to an Oracle Database</title>
+            
+            <orderedlist>
+                <listitem><para><emphasis role="bold">(first time only)</emphasis> Run the provided etl/create_etl.sql script to create
+                the required data structures in your target Oracle database.</para></listitem>
+                <listitem>
+                    <para>Run the import script:
+                    <informalexample><screen>&gt; ./load-event.sh user/pass@sid path/to/log.bxml.gz</screen></informalexample>
+                    </para>
+                </listitem>
+                <listitem><para>The time required for this process will vary with available system resources, 
+                the size of the log, the speed of your connection to the database, and so on.  Examine 
+                the resulting log files <literal>load_event_csv.log</literal> and (if there were error records) 
+                <literal>BAD_EVENT_CSV.log</literal>. Typically errors will only occur if you have tried to insert values to large for the target 
+                schema.  If this is the case, you may want to update the schema to accommodate the larger values, 
+                or truncate the bad data (in <literal>BAD_EVENT_CSV.log</literal>) and attempt the load again. The provided 
+                structures are adequate to handle most needs, so errors should be rare.</para></listitem>
+            </orderedlist>
+            
+            <caution>
+                <title>Important Note for Cygwin Users:</title>
+                <para>While the script supports Cygwin, an Oracle sqlldr limitation requires the use 
+                of <emphasis>very large</emphasis> temporary files in a Cygwin environment.  It is strongly recommended that 
+                you execute the upload scripts from a true Unix environment with stronger pipeline support, 
+                such as Solaris or Linux.</para>
+            </caution>
+            
+            <para>Use of the provided script is simple, but database administration is up to you. 
+            Depending on what you hope to do with your data, you will likely want to customize 
+            the ETL process to suit your needs. Therefore familiarity with sqlldr and basic 
+            Oracle database administration is assumed here. You should examine the provided 
+            scripts and make sure you understand what they do before using them.</para>
+        </section>
+        
+        <section>
+            <title>Export to XML</title>
+            <para>
+                You can easily export a binary log to a simple XML format legible to humans or other XML
+                processing utilities:
+                <informalexample><screen>&gt; zcat path/to/log.bxml.gz | java -jar beet-utils.jar -tool xml &gt; result.xml</screen></informalexample>
+                <caution>
+                    <title>Problems with zcat</title>
+                    <para>Some systems (like OS X) may not ship with zcat, or may contain a version
+                    that is incompatible with the above command line interface.  Try using <code>gzcat</code>
+                    if <code>zcat</code> is missing or doesn't work.  Otherwise, you may have to install
+                    zcat, or research the available compression utilities on your host platform.</para>
+                </caution>
+                <example>
+                    <title>Sample XML Data</title>
+                    <programlisting><![CDATA[<event id="244f5f4e-21d0-4044-b71f-ba39bb96cfbd"]]><co id="eventId"/><![CDATA[
+       parent-id="778e4a40-48a8-4386-b93c-72e322663a90"]]><co id="parentId"/><![CDATA[>
+    <type>jdbc</type><name>executeBatch</name><application>beet-hello</application>
+    <start>2009-04-23T13:50:37.625-07:00</start><duration-ms>0</duration-ms>
+    <session-id>53FAB2406DB3CFAE8BD4201D6DD60D73</session-id>]]><co id="sessionId"/><![CDATA[
+    <event-data>]]><co id="eventData"/><![CDATA[<sql>delete from HelloData where id=?</sql>
+        <batch><parameters><param>1</param></parameters></batch>
+    </event-data>
+</event>
+<event id="778e4a40-48a8-4386-b93c-72e322663a90" parent-id="9d2f5856-193f-4fe7-a7d5-51b5a355e4cf">
+    <type>method</type><name>com.mtgi.analytics.example.service.HelloService.delete</name><application>beet-hello</application>
+    <start>2009-04-23T13:50:37.531-07:00</start><duration-ms>109</duration-ms>
+    <session-id>53FAB2406DB3CFAE8BD4201D6DD60D73</session-id>
+    <event-data><parameters><param>{object}</param></parameters><result/></event-data>
+</event>
+<event id="9d2f5856-193f-4fe7-a7d5-51b5a355e4cf">
+    <type>http-request</type><name>/beet-hello/</name><application>beet-hello</application>
+    <start>2009-04-23T13:50:37.515-07:00</start><duration-ms>157</duration-ms>
+    <event-data uri="/beet-hello/" protocol="HTTP/1.1" method="POST" remote-address="127.0.0.1" remote-host="127.0.0.1">
+        <parameters><param name="command"><value>delete</value></param></parameters>
+    </event-data>
+</event>]]></programlisting>
+                    <calloutlist>
+                        <callout arearefs="eventId"><para>Each event is identified by a globally unique identifier.</para></callout>
+                        <callout arearefs="parentId"><para>Events that are triggered by an enclosing event include a reference
+                        to their parent's ID.</para></callout>
+                        <callout arearefs="sessionId"><para>Events include user and session ID, if applicable.</para></callout>
+                        <callout arearefs="eventData"><para>event-data contains flexible type-specific information about a recorded event,
+                        such as parameter data, SQL text, and so on.</para></callout>
+                    </calloutlist>
+                </example>
+            </para>
+            <para>Be careful.  The default compressed-binary format has a compression ratio
+            of around 20:1 compared to its plain-text counterpart, so you can use a lot of disk this way.
+            If you plan to apply an XSL transform to the output document, consider the XSLT mode of the
+            export tool as outlined below.</para>
+        </section>
+        
+        <section>
+            <title>Export to CSV</title>
+            <para>
+                Similarly, you can export to a CSV file for use in a spreadsheet or older EDI tools:
+                <informalexample><screen>&gt; zcat path/to/log.bxml.gz | java -jar beet-utils.jar -tool csv &gt; result.csv</screen></informalexample>
+            </para>
+            <para>Again, assume that your CSV data will be quite a bit larger than the compressed-binary data.</para>
+        </section>
+        
+        <section>
+            <title>Export with custom XSL</title>
+            <para>You can certainly use the XML export and stream the result to an XSL transformer.
+            However, executing XSL transforms on large XML documents can be extremely resource-intensive
+            without specialized tools.  Included with the log analysis package is an analyzer
+            that splits a large input document into fragments based on an XPath query, and then
+            applies an XSL transform to each fragment.  For transforms that are stateless or only need
+            to examine a small part of a document, this is vastly more efficient than loading an entire document to invoke the transform.</para>
+            
+            <para>The following example splits the input document into one fragment per 'event' element,
+            applying the given XSL transform file to each fragment and streaming the result to standard
+            out:
+                <informalexample><screen>&gt; zcat path/to/log.bxml.gz | java -jar beet-utils.jar -tool xslt -split event-log/event -xsl sql/etl/insert_events.xsl &gt; result.csv</screen></informalexample>
+            </para>
+             
+            <para>The included file <varname>sql/etl/insert_events.xsl</varname> provides an example transform document, including some custom XSL functions available to transforms 
+            invoked in this way.</para>
+        </section>
+    </section>
+    
+</chapter>
+
+<chapter id="chapter_justification">
+    <title>Justification</title>
+    <para>It is hard to predict how users will engage your application before it hits production.  
+    You can invest much or little in your attempts to 
+    predict demand, but in either case your best educated guess cannot dictate  
+    the future.  If you can avoid performance problems on first release, monitoring  
+    is paramount to ensure that things stay under control  as users find new ways to  
+    torture your application.  If you do have problems on initial deployment,  
+    monitoring is paramount to finding and addressing a problem quickly. In any case,  
+    production monitoring is required.</para>
+    
+    <section>
+        <title>Existing Tools and Methods</title> 
+
+        <para>There are many powerful tools available to monitor any modern Java application.  Beet 
+        is designed to augment, not replace, the information that these tools provide.  What's most important is that you 
+        actually measure your system to understand where the problems lie.  You can verify
+        whether a candidate fix improves the readings you get on these metrics.
+        It also enables you to devise tests that load the system in a way that
+        resembles the actual production load patterns, rather than having to
+        rely on expectations and guesses.</para>
+        
+        <section>
+            <title>System Resource Monitoring</title>
+            <para>System resource monitoring tools are widely available and do not require you 
+            to make any special considerations in your application.  For example, most modern 
+            Windows systems have <ulink url="http://technet.microsoft.com/en-us/library/cc749115.aspx">Performance Monitor</ulink>, 
+            and most Unix systems will include some 
+            variant of <ulink url="http://pagesperso-orange.fr/sebastien.godard/documentation.html">sar</ulink>. In either case, 
+            you should be able to identify bottlenecks at the 
+            resource level (disk, memory, CPU, network).  If your system is simply being asked 
+            to do too much with the tools given, and you can address bottlenecks with better hardware, that's excellent.</para>
+            <para>If you are having application responsiveness problems and your resources are  
+            underutilized, you can't hope to get much more out of your resource monitors and must 
+            dig deeper.  If your system is overutilized with two users logging in and nothing more, you must dig 
+            deeper.  In short, you should anticipate a need for deeper visibility into your application 
+            than what resource monitoring tools alone can provide.</para>
+        </section>
+        
+        <section>
+            <title>JMX Monitoring</title>
+            <para>Modern Java application servers provide a wealth of information to JMX clients 
+            (<ulink url="http://java.sun.com/developer/technicalArticles/J2SE/jconsole.html">jconsole</ulink>, 
+            <ulink url="http://mc4j.org">MC4J</ulink>). 
+            If your application is overpowering the CPU, you can quickly identify which threads 
+            are eating your processor and what code they are executing while they are doing it. 
+            You can view heap memory use statistics, identify deadlocked threads, and usually  
+            (depending on application server) exercise some control over user sessions.</para>
+            <para>A significant limitation of JMX monitoring tools is that it is difficult to perform 
+            post-mortem analysis after your system has become unresponsive.  If your application 
+            is leaking memory, or pegs your processor, users of JMX clients are frequently 
+            as out-of-luck as users of your application. Some IT departments will consider (not entirely without merit) JMX  
+            access a security risk and will refuse to activate it.</para>
+        </section>
+
+        <section>
+            <title>Access Logging</title>
+            <para>All major web servers will provide some kind of configurable 
+            <ulink url="http://httpd.apache.org/docs/2.0/logs.html#accesslog">access logging</ulink>, 
+            usually in the style of the <ulink url="http://httpd.apache.org/">Apache web server</ulink>.
+            An access log may include which URL was requested, 
+            when the request was made, which user made the request, a session ID associated with the request,  
+            how long the server spent processing the request, how large the response was, 
+            and whether the processing resulted in any errors.  The access log is the primary data 
+            source for many user analytics packages.  If you are writing a web application, access 
+            logging is a powerful tool for understanding how users are accessing your application 
+            and how their behavior changes over time.</para>
+            <para>Many applications implement custom authentication methods, without integrating these 
+            methods into the container's standard authentication methods.  Whether or not this is a  
+            good idea is a separate issue, but at the very least these applications lose association  
+            between a specific user account and the info in the access logs.  Therefore you can only understand  
+            how your users behave as an entire community, not as individuals or classes. You can make inferences 
+            from session ID and unique IP address, but you generally won't know which roles
+            are attached to which requests.</para>
+            <para>Even in cases where you know which user caused a request, access logs do not directly tie requests to resource utilization 
+            and system behavior. Why did the request take so long to process?  Why is the response 
+            so large?  What parameters were provided with the request?  You may have separate logging 
+            of database activity or maybe even method calls, but you generally must correlate events using 
+            timestamps.  If you have a high volume application in which many events often happen within 
+            the same second, this is actually impossible to do with any reasonable accuracy.</para>
+        </section>
+        
+        <section>
+            <title>Logging Toolkits</title>
+            <para>The use of toolkit logging 
+            (<ulink url="http://java.sun.com/j2se/1.4.2/docs/guide/util/logging/">Java Logging API</ulink>, 
+            <ulink url="http://commons.apache.org/logging/">Apache Commons Logging</ulink>, 
+            <ulink url="http://logging.apache.org/log4j/1.2/index.html">log4j</ulink>) is widely practiced 
+            in the global Java development community.  Logging statements allow you to select which 
+            information will be most useful for your own troubleshooting. 
+            Logging toolkits are highly configurable and allow you to dynamically increase 
+            the volume of information in areas where trouble is suspected.</para>
+            <para>One major limitation of toolkits is that high volume logging is expensive -- it fills 
+            up your disk and takes processor time away from your application.  Learning when and what to log 
+            is an art that most programmers acquire naturally and will not be discussed here.  But even 
+            the most skillful programmer will frequently experience the logging hole: information 
+            seems to pour out of every part of the system except the one that is behaving badly. 
+            After all, if you knew it was going to be a problem, you wouldn't have written it that way, 
+            right?  The proactive, compile-time nature of logging is its essential weakness. Zealously adding a logging 
+            statement at every conditional branch, at every method open and close, and at every object 
+            instantiation and finalization is time-consuming, error-prone, erodes application 
+            performance, decreases code legibility, and generates log noise that distracts from 
+            the truly valuable information you are logging. A unique frustration of troubleshooting a flagging system 
+            is discovering that a critical stacktrace has been rotated out of existence by 
+            a debug message that is being logged every 3 seconds.  Of course you can then tune 
+            your configuration appropriately, but at that point you must wait for your error to happen again. Even so you 
+            can't add logging statements without a recompile / redeploy, which in tightly 
+            controlled environments may be difficult or entirely forbidden.</para>
+            <para>Assume that you have precisely predicted your logging needs, and have a calibrated 
+            configuration that tells you exactly what your system is doing. Still, like access logging, you must often do  
+            extra work to infer relationships between the toolkit logging and 
+            other streams of information (database logs, access logs, performance monitors).</para>
+        </section>
+        
+        <section>
+            <title>Profilers, Performance Logging</title>
+            <para>The Java virtual machine now hosts a <ulink url="http://java.sun.com/docs/performance/">rich toolset</ulink> 
+            for logging performance data about an application -- method calls, class construction and destruction, garbage
+            collector behavior.  Profiling tools like <ulink url="http://www.eclipse.org/tptp/">Eclipse TPTP</ulink> 
+            allow you to connect to a virtual machine and mine this data in exhaustive detail.</para>
+            <para>This is excellent in a test environment; but at time of this writing and for a long 
+            time before, a profiler is not a tool that can be easily used in production.  The 
+            impact on system responsiveness is massive, and interference from monitoring can 
+            obscure the source of the problem.  Profilers are generally a &quot;last mile&quot; tool -- 
+            you've identified the problem scenario (which users, what they are doing, when), 
+            can reproduce the problem in a controlled environment, and want to know what the 
+            problem is at the level of bits and booleans.  Even less invasive tools like  
+            verbose GC and allocation logging must be used with care (usually reactively), 
+            and again require tedious correlation analysis with other data sources to arrive 
+            at meaningful results.</para>
+        </section>
+    </section>
+    
+    <section>
+        <title>Where beet Fits</title>
+        <para>From the above discussion, there are some obvious needs not <emphasis>easily</emphasis> met by existing tools:
+        <orderedlist>
+        <listitem><para>Easy addition of instrumentation at runtime, not compile-time</para></listitem>
+        <listitem><para>Logging that is both detailed (method-call granularity) and low-overhead, so that it 
+        can <emphasis>always</emphasis> be active, even in production</para></listitem>
+        <listitem><para><emphasis role="bold">most importantly</emphasis>, strong correlation of events across multiple layers of  
+        a system, so that you know which request triggered that expensive SQL statement without needing to infer it.</para></listitem>
+        </orderedlist>
+        </para>
+        <para>beet aims to balance these needs against each other, so that you can react with more  
+        focus to production problems, and so that you can proactively understand how users behave as you  
+        consider ways to grow your system. The ideal use of beet combines it with judicious toolkit 
+        logging, system resource monitoring, and JMX console access to provide you with a profoundly detailed portrait 
+        of your live production system.</para>
+        
+        <section>
+            <title>Why Spring?</title>
+            <para>The first release of beet targets <ulink url="http://www.springframework.org">Spring</ulink> 
+            applications exclusively.  This is mostly because of Spring's 
+            excellent runtime AOP support, which is critical to beet's aim of zero code modification.
+            Spring is also unusual in being of generally high quality, completely free, and wildly popular.  Finally,
+            many other important frameworks make Spring compatibility a priority.</para>
+            <para>Still, the core components of beet are not tightly coupled to Spring and support for other
+            deployment scenarios is conceivable.  Deployment in a pure EJB3 container is a likely target for a 
+            future release.</para>
+        </section>
+        
+        <section>
+            <title>Commercial and Open-Source Alternatives</title>
+            <para>There are many high-quality commercial alternatives.  If closed-source and/or commercial tools 
+            are an option for you, make sure you evaluate a few.  We won't specifically endorse any of them here, 
+            however :).  Generally the benefit of a commercial alternative will be in the out-of-the-box data 
+            analysis tools; with our library, you mostly get the data, and what you do with it is your business. 
+            Many portal application servers (Sun Glassfish and BEA WebLogic come to mind) have some behavior 
+            tracking features; make sure you consider the capabilities of your target platform.  Even if you have 
+            some tools available, beet may offer you something in simplicity, flexibility, and performance.</para>
+            
+            <para>There is a growing body of excellent open source projects out there geared toward 
+            gathering performance metrics and monitoring a production system.  You may want to evaluate:
+            <itemizedlist>
+                <listitem><para><ulink url="http://jamonapi.sourceforge.net/">JAMon</ulink></para></listitem>
+                <listitem><para><ulink url="http://perf4j.codehaus.org/">Perf4j</ulink></para></listitem>
+                <listitem><para><ulink url="https://helios.dev.java.net/">Helios</ulink></para></listitem>
+                <listitem><para><ulink url="https://sourceforge.net/projects/jmeasurement2">jmeasurement</ulink></para></listitem>
+            </itemizedlist>
+            and there are many others.  Each tool has advantages and drawbacks.  Beet is focused on delivering:
+            <itemizedlist>
+                <listitem><para><emphasis>Single event granularity</emphasis>.  Many tools take the approach of
+                statistical aggregation to monitor quality-of-service.  While you can use beet in this way, beet 
+                also maintains detailed information about individual executions (method calls, HTTP requests, SQL statements)
+                and how those executions are nested for more effective post-mortem analysis of system outages.  
+                This configurable level of detail includes parameter values and user names.</para></listitem>
+                <listitem><para><emphasis>Deploy-time installation</emphasis>.  Beet is designed for use in existing
+                production applications, without necessitating a recompile.</para></listitem>
+                <listitem><para><emphasis>Centralized configuration</emphasis>.  All aspects of beet configuration
+                can be centralized in a single Spring configuration file, usually in 3-4 lines of simple markup.</para></listitem>
+                <listitem><para><emphasis>Application scope</emphasis>.  Beet does not require manipulation of the JVM
+                or its runtime parameters, so you can instrument an application when you don't have strong control of
+                the production environment.</para></listitem>
+                <listitem><para><emphasis>Integration</emphasis>.  Beet is designed for high-performance, meaningful data capture.
+                It exposes data through JMX or XML to integrate with other popular monitoring and aggregation tools, rather 
+                than providing monolithic data analysis services.</para></listitem>
+            </itemizedlist>
+            </para>
+            
+            <section>
+                <title>Related Tools</title>
+                <para>As described in <xref linkend="chapter_jmx_administration"/>, beet can export mbeans for
+                integration with JMX monitoring tools.  Besides jconsole (which ships standard with an SDK install),
+                some open source tools worth considering in this role:
+                <itemizedlist>
+                    <listitem><para><ulink url="http://www.hyperic.com/">Hyperic HQ</ulink></para></listitem>
+                    <listitem><para><ulink url="http://mc4j.org/confluence/display/mc4j/Home">MC4J</ulink></para></listitem>
+                    <listitem><para><ulink url="http://www.jmanage.org/">jmanage</ulink></para></listitem>
+                </itemizedlist>
+                You should also check out <ulink url="http://messadmin.sourceforge.net/">MessAdmin</ulink> for examining
+                and administering session state in JEE applications.</para>
+            </section>
+            
+        </section>
+    </section>
+</chapter>
+
+<chapter id="chapter_configuration">
+   <title>Configuration Reference</title>
+
+   <para>Most configuration is accomplished by importing the custom config namespace into
+   your Spring bean definition file, and then using it to define the appropriate elements.
+   You can find probably find an example in <xref linkend="config_examples"/> and then customize
+   it to suit your needs using the schema reference in <xref linkend="config_schema"/>.</para>
+   
+   <para>Unless otherwise specified, all schema elements support the "id" attribute for injection into
+   other Spring beans, in addition to those listed here.</para>
+   
+   <section id="config_examples">
+      <title>Configuration Examples</title>
+      <para>The simplest example in <xref linkend="chapter_getting_started"/> should suit most applications.
+      Here are some common (and less common) customizations:</para>
+        <example>
+            <title>Store performance logs in the Tomcat logs directory</title>
+            <programlisting><![CDATA[<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:bt="http://beet.sourceforge.net/schema/bt/1.1"
+       xsi:schemaLocation="
+          http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+          http://beet.sourceforge.net/schema/bt/1.1        http://beet.sourceforge.net/schema/bt/mtgi-bt-1.1.xsd">
+
+   <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>]]><co id="placeholder"/><![CDATA[
+   
+   <bt:manager application="myapp">
+      <bt:xml-persister file="${catalina.home}/logs/myapp-beet.xml"/>]]><co id="log-location"/><![CDATA[
+   </bt:manager>]]></programlisting>
+            <calloutlist>
+                <callout arearefs="placeholder"><para>This spring utility class is required to use
+                system properties like catalina.home in your Spring configuration.</para></callout>
+                <callout arearefs="log-location"><para>Tomcat defines the catalina.home system property, which
+                is useful for specifying server-relative paths in the configuration.
+                The file extension listed here will be replaced at runtime with one appropriate
+                to the log settings; for example, ".gz" is appended if log compression is enabled 
+                (which is the default).</para></callout>
+            </calloutlist>
+        </example>
+        
+        <example>
+            <title>Monitor application performance from a JMX console</title>
+            <programlisting><![CDATA[<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:bt="http://beet.sourceforge.net/schema/bt/1.1"
+       xsi:schemaLocation="
+          http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+          http://beet.sourceforge.net/schema/bt/1.1        http://beet.sourceforge.net/schema/bt/mtgi-bt-1.1.xsd">
+
+   <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>]]><co id="placeholder"/><![CDATA[
+   
+   <bt:manager application="myapp">
+      <bt:persister-chain>
+         <bt:xml-persister/>]]><co id="otherPersister"/><![CDATA[
+         <bt:mbean-persister/>]]><co id="mbeanPersister"/><![CDATA[
+      </bt:persister-chain>
+   </bt:manager>]]></programlisting>
+            <calloutlist>
+                <callout arearefs="otherPersister"><para>You can use mbean-persister by itself,
+                but we recommend using it in combination with another persister that actually
+                stores the data for later analysis.</para></callout>
+                <callout arearefs="mbeanPersister"><para><xref linkend="elt_mbean_persister" endterm="elt_mbean_persister_title"/> 
+                enables export of basic statistics mbeans to a JMX server.</para></callout>
+            </calloutlist>
+        </example>
+
+        <example>
+            <title>Use a custom SessionContext implementation to specify user IDs</title>
+            <programlisting><![CDATA[<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:bt="http://beet.sourceforge.net/schema/bt/1.1"
+       xsi:schemaLocation="
+          http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+          http://beet.sourceforge.net/schema/bt/1.1        http://beet.sourceforge.net/schema/bt/mtgi-bt-1.1.xsd">
+        
+   <bt:manager application="myapp">
+      <bt:session-context class="com.me.MySessionContextImpl]]><co id="custom-sc"/><![CDATA["/>
+   </bt:manager>]]></programlisting>
+            <calloutlist>
+                <callout arearefs="custom-sc"><para>This class must implement 
+                <ulink url="../../api/com/mtgi/analytics/SessionContext.html">com.mtgi.analytics.SessionContext</ulink>.
+                The <xref linkend="elt_session_context" endterm="elt_session_context_title"/> element is otherwise
+                a normal Spring bean definition, and may include nested property elements and so on.</para></callout>
+            </calloutlist>
+        </example>
+        
+        <example>
+            <title>Send tracking data for different packages to different log files</title>
+            <programlisting><![CDATA[<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:bt="http://beet.sourceforge.net/schema/bt/1.1"
+       xsi:schemaLocation="
+          http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+          http://beet.sourceforge.net/schema/bt/1.1        http://beet.sourceforge.net/schema/bt/mtgi-bt-1.1.xsd">
+        
+   <bt:config>
+      <bt:manager id="loggerA]]><co id="multiple-managers"/><![CDATA[" application="myapp"
+                  track-method-expression="execution(* com.mtgi.package_a..*Tracked(..))">
+         <bt:xml-persister file="log-a.xml"/>
+      </bt:manager>
+      <bt:manager id="loggerB" application="myapp"
+                  track-method-expression="execution(* com.mtgi.package_b..*Tracked(..))">
+         <bt:xml-persister file="log-b.xml"/>]]><co id="multiple-executors"/><![CDATA[
+      </bt:manager>
+   </bt:config>]]></programlisting>
+            <calloutlist>
+                <callout arearefs="multiple-managers"><para>When specifying multiple &lt;bt:manager&gt; instances
+                in a single application, you must provide unique IDs for each.</para></callout>
+                <callout arearefs="multiple-executors"><para>An important consequence of having multiple
+                managers in a single application is that each will define a private thread pool for persistence
+                operations.  If you want to have them all share a thread pool (which is not a bad idea), 
+                use the <xref linkend="elt_manager" endterm="elt_manager_title"/> attribute "task-executor".</para></callout>
+            </calloutlist>
+        </example>
+
+        <example>
+            <title>Integrate beet with other AOP advice</title>
+            <programlisting><![CDATA[<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:bt="http://beet.sourceforge.net/schema/bt/1.1"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="
+          http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+          http://www.springframework.org/schema/tx    http://www.springframework.org/schema/tx/spring-tx-2.0.xsd
+          http://beet.sourceforge.net/schema/bt/1.1        http://beet.sourceforge.net/schema/bt/mtgi-bt-1.1.xsd
+          http://www.springframework.org/schema/aop   http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
+        
+   <bt:manager/>]]><co id="no-expression"/><![CDATA[
+        
+   <bt:advice id="btAdvice"/>]]><co id="advice-manager"/><![CDATA[
+   <tx:advice id="txAdvice"/>
+                
+   <aop:config>
+      <aop:pointcut id="trackedOperations" expression="execution(* com.mtgi..*Service(..))" />
+      <aop:advisor id="behaviorTrackingAdvisor" advice-ref="btAdvice" pointcut-ref="trackedOperations" order="1"/>
+      <aop:advisor id="transactionAdvisor" advice-ref="txAdvice" pointcut-ref="trackedOperations" order="2"/>]]><co id="advice-ordering"/><![CDATA[
+   </aop:config>]]></programlisting>
+            <calloutlist>
+                <callout arearefs="no-expression"><para>We have intentionally not specified a pointcut expression
+                here, since we're going to be including that with the rest of our AOP config below.</para></callout>
+                <callout arearefs="advice-manager"><para>If you want to associate behavior tracking advice
+                with a manager other than the default instance, you can use the "tracking-manager" attribute to do so.</para></callout>
+                <callout arearefs="advice-ordering"><para>By specifying a lower order for the behavior tracking advice, 
+                we've ensured that behavior tracking metrics include time spent on transaction synchronization.</para></callout>
+            </calloutlist>
+        </example>
+
+        <example>
+            <title>Register Beet JMX MBeans</title>
+            <programlisting><![CDATA[<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:bt="http://beet.sourceforge.net/schema/bt/1.1"
+       xsi:schemaLocation="
+          http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+          http://beet.sourceforge.net/schema/bt/1.1        http://beet.sourceforge.net/schema/bt/mtgi-bt-1.1.xsd">
+        
+   <bt:manager application="myapp" register-mbeans="true"]]><co id="jmx-naming"/><![CDATA[/>
+        ]]></programlisting>
+            <calloutlist>
+                <callout arearefs="jmx-naming"><para>This attribute exposes MBeans for both
+                the Beet manager bean and the Beet logging bean.  Both of these MBeans are
+                contained in a domain with the application name; in this case, "myapp".</para>
+                <para>If you want more fine-grained control over which beans are registered,
+                which MBean server registers them, or how they are named, you can use Spring's
+                standard JMX support classes to accomplish this.</para></callout>
+            </calloutlist>
+        </example>
+   </section>
+  
+   <section id="config_web">
+      <title>The Behavior Tracking Servlet Filter</title>
+      <para>As mentioned in <xref linkend="chapter_getting_started"/>, HTTP request tracking can be enabled either
+      in spring configuration via inclusion of <xref linkend="elt_http_requests" endterm="elt_http_requests_title"/>
+      or as a servlet filter.  The primary difference is that the serlvet filter can record response codes and error
+      messages in the event log.
+        <example>
+            <title>Defining BehaviorTrackingFilter in web.xml</title>
+            <programlisting><![CDATA[<?xml version="1.0"?>
+            
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
+         version="2.4">
+         
+   ...
+   <!-- normal web.xml configuration up to this point -->
+   
+   <!-- enable behavior tracking for servlet requests -->
+   <filter>
+      <filter-name>trackingFilter</filter-name>
+      <filter-class>com.mtgi.analytics.servlet.BehaviorTrackingFilter</filter-class>
+      <init-param>
+         <param-name>com.mtgi.analytics.parameters.include</param-name>]]><co id="filter-params"/><![CDATA[
+         <param-value>dispatch</param-value>
+      </init-param>
+      <init-param>
+         <param-name>com.mtgi.analytics.parameters.name</param-name>]]><co id="filter-name"/><![CDATA[
+         <param-value>dispatch</param-value>
+      </init-param>
+      <init-param>
+         <param-name>com.mtgi.analytics.servlet.event</param-name>]]><co id="filter-type"/><![CDATA[
+         <param-value>http-request</param-value>
+      </init-param>
+      <init-param>
+         <param-name>com.mtgi.analytics.manager</param-name>]]><co id="filter-manager"/><![CDATA[
+         <param-value>defaultTrackingManager</param-value>
+      </init-param>
+   </filter>
+
+   <filter-mapping>
+      <filter-name>trackingFilter</filter-name>
+      <servlet-name>action</servlet-name>
+      <dispatcher>REQUEST</dispatcher>
+   </filter-mapping>
+             
+</web-app>]]></programlisting>
+            <calloutlist>
+                <callout arearefs="filter-params"><para>An optional comma-separated list of parameters to include
+                in the event data logs.  If unspecified, all parameters are logged.</para></callout>
+                <callout arearefs="filter-name"><para>An optional comma-separated list of parameters to include
+                with the request URI in the event name.  If unspecified, no parameters are included in the name.</para></callout>
+                <callout arearefs="filter-type"><para>The value to specify for "event-type" in the event data
+                logs.  Primarily useful if you want to define several different filters and be able to identify
+                which generated each event.  Defaults to "http-request" if unspecified.</para></callout>
+                <callout arearefs="filter-manager"><para>The Spring bean name of the BehaviorTrackingManager used
+                to log events.  Defaults to "defaultTrackingManager" if unspecified (if you only have one &lt;bt:manager&gt;
+                tag in your Spring configuration, you should not need this parameter).</para></callout>
+            </calloutlist>
+        </example>
+      </para>
+   </section>
+   
+   <xi:include href="ch3_configuration_schema.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+   
+</chapter>
+
+<chapter id="chapter_jmx_administration">
+    <title>JMX Integration</title>
+    <para>Beet offers two major JMX features: <xref linkend="section_beet_admin" endterm="beet_admin_title"/> 
+    for admininistering beet itself, and <xref linkend="section_beet_statistics" endterm="beet_statistics_title"/> 
+    for monitoring the performance of your application.</para>
+    <section id="section_beet_admin">
+        <title id="beet_admin_title">Beet Administrative MBeans</title>
+        <para>To enable JMX administration of beet, add the <literal>register-mbeans</literal> attribute to 
+        your <xref linkend="elt_manager" endterm="elt_manager_title" /> tag:
+        <example>
+            <title>Activating Beet Administration MBeans</title>
+            <programlisting><![CDATA[<bt:manager id="myManager"]]><co id="groupName"/><![CDATA[
+            application="myapp"]]><co id="domainName"/><![CDATA[
+            register-mbeans="true"]]><co id="mbeans"/><![CDATA[
+            track-method-expression="execution(* com.mtgi.analytics..*Tracked(..))"/>]]></programlisting>
+            <calloutlist>
+                <callout arearefs="groupName"><para>The <literal>id</literal> value will be used as the <literal>group</literal> name
+                in registered MBeans.  If you don't specify an id, the default value <literal>defaultTrackingManager</literal>
+                is used.</para></callout>
+                <callout arearefs="domainName"><para>The required <literal>application</literal> value will be used as the <literal>domain</literal> name
+                in registered MBeans.</para></callout>
+                <callout arearefs="mbeans"><para>"true" enables mbean registration.  This optional attribute is false by default.</para></callout>
+            </calloutlist>
+        </example>
+        </para>
+        <para>Following the example above, an MBean named <literal>testApp:package=com.mtgi.analytics,group=myManager,name=BeetManager</literal>
+        will be registered with the platform JMX server.  This MBean defines the following attributes and operations:
+            <segmentedlist><?dbhtml list-presentation="table"?>
+                <title>BeetManager MBean Features</title>
+                <segtitle>Name</segtitle>
+                <segtitle>Type</segtitle>
+                <segtitle>Description</segtitle>
+                <seglistitem>
+                    <seg>Application</seg>
+                    <seg>attribute</seg>
+                    <seg>The application name recorded with all events originating in this manager.  This should be
+                    the same value as the domain name of the MBean.</seg>
+                </seglistitem>
+                <seglistitem>
+                    <seg>Suspended</seg>
+                    <seg>attribute</seg>
+                    <seg>True if this manager is suspended, false otherwise (see "suspend" and "resume" operations).</seg>
+                </seglistitem>
+                <seglistitem>
+                    <seg>EventsPendingFlush</seg>
+                    <seg>attribute</seg>
+                    <seg>The number of events which have been recorded but not yet flushed to the persisters.  See
+                    the "flush" operation.</seg>
+                </seglistitem>
+                <seglistitem>
+                    <seg>flush</seg>
+                    <seg>operation</seg>
+                    <seg>Flush all completed events to the persisters.  This is normally done automatically according
+                    to the flush interval (default 5 minutes) or when the flush threshold is exceeded (default 100 events), 
+                    whichever comes first.  Manual flush is useful if you don't want to wait until the next natural flush
+                    to analyze event data.  The EventsPendingFlush attribute value will tell you how many events have
+                    been recorded but not yet flushed to the persisters.</seg>
+                </seglistitem>
+                <seglistitem>
+                    <seg>suspend</seg>
+                    <seg>operation</seg>
+                    <seg>Suspend recording of events.  No events captured while suspect will be persisted.</seg>
+                </seglistitem>
+                <seglistitem>
+                    <seg>resume</seg>
+                    <seg>operation</seg>
+                    <seg>Resume recording of events if suspended.  If not suspended, this operation has no effect.</seg>
+                </seglistitem>
+            </segmentedlist>
+        </para>
+        <para>If you are using <xref linkend="elt_xml_persister" endterm="elt_xml_persister_title" /> (the default), 
+        another MBean called <literal>BeetLog</literal> is also registered for log control.
+        Following the example above, this MBean will be named <literal>testApp:package=com.mtgi.analytics,group=myManager,name=BeetLog</literal>.
+        BeetLog supports the following attributes and operations:
+            <segmentedlist><?dbhtml list-presentation="table"?>
+                <title>BeetLog MBean Features</title>
+                <segtitle>Name</segtitle>
+                <segtitle>Type</segtitle>
+                <segtitle>Description</segtitle>
+                <seglistitem>
+                    <seg>Binary</seg>
+                    <seg>attribute</seg>
+                    <seg><para>If true, binary XML (FastInfoSet) data is written to the log file.  If false, plain UTF-8
+                    text XML is written.  Binary XML is recommended for production systems; see <xref linkend="section_log_analysis"/>
+                    for information on manipulating binary XML log data.</para>
+                    <para>Changes to the value of this attribute only take affect after the next log rotation.</para></seg>
+                </seglistitem>
+                <seglistitem>
+                    <seg>Compress</seg>
+                    <seg>attribute</seg>
+                    <seg><para>If true, log file data is GZIP compressed.  Compression can be enabled separately or in combination with
+                    <literal>Binary</literal> logging.  Compressed logging is recommended for production systems.</para>
+                    <para>Changes to the value of this attribute only take affect after the next log rotation.</para></seg>
+                </seglistitem>
+                <seglistitem>
+                    <seg>FileSize</seg>
+                    <seg>attribute</seg>
+                    <seg>The length, in bytes, of the active log file.</seg>
+                </seglistitem>
+                <seglistitem>
+                    <seg>rotateLog</seg>
+                    <seg>operation</seg>
+                    <seg>Force a log rotation.  This operation is normally performed automatically, every day at midnight by default.
+                    The return value is the absolute path to the newly created log archive file.  If you manually rotate a log file,
+                    it will probably be useful to first execute the <literal>flush</literal> operation on the <literal>BeetManager</literal>
+                    MBean to make sure all of the event data in memory has been flush.</seg>
+                </seglistitem>
+            </segmentedlist>
+            <mediaobject>
+                <imageobject><imagedata fileref="images/reference/jconsole-mbeans.png" format="PNG" align="center"/></imageobject>
+                <textobject><phrase>Beet Administrative MBeans</phrase></textobject>
+                <caption><para>JConsole 6 with Beet MBeans</para></caption>
+            </mediaobject>
+        </para>
+    </section>
+    <section id="section_beet_statistics">
+        <title id="beet_statistics_title">Beet Statistical MBeans</title>
+        <para>Beet records very detailed data (at the single event level) via the xml or jdbc peristers.
+        If you want access to higher-level aggregate statistics at runtime, without necessitating direct access to
+        the logs, you can configure the <xref linkend="elt_mbean_persister" endterm="elt_mbean_persister_title"/>.
+        This is also a useful strategy for integrating beet statistics with system monitoring tools that support JMX.
+        <example>
+            <title>Activating Beet Statistical MBeans</title>
+            <programlisting><![CDATA[<bt:manager application="myapp"]]><co id="domainName"/><![CDATA[
+            track-method-expression="execution(* com.mtgi.analytics..*Tracked(..))">
+               <bt:persister-chain>]]><co id="persisterChain"/><![CDATA[
+                  <bt:xml-persister/>
+                  <bt:mbean-persister/>
+               </bt:persister-chain>
+</bt:manager>]]></programlisting>
+            <calloutlist>
+                <callout arearefs="domainName"><para>Like the <xref linkend="section_beet_admin" endterm="beet_admin_title"/>, 
+                the <literal>application</literal> attribute value is used as the domain name of statistical MBeans.</para></callout>
+                <callout arearefs="persisterChain"><para>While you can use the <xref linkend="elt_mbean_persister" endterm="elt_mbean_persister_title"/>
+                by itself, it is recommended that you use it as part of a <xref linkend="elt_persister_chain" endterm="elt_persister_chain_title"/>
+                so that your data is saved for later, deeper analysis.</para></callout>
+            </calloutlist>
+        </example>
+        </para>
+        <para>When the mbean persister is registered, a single MBean is created in your application domain
+        for each distinct type of event.  MBeans are also named hierarchically according to their parent events.
+        For example, statistics for the Java method <literal>MyClass.myMethod</literal> invoked from the 
+        HTTP request <literal>/myApp/save.do</literal> are tracked separately than statistics for the same
+        method when invoked from the HTTP request <literal>/myApp/delete.do</literal>.  All statistics MBeans support
+        the following operations and attributes:
+            <segmentedlist><?dbhtml list-presentation="table"?>
+                <title>Beet Statistics MBean Features</title>
+                <segtitle>Name</segtitle>
+                <segtitle>Type</segtitle>
+                <segtitle>Description</segtitle>
+                <seglistitem>
+                    <seg>Count</seg>
+                    <seg>attribute</seg>
+                    <seg>The number of times this event has occurred.</seg>
+                </seglistitem>
+                <seglistitem>
+                    <seg>ErrorCount</seg>
+                    <seg>attribute</seg>
+                    <seg>The number of times this event ended in error.</seg>
+                </seglistitem>
+                <seglistitem>
+                    <seg>AverageTime</seg>
+                    <seg>attribute</seg>
+                    <seg>The average execution time, in the selected unit.</seg>
+                </seglistitem>
+                <seglistitem>
+                    <seg>MaxTime</seg>
+                    <seg>attribute</seg>
+                    <seg>The maximum execution time, in the selected unit.</seg>
+                </seglistitem>
+                <seglistitem>
+                    <seg>MinTime</seg>
+                    <seg>attribute</seg>
+                    <seg>The minimum execution time, in the selected unit.</seg>
+                </seglistitem>
+                <seglistitem>
+                    <seg>StandardDeviation</seg>
+                    <seg>attribute</seg>
+                    <seg>The standard deviation from the mean, in the selected unit.</seg>
+                </seglistitem>
+                <seglistitem>
+                    <seg>LastInvocation</seg>
+                    <seg>attribute</seg>
+                    <seg>The most recent date and time at which this event occurred.</seg>
+                </seglistitem>
+                <seglistitem>
+                    <seg>Units</seg>
+                    <seg>attribute</seg>
+                    <seg>The unit of measure for max, min, average, and stddev.  
+                    Valid values are seconds, milliseconds, and nanoseconds.
+                    Defaults to milliseconds if unspecified.</seg>
+                </seglistitem>
+                <seglistitem>
+                    <seg>reset</seg>
+                    <seg>operation</seg>
+                    <seg>Reset statistics for this type of event.</seg>
+                </seglistitem>
+            </segmentedlist>
+            <mediaobject>
+                <imageobject><imagedata fileref="images/reference/jconsole-statistics-mbeans.png" format="PNG" align="center"/></imageobject>
+                <textobject><phrase>Beet Statistical MBeans</phrase></textobject>
+                <caption><para>JConsole 6 with Beet Statistical MBeans.  Note the hierarchical grouping of events,
+                so that we can quantify the impact of jdbc updates on the method that triggered them, and in turn
+                the impact of that method on the URI that invoked it.</para></caption>
+            </mediaobject>
+        </para>
+    </section>
+</chapter>
+
+<chapter id="chapter_api_reference">
+    <title>Programmer Reference</title>
+    <para>You only need to refer to the API documentation if you plan to write new persisters, application-specific modules, or log analysis utilities. 
+    For most applications the provided tools should be adequate.
+    <segmentedlist><?dbhtml list-presentation="table"?>
+        <title>API Modules</title>
+        <segtitle>JavaDocs</segtitle>
+        <segtitle>Description</segtitle>
+        <seglistitem>
+            <seg><ulink url="../../api/core/index.html">Beet Core API</ulink></seg>
+            <seg>beet core interfaces and utility classes.  
+            This library is packaged as <literal>beet-[version].jar</literal>.
+            This package contains interfaces you must implement for custom persistence 
+            mechanisms and user identity providers.</seg>
+        </seglistitem>
+        <seglistitem>
+            <seg><ulink url="../../api/utils/index.html">Beet Utils API</ulink></seg>
+            <seg>is a library useful for manipulating common behavior tracking log formats.  These
+            tools are primarily intended for command line use, but can be programmatically extended
+            to support custom data loaders.  This API is packaged as beet-utils-[version].jar.</seg>
+        </seglistitem>
+    </segmentedlist>
+    </para>
+    <section>
+        <title>Third-party Dependencies</title>
+        <para>Beet is obviously built for and depends on Spring Framework.  There are also a handful of other
+        open source tools distributed with beet.  The <ulink url="http://beet.sourceforge.net/dependencies">Ivy Dependency Report</ulink>
+        contains a technical summary of third-party library requirements for compilation, testing, and deployment. 
+        Here is a more practical summary of libraries required by beet-core and beet-utils at runtime:
+            <segmentedlist><?dbhtml list-presentation="table"?>
+                <title>Beet Third-Party Dependencies</title>
+                <segtitle>Project</segtitle>
+                <segtitle>Required By</segtitle>
+                <segtitle>Included?</segtitle>
+                <segtitle>Description</segtitle>
+                <segtitle>License</segtitle>
+                <segtitle>Home Page</segtitle>
+                <segtitle>Supported</segtitle>
+                <seglistitem>
+                    <seg><?dbhtml term-width="30ex"?>
+                        <para>Spring Framework</para><para>file(s): spring.jar</para>
+                    </seg>
+                    <seg>Beet Core</seg>
+                    <seg>No</seg>
+                    <seg>At present, Beet is foremost an add-on tool for Spring applications.
+                    Because it is intended to augment an existing application (and to reduce download
+                    size), Spring itself is not included with a Beet release.</seg>
+                    <seg><ulink url="http://www.apache.org/licenses/LICENSE-2.0.html">Apache Software License, 2.0</ulink></seg>
+                    <seg><ulink url="http://www.springframework.org">springframework.org</ulink></seg>
+                    <seg>2.0.*, 2.5.*</seg>
+                </seglistitem>
+                <seglistitem>
+                    <seg>
+                        <para>Quartz</para>
+                        <para>file(s): quartz-all.jar</para>
+                    </seg>
+                    <seg>Beet Core</seg>
+                    <seg>Yes</seg>
+                    <seg>Beet uses the Quartz scheduler to periodically flush events and rotate log files.  Spring
+                    features strong Quartz integration features of its own, so your application may already include
+                    the Quartz scheduler jar.</seg>
+                    <seg><ulink url="http://www.apache.org/licenses/LICENSE-2.0.html">Apache Software License, 2.0</ulink></seg>
+                    <seg><ulink url="http://www.opensymphony.com/quartz/">opensymphony.com/quartz</ulink></seg>
+                    <seg>1.6.0</seg>
+                </seglistitem>
+                <seglistitem>
+                    <seg><para>AspectJ</para><para>file(s): aspectjrt.jar, aspectjweaver.jar</para></seg>
+                    <seg>Beet Core</seg>
+                    <seg>Yes</seg>
+                    <seg>Beet uses AspectJ pointcuts to implement Java method monitoring.</seg>
+                    <seg><ulink url="http://www.mozilla.org/MPL/MPL-1.1.html">Mozilla Public License, 1.1</ulink></seg>
+                    <seg><ulink url="http://www.eclipse.org/aspectj/">www.eclipse.org/aspectj</ulink></seg>
+                    <seg>1.5.3</seg>
+                </seglistitem>
+                <seglistitem>
+                    <seg><para>Code Generation Library</para><para>file(s): cglib.jar</para></seg>
+                    <seg>Beet Core</seg>
+                    <seg>Yes</seg>
+                    <seg>CGLib is a dependency of Spring AOP, required if you want to monitor the execution times of
+                    Java classes that do <emphasis>not</emphasis> implement a business interface.  If all of your
+                    Java classes implement at least one interface, you do not necessarily need to include cglib in your
+                    application.</seg>
+                    <seg><ulink url="http://www.apache.org/licenses/LICENSE-1.1">Apache Software License, 1.1</ulink></seg>
+                    <seg><ulink url="http://cglib.sourceforge.net/">cglib.sourceforge.net</ulink></seg>
+                    <seg>2.1.3</seg>
+                </seglistitem>
+                <seglistitem>
+                    <seg><para>ASM</para><para>file(s): asm.jar</para></seg>
+                    <seg>Beet Core</seg>
+                    <seg>Yes</seg>
+                    <seg>ASM is a requirement of cglib.  If you don't use cglib, you can also remove ASM.</seg>
+                    <seg><ulink url="http://asm.ow2.org/license.html">ASM Project License</ulink></seg>
+                    <seg><ulink url="http://asm.ow2.org/">asm.ow2.org</ulink></seg>
+                    <seg>1.5.3</seg>
+                </seglistitem>
+                <seglistitem>
+                    <seg><para>Apache Commons Logging</para><para>file(s): commons-logging.jar</para></seg>
+                    <seg>Beet Core, Beet Utils</seg>
+                    <seg>Yes</seg>
+                    <seg>Beet classes use the commons-logging framework to log diagnostic and information messages.
+                    A supported version of the commons-logging jar is required for all uses of Beet.</seg>
+                    <seg><ulink url="http://www.apache.org/licenses/LICENSE-2.0.html">Apache Software License, 2.0</ulink></seg>
+                    <seg><ulink url="http://commons.apache.org/logging/">commons.apache.org/logging</ulink></seg>
+                    <seg>1.1.1</seg>
+                </seglistitem>
+                <seglistitem>
+                    <seg><para>FastInfoset</para><para>file(s): FastInfoset.jar</para></seg>
+                    <seg>Beet Core, Beet Utils</seg>
+                    <seg>Yes</seg>
+                    <seg>The Beet XML persister and beet-utils use the FastInfoset encoding when Binary XML logging
+                    is specified.  If you do not use the XML persister, or disable binary logging, you do not need this jar.</seg>
+                    <seg><ulink url="http://www.apache.org/licenses/LICENSE-2.0.html">Apache Software License, 2.0</ulink></seg>
+                    <seg><ulink url="https://fi.dev.java.net/">fi.dev.java.net</ulink></seg>
+                    <seg>1.2.2</seg>
+                </seglistitem>
+                <seglistitem>
+                    <seg><para>StAX API</para><para>file(s): stax-api.jar</para></seg>
+                    <seg>Beet Core, Beet Utils, <emphasis role="bold">Java 5 only</emphasis></seg>
+                    <seg>Yes</seg>
+                    <seg>The Beet XML persister and beet-utils use the XML streaming API for reading
+                    and writing log data.  If your app runs in a Java 6 SDK, or if you do not intend
+                    to use the XML persister, you do not have to include this jar.</seg>
+                    <seg><ulink url="http://www.apache.org/licenses/LICENSE-2.0.html">Apache Software License, 2.0</ulink></seg>
+                    <seg><ulink url="http://stax.codehaus.org/Home">stax.codehaus.org</ulink></seg>
+                    <seg>1.0.1</seg>
+                </seglistitem>
+                <seglistitem>
+                    <seg><para>StAX Implementation</para><para>file(s): stax-impl.jar</para></seg>
+                    <seg>Beet Core, Beet Utils, <emphasis role="bold">Java 5 only</emphasis></seg>
+                    <seg>Yes</seg>
+                    <seg>The Beet XML persister and beet-utils use the XML streaming API for reading
+                    and writing log data.  If your app runs in a Java 6 SDK, or if you do not intend
+                    to use the XML persister, you do not have to include this jar.</seg>
+                    <seg><ulink url="http://www.apache.org/licenses/LICENSE-2.0.html">Apache Software License, 2.0</ulink></seg>
+                    <seg><ulink url="http://stax.codehaus.org/Home">stax.codehaus.org</ulink></seg>
+                    <seg>1.2.0</seg>
+                </seglistitem>
+                <seglistitem>
+                    <seg><para>SAXON</para><para>file(s): saxon.jar, saxon-dom.jar</para></seg>
+                    <seg>Beet Utils</seg>
+                    <seg>Yes</seg>
+                    <seg>The beet-utils XSLT tool uses saxon to execute stylesheet transformations.  We require
+                    a versatile XSLT 2.0 processor, of which saxon is a leading example.</seg>
+                    <seg><ulink url="http://www.mozilla.org/MPL/MPL-1.0.html">Mozilla Public License, 1.0</ulink></seg>
+                    <seg><ulink url="http://saxon.sourceforge.net">saxon.sourceforge.net</ulink></seg>
+                    <seg>8.8</seg>
+                </seglistitem>
+                <seglistitem>
+                    <seg><para>xerces</para><para>file(s): xercesImpl.jar</para></seg>
+                    <seg>Beet Utils</seg>
+                    <seg>Yes</seg>
+                    <seg>beet-utils uses some xerces-specific XML APIs to process log files.</seg>
+                    <seg><ulink url="http://www.apache.org/licenses/LICENSE-1.1">Apache Software License, 1.1</ulink></seg>
+                    <seg><ulink url="http://xerces.apache.org/xerces-j/">xerces.apache.org/xerces-j</ulink></seg>
+                    <seg>2.8.1</seg>
+                </seglistitem>
+            </segmentedlist>
+        </para>
+    </section>
+    
+</chapter>
 
 </book>
