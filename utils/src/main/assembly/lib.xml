@@ -14,12 +14,6 @@
     <fileSets>
         <fileSet>
             <directory>${project.build.directory}/dependency</directory>
-            <includes>
-                <include>commons-logging*.jar</include>
-                <include>Fast*.jar</include>
-                <include>saxon*.jar</include>
-                <include>xerces*.jar</include>
-            </includes>
             <outputDirectory></outputDirectory>
         </fileSet>
     </fileSets>
