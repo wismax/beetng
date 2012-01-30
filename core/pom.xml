@@ -256,34 +256,6 @@
             </plugin>
 
             <plugin>
-                <groupId>com.agilejava.docbkx</groupId>
-                <artifactId>docbkx-maven-plugin</artifactId>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.docbook</groupId>
-                        <artifactId>docbook-xml</artifactId>
-                        <version>4.4</version>
-                        <scope>runtime</scope>
-                    </dependency>
-                </dependencies>
-                <configuration>
-                    <includes>**/index.xml</includes>
-                    <htmlStylesheet>css/stylesheet.css</htmlStylesheet>
-                    <tableBordersWithCss>true</tableBordersWithCss>
-                    <xincludeSupported>true</xincludeSupported>
-                    <chunkedOutput>true</chunkedOutput>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>${build.distribution.bind.phase}</phase>
-                        <goals>
-                            <goal>generate-html</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            
-            <plugin>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
@@ -299,8 +271,6 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
                     <descriptors>
-                        <descriptor>src/main/assembly/reference.xml</descriptor>
-                        <descriptor>src/main/assembly/tutorial.xml</descriptor>
                         <descriptor>src/main/assembly/scripts-sql.xml</descriptor>
                         <descriptor>src/main/assembly/lib.xml</descriptor>
                     </descriptors>

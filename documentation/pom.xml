@@ -16,7 +16,6 @@
     </description>
 
     <build>
-    <!-- 
         <plugins>
             <plugin>
                 <groupId>com.agilejava.docbkx</groupId>
@@ -64,6 +63,5 @@
                 </executions>
             </plugin>
         </plugins>
-     -->
     </build>
 </project>
