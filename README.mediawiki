@@ -33,9 +33,10 @@ Features
 * Low resource overhead, appropriate for production systems
 
 ===Todo list===
-* move all modules to maven build
-* remove all eclipse, ivy and easyant files
-* add beet-hello.war to distribution
+* <del>move all modules to maven build</del>
+* <del>remove all eclipse, ivy and easyant files</del>
+* <del>add beet-hello.war to distribution</del>
+* fix examples list in tutorial
 * create an abstraction on the logging library to remove mandatory dependency
 * split core codebase from spring dependencies
 * create a spring based integration
