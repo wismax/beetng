@@ -153,6 +153,9 @@
         <textobject>
           <para>Beet Hello World application</para>
         </textobject>
+        <caption>
+          <para>Beet Hello World application</para>
+        </caption>
       </mediaobject>
 
       <para>Take a minute to familiarize yourself with the app (there's only
@@ -212,7 +215,7 @@
       [TOMCAT]/webapps/beet-hello/WEB-INF/beet-hello-servlet.xml in your
       favorite text or XML document editor. You should see something that
       starts like this: <example>
-          <title></title>
+          <title>Un-monitored spring application context</title>
 
           <programlisting>&lt;beans xmlns="http://www.springframework.org/schema/beans" 
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -230,7 +233,7 @@
       <para>Add the highlighted code as below:</para>
 
       <para><example>
-          <title></title>
+          <title>Enabling beet tracking</title>
 
           <programlisting>&lt;beans xmlns="http://www.springframework.org/schema/beans"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -256,7 +259,7 @@
 
       <para>For this we just have to add the track-method-expression attribute
       to bt:manager:<example>
-          <title></title>
+          <title>Tracking methods executions</title>
 
           <programlisting>&lt;beans xmlns="http://www.springframework.org/schema/beans"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -284,7 +287,7 @@
 
       <para>We add the bt:tracking-manager attribute to any data source we
       want to track:<example>
-          <title></title>
+          <title>Activate JDBC Statement tracking</title>
 
           <programlisting>&lt;beans xmlns="http://www.springframework.org/schema/beans"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -329,7 +332,7 @@
       <para>The default binary log format is good for production, but for our
       tutorial we'll switch to plain text XML logging, and put the log in a
       sensible location relative to the Tomcat install.<example>
-          <title></title>
+          <title>Use plain text logging</title>
 
           <programlisting>&lt;beans xmlns="http://www.springframework.org/schema/beans
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -372,7 +375,7 @@
     Wait about 30 seconds to 1 minute, and then open up
     [TOMCAT]/logs/beet-hello-perf.xml. You should already see some data
     (formatted here for legibility):<example>
-        <title></title>
+        <title>XML event format example</title>
 
         <programlisting>&lt;event id="6dc8bd6c-c63c-4ecc-803c-9a1bc7dcf4c7"&gt;&lt;type&gt;jdbc&lt;/type&gt;&lt;name&gt;executeUpdate&lt;/name&gt;
    &lt;application&gt;beet-hello&lt;/application&gt;&lt;start&gt;2009-04-23T12:40:03.547-07:00&lt;/start&gt;&lt;duration-ns&gt;0&lt;/duration-ns&gt;
@@ -395,7 +398,7 @@
     least another 30 seconds, and revisit the beet log. It should have a host
     of new data. Here's some data for a single press of the 'delete' button,
     again formatted for legibility:<example>
-        <title></title>
+        <title>More events examples</title>
 
         <programlisting>&lt;event id="244f5f4e-21d0-4044-b71f-ba39bb96cfbd" parent-id="778e4a40-48a8-4386-b93c-72e322663a90"&gt;
     &lt;type&gt;jdbc&lt;/type&gt;&lt;name&gt;executeBatch&lt;/name&gt;&lt;application&gt;beet-hello&lt;/application&gt;
@@ -508,7 +511,7 @@
       editor, and insert the following text near the top:</para>
 
       <para>Windows users:<example>
-          <title></title>
+          <title>Enable JMX remote access on Linux</title>
 
           <programlisting>set JAVA_OPTS=-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=12345 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false</programlisting>
         </example></para>
@@ -516,7 +519,7 @@
       <para>*nix users:</para>
 
       <example>
-        <title></title>
+        <title>Enable JMX remote access on Windows</title>
 
         <programlisting>JAVA_OPTS=-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=12345 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false</programlisting>
       </example>
@@ -528,7 +531,7 @@
       <para>Once again open our spring configuration file
       beet-hello-servlet.xml in a text editor, and add the register-mbeans
       attribute to &lt;bt:manager&gt;:<example>
-          <title></title>
+          <title>Publish the beet mbeans</title>
 
           <programlisting>&lt;beans xmlns="http://www.springframework.org/schema/beans"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -572,6 +575,9 @@
           <textobject>
             <para>VisualVM</para>
           </textobject>
+          <caption>
+            <para>VisualVM</para>
+          </caption>
         </mediaobject></para>
 
       <para>First ensure that the MBeans plugin is installed. Open the
@@ -590,6 +596,10 @@
           <textobject>
             <para>VisualVM - Install MBeans plugin</para>
           </textobject>
+
+          <caption>
+            <para>VisualVM - Install MBeans plugin</para>
+          </caption>
         </mediaobject></para>
 
       <para>Double clic on the <emphasis role="bold">Tomcat</emphasis>
@@ -608,6 +618,10 @@
           <textobject>
             <para>VisualVM - Beet MBeans</para>
           </textobject>
+
+          <caption>
+            <para>VisualVM - Beet MBeans</para>
+          </caption>
         </mediaobject>The <emphasis role="bold">BeetManager</emphasis> bean
       can be used to<itemizedlist>
           <listitem>
@@ -656,7 +670,7 @@
 
       <para>Once again <emphasis role="bold">stop your Tomcat
       server</emphasis>. Open beet-hello-servlet.xml for editing:<example>
-          <title></title>
+          <title>Add the statistics mbean</title>
 
           <programlisting>&lt;beans xmlns="http://www.springframework.org/schema/beans"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -717,6 +731,10 @@
           <textobject>
             <para>VisualVM - Statistics MBeans</para>
           </textobject>
+
+          <caption>
+            <para>VisualVM - Statistics MBeans</para>
+          </caption>
         </mediaobject></para>
 
       <para>The attributes of the <emphasis
@@ -735,7 +753,7 @@
       <title>Refine event groupings</title>
 
       <para>Stop your server and edit beet-hello-servlet.xml:<example>
-          <title></title>
+          <title>Configure the http request events</title>
 
           <programlisting>&lt;beans xmlns="http://www.springframework.org/schema/beans"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -764,6 +782,14 @@
             <imagedata align="center" fileref="images/tutorial/visualvm-5.png"
                        format="PNG" />
           </imageobject>
+
+          <textobject>
+            <para>VisualVM - Drill down in the events</para>
+          </textobject>
+
+          <caption>
+            <para>VisualVM - Drill down in the events</para>
+          </caption>
         </mediaobject></para>
 
       <para>The <emphasis role="bold">name-parameters</emphasis> attribute
@@ -810,6 +836,10 @@
           <textobject>
             <para>Command interpreter</para>
           </textobject>
+
+          <caption>
+            <para>Command interpreter</para>
+          </caption>
         </mediaobject></para>
 
       <para>Leave the terminal window open.</para>
@@ -835,6 +865,10 @@
         <textobject>
           <para>VisualVM - Change logging format</para>
         </textobject>
+
+        <caption>
+          <para>VisualVM - Change logging format</para>
+        </caption>
       </mediaobject>
 
       <para>Since we're changing the log format, these changes only take
@@ -850,6 +884,10 @@
           <textobject>
             <para>VisualVM - Rotate log operation</para>
           </textobject>
+
+          <caption>
+            <para>VisualVM - Rotate log operation</para>
+          </caption>
         </mediaobject></para>
 
       <para>Click the <emphasis role="bold">rotateLog</emphasis> button; you
@@ -862,6 +900,10 @@
           <textobject>
             <para>VisualVM - Rotate log operation result</para>
           </textobject>
+
+          <caption>
+            <para>VisualVM - Rotate log operation result</para>
+          </caption>
         </mediaobject></para>
 
       <para>Use a filesystem browser to examine the [TOMCAT]\logs directory.
@@ -896,6 +938,10 @@
           <textobject>
             <para>VisualVM - Flush in-memory events</para>
           </textobject>
+
+          <caption>
+            <para>VisualVM - Flush in-memory events</para>
+          </caption>
         </mediaobject></para>
 
       <para>The result window indicates the number of events flushed to the

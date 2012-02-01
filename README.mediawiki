@@ -37,7 +37,7 @@ Features
 * <del>remove all eclipse, ivy and easyant files</del>
 * <del>add beet-hello.war to distribution</del>
 * implement the xsd to docbook transformation
-* fix examples list in tutorial
+* <del>fix examples list in tutorial</del>
 * create an abstraction on the logging library to remove mandatory dependency
 * split core codebase from spring dependencies
 * create a spring based integration
