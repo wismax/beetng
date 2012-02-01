@@ -36,6 +36,7 @@ Features
 * <del>move all modules to maven build</del>
 * <del>remove all eclipse, ivy and easyant files</del>
 * <del>add beet-hello.war to distribution</del>
+* implement the xsd to docbook transformation
 * fix examples list in tutorial
 * create an abstraction on the logging library to remove mandatory dependency
 * split core codebase from spring dependencies
